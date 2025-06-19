@@ -35,10 +35,12 @@ jobs:
         env:
           API_KEY: ${{ secrets.API_KEY }}
         run: |
+          echo "Build Step: Ensuring 'src' directory exists."
+          # Create the 'src' directory if it doesn't exist. The -p flag prevents errors if it's already there.
+          mkdir -p src
+
           echo "Build Step: Creating temporary environment file at src/env.js"
           # This command creates a JS file that exports your key as a constant.
-          # This is more robust than using the --define flag.
-          # IMPORTANT: Ensure src/env.js is in your .gitignore file!
           echo "export const API_KEY = '${{ env.API_KEY }}';" > src/env.js
 
           echo "Build Step: Executing esbuild command..."
