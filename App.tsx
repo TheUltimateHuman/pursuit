@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect } from './types';
-import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/geminiService'; 
+import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/geminiService';
 import StoryDisplay from './components/StoryDisplay';
 import ChoicesDisplay from './components/ChoicesDisplay';
 import LoadingIndicator from './components/LoadingIndicator';
@@ -9,11 +8,9 @@ import ApiKeyMissingBanner from './components/ApiKeyMissingBanner';
 import InventoryDisplay from './components/InventoryDisplay';
 import PersistentThreatDisplay from './components/PersistentThreatDisplay';
 import { MAX_PLAYER_HEALTH, SCENARIO_THEMES_LIST } from './constants';
+import { API_KEY } from './env.js'; // Import the key from our new file
 
-const apiKeyFromEnv = (typeof process !== 'undefined' && process.env && typeof process.env.API_KEY === 'string')
-                      ? process.env.API_KEY
-                      : undefined;
-const API_KEY_AVAILABLE = !!apiKeyFromEnv && apiKeyFromEnv.trim() !== "";
+const API_KEY_AVAILABLE = typeof API_KEY === 'string' && API_KEY.trim() !== "";
 
 const MAX_MEMORY_LOG_ENTRIES = 5;
 
@@ -50,12 +47,12 @@ const App: React.FC = () => {
   const [customChoiceText, setCustomChoiceText] = useState<string>("");
 
   useEffect(() => {
-    // Diagnostic log for Netlify deployment
-    console.log("NETLIFY DEBUG: process.env.API_KEY as seen by app:", apiKeyFromEnv);
-    console.log("NETLIFY DEBUG: API_KEY_AVAILABLE evaluates to:", API_KEY_AVAILABLE);
+    // Diagnostic log for the build process
+    console.log("DEBUG: API_KEY as seen by app:", API_KEY ? `Exists (length: ${API_KEY.length})` : 'Does not exist or is not a string');
+    console.log("DEBUG: API_KEY_AVAILABLE evaluates to:", API_KEY_AVAILABLE);
 
     if (!API_KEY_AVAILABLE) {
-      console.error("API_KEY is not available. Please configure it in your environment.");
+      console.error("API_KEY is not available. Check the build process and the generated env.js file.");
     }
   }, []); // Runs once on mount
 
