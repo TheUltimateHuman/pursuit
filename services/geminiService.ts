@@ -1,27 +1,23 @@
 
+// services/geminiService.ts
 
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { GEMINI_MODEL_NAME, GEMINI_SYSTEM_INSTRUCTION_JSON, INITIAL_GAME_PROMPT_JSON } from '../constants';
 import { GeminiApiResponse, PersistentThreat, PlayerAbilityEffect, StoryFlagEffect } from '../types';
-
-// Attempt to read API_KEY from process.env
-const apiKeyFromEnv = (typeof process !== 'undefined' && process.env && typeof process.env.API_KEY === 'string')
-                      ? process.env.API_KEY
-                      : undefined;
-
-export const IS_API_KEY_CONFIGURED: boolean = typeof apiKeyFromEnv === 'string' && apiKeyFromEnv.trim() !== "";
+import { API_KEY } from '../env.js'; // This line is correct
 
 let ai: GoogleGenAI | null = null;
 
-if (IS_API_KEY_CONFIGURED) {
+// This logic correctly uses the imported API_KEY
+if (typeof API_KEY === 'string' && API_KEY.trim() !== '') {
   try {
-    ai = new GoogleGenAI({ apiKey: apiKeyFromEnv as string });
+    ai = new GoogleGenAI({ apiKey: API_KEY });
   } catch (e) {
-    console.error("Critical Error: Failed to initialize GoogleGenAI client. API_KEY from process.env might be invalid or service issue.", e);
-    ai = null; // Ensure ai is null if initialization fails
+    console.error("Critical Error: Failed to initialize GoogleGenAI client during module load. Services will be unavailable.", e);
+    ai = null;
   }
 } else {
-  console.warn("API_KEY is not properly configured in process.env (e.g., undefined, not a string, or empty string). Gemini services will not function.");
+  console.warn("API Key was not imported or is empty. Gemini services will not function.");
 }
 
 
