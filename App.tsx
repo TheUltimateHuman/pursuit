@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect } from './types';
 import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/geminiService'; 
@@ -49,6 +48,17 @@ const App: React.FC = () => {
 
   const [isCustomChoiceInputVisible, setIsCustomChoiceInputVisible] = useState<boolean>(false);
   const [customChoiceText, setCustomChoiceText] = useState<string>("");
+
+  useEffect(() => {
+    // Diagnostic log for Netlify deployment
+    console.log("NETLIFY DEBUG: process.env.API_KEY as seen by app:", apiKeyFromEnv);
+    console.log("NETLIFY DEBUG: API_KEY_AVAILABLE evaluates to:", API_KEY_AVAILABLE);
+
+    if (!API_KEY_AVAILABLE) {
+      console.error("API_KEY is not available. Please configure it in your environment.");
+    }
+  }, []); // Runs once on mount
+
 
   const handleFatalError = useCallback((message: string, gameOver: boolean = true, isNarrativeDefeat: boolean = false, narrativeDemiseScene?: string) => {
     setIsLoading(false);
@@ -427,13 +437,6 @@ const App: React.FC = () => {
     const randomTheme = SCENARIO_THEMES_LIST[randomIndex] || "Unique & Surreal Environments: Abstract Conceptual Realm Made Manifest"; // Fallback
     processApiResponse(fetchInitialStory(randomTheme), true);
   }, [processApiResponse, isLoading]);
-
-
-  useEffect(() => {
-    if (!API_KEY_AVAILABLE) {
-      console.error("API_KEY is not available. Please configure it in your environment.");
-    }
-  }, []); 
 
 
   if (!API_KEY_AVAILABLE) {
