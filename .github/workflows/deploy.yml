@@ -34,9 +34,17 @@ jobs:
         env:
           GH_API_KEY: ${{ secrets.API_KEY }} # Access the secret
         run: |
-          echo "Building with esbuild..."
-          echo "API Key for define (first few chars): ${GH_API_KEY:0:5}..." # For debug, DO NOT log full key
-          npx esbuild index.tsx \
+          echo "Build Step: Checking if GH_API_KEY is set..."
+          if [ -z "$GH_API_KEY" ]; then
+            echo "Error: GH_API_KEY (from secrets.API_KEY) is not set or is empty!" >&2
+            exit 1
+          else
+            echo "Build Step: GH_API_KEY is set. First 5 chars: ${GH_API_KEY:0:5}..."
+          fi
+
+          echo "Build Step: Executing esbuild command..."
+          # Using direct call to esbuild after global installation
+          esbuild index.tsx \
             --bundle \
             --outfile=bundle.js \
             --platform=browser \
@@ -46,7 +54,9 @@ jobs:
             --external:react-dom/client \
             --external:react/jsx-runtime \
             --external:@google/genai \
-            --define:process.env.API_KEY="\"$GH_API_KEY\"" # Correctly inject as string
+            --define:process.env.API_KEY="\"$GH_API_KEY\""
+
+          echo "Build Step: esbuild command finished."
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
