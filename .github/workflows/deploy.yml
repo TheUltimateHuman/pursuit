@@ -47,8 +47,6 @@ jobs:
           echo "Build Step: Constructed DEFINE_ARG: ${DEFINE_ARG}"
 
           echo "Build Step: Executing esbuild command..."
-          # Reverted to npx esbuild, though esbuild globally should also work.
-          # The key is the DEFINE_ARG construction and expansion.
           npx esbuild index.tsx \
             --bundle \
             --outfile=bundle.js \
