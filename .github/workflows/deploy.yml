@@ -42,9 +42,14 @@ jobs:
             echo "Build Step: GH_API_KEY is set. First 5 chars: ${GH_API_KEY:0:5}..."
           fi
 
+          # Construct the define argument
+          DEFINE_ARG="--define:process.env.API_KEY=\"\\\"$GH_API_KEY\\\"\""
+          echo "Build Step: Constructed DEFINE_ARG: ${DEFINE_ARG}"
+
           echo "Build Step: Executing esbuild command..."
-          # Using direct call to esbuild after global installation
-          esbuild index.tsx \
+          # Reverted to npx esbuild, though esbuild globally should also work.
+          # The key is the DEFINE_ARG construction and expansion.
+          npx esbuild index.tsx \
             --bundle \
             --outfile=bundle.js \
             --platform=browser \
@@ -54,7 +59,7 @@ jobs:
             --external:react-dom/client \
             --external:react/jsx-runtime \
             --external:@google/genai \
-            --define:process.env.API_KEY="\"$GH_API_KEY\""
+            ${DEFINE_ARG}
 
           echo "Build Step: esbuild command finished."
 
