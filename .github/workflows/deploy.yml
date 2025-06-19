@@ -1,0 +1,61 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+permissions:
+  contents: read # To checkout the repository
+  pages: write    # To deploy to GitHub Pages
+  id-token: write # To authenticate with OIDC (if needed for advanced deployments, good to have)
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Or your preferred Node.js version
+
+      - name: Install esbuild (globally)
+        run: npm install --global esbuild
+
+      - name: Build application
+        env:
+          GH_API_KEY: ${{ secrets.API_KEY }} # Access the secret
+        run: |
+          echo "Building with esbuild..."
+          echo "API Key for define (first few chars): ${GH_API_KEY:0:5}..." # For debug, DO NOT log full key
+          npx esbuild index.tsx \
+            --bundle \
+            --outfile=bundle.js \
+            --platform=browser \
+            --format=esm \
+            --minify \
+            --external:react \
+            --external:react-dom/client \
+            --external:react/jsx-runtime \
+            --external:@google/genai \
+            --define:process.env.API_KEY="\"$GH_API_KEY\"" # Correctly inject as string
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.' # Upload the root directory (containing index.html and bundle.js)
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
