@@ -6,10 +6,11 @@ on:
       - main # Or your default branch
   workflow_dispatch: # Allows manual triggering from the Actions tab
 
+# Set permissions for the GITHUB_TOKEN for deployment
 permissions:
   contents: read # To checkout the repository
   pages: write    # To deploy to GitHub Pages
-  id-token: write # To authenticate with OIDC (if needed for advanced deployments, good to have)
+  id-token: write # To authenticate with OIDC (if needed, good practice)
 
 jobs:
   build-and-deploy:
@@ -25,28 +26,24 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Or your preferred Node.js version
+          node-version: '20'
+          cache: 'npm' # Cache npm dependencies for faster builds
 
-      - name: Install esbuild (globally)
-        run: npm install --global esbuild
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Build application
+      - name: Build Application
+        # This is the canonical way to handle secrets in a build step.
+        # The secret is securely mapped to an environment variable for this step only.
         env:
-          GH_API_KEY: ${{ secrets.API_KEY }} # Access the secret
+          API_KEY: ${{ secrets.API_KEY }}
         run: |
-          echo "Build Step: Checking if GH_API_KEY is set..."
-          if [ -z "$GH_API_KEY" ]; then
-            echo "Error: GH_API_KEY (from secrets.API_KEY) is not set or is empty!" >&2
-            exit 1
-          else
-            echo "Build Step: GH_API_KEY is set. First 5 chars: ${GH_API_KEY:0:5}..."
-          fi
-
-          # Construct the define argument
-          DEFINE_ARG="--define:process.env.API_KEY=\"\\\"$GH_API_KEY\\\"\""
-          echo "Build Step: Constructed DEFINE_ARG: ${DEFINE_ARG}"
-
           echo "Build Step: Executing esbuild command..."
+          # We run esbuild directly using npx.
+          # The --define flag uses GitHub Actions' expression syntax `${{ env.API_KEY }}`.
+          # This substitution is done by Actions before the shell runs, which is safer and
+          # correctly handles special characters in your API key.
+          # The result passed to esbuild is --define:process.env.API_KEY="<your_actual_key>"
           npx esbuild index.tsx \
             --bundle \
             --outfile=bundle.js \
@@ -57,9 +54,20 @@ jobs:
             --external:react-dom/client \
             --external:react/jsx-runtime \
             --external:@google/genai \
-            ${DEFINE_ARG}
-
+            --define:process.env.API_KEY='"${{ env.API_KEY }}"'
           echo "Build Step: esbuild command finished."
+
+      - name: Verify API Key in bundle.js
+        # CRITICAL DIAGNOSTIC STEP:
+        # This step fails the build if the API key was not injected correctly.
+        run: |
+          if grep -q "process.env.API_KEY" bundle.js; then
+            echo "Error: Build failed. 'process.env.API_KEY' was found literally in bundle.js."
+            echo "This means the esbuild --define flag did NOT work."
+            exit 1
+          else
+            echo "Success: 'process.env.API_KEY' was correctly replaced by esbuild."
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -67,7 +75,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' # Upload the root directory (containing index.html and bundle.js)
+          # Upload the root directory since index.html and bundle.js are there.
+          path: '.'
 
       - name: Deploy to GitHub Pages
         id: deployment
