@@ -1,21 +1,29 @@
+
+
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { GEMINI_MODEL_NAME, GEMINI_SYSTEM_INSTRUCTION_JSON, INITIAL_GAME_PROMPT_JSON } from '../constants';
 import { GeminiApiResponse, PersistentThreat, PlayerAbilityEffect, StoryFlagEffect } from '../types';
-import { API_KEY } from '../env.js'; // This is the correct path
+
+// Attempt to read API_KEY from process.env
+const apiKeyFromEnv = (typeof process !== 'undefined' && process.env && typeof process.env.API_KEY === 'string')
+                      ? process.env.API_KEY
+                      : undefined;
+
+export const IS_API_KEY_CONFIGURED: boolean = typeof apiKeyFromEnv === 'string' && apiKeyFromEnv.trim() !== "";
 
 let ai: GoogleGenAI | null = null;
 
-// The API_KEY is now imported from env.js, which is generated during the build process.
-if (typeof API_KEY === 'string' && API_KEY.trim() !== '') {
+if (IS_API_KEY_CONFIGURED) {
   try {
-    ai = new GoogleGenAI({ apiKey: API_KEY });
+    ai = new GoogleGenAI({ apiKey: apiKeyFromEnv as string });
   } catch (e) {
-    console.error("Critical Error: Failed to initialize GoogleGenAI client during module load. Services will be unavailable.", e);
-    ai = null;
+    console.error("Critical Error: Failed to initialize GoogleGenAI client. API_KEY from process.env might be invalid or service issue.", e);
+    ai = null; // Ensure ai is null if initialization fails
   }
 } else {
-  console.warn("API Key was not imported or is empty. Gemini services will not function.");
+  console.warn("API_KEY is not properly configured in process.env (e.g., undefined, not a string, or empty string). Gemini services will not function.");
 }
+
 
 function parseGeminiJsonResponse<T>(responseText: string): T {
   let originalTextForParsing = responseText;
@@ -29,9 +37,8 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
   let wasPreprocessedChineseComment = false;
   let wasPreprocessedGeneralProse = false;
   let wasPreprocessedMissingComma = false;
-  let wasPreprocessedBengaliBeforeGenerating = false; // New flag
+  let wasPreprocessedBengaliBeforeGenerating = false; 
 
-  // Pre-processing step 1: Fix unclosed object after "triggersCombat": true/false , {
   const unclosedBooleanRegex = /(true|false)(\s*,\s*)(\{)/g;
   const textAfterUnclosedBooleanFix = originalTextForParsing.replace(unclosedBooleanRegex, '$1}, $3');
   if (textAfterUnclosedBooleanFix !== originalTextForParsing) {
@@ -39,7 +46,6 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
     originalTextForParsing = textAfterUnclosedBooleanFix;
   }
 
-  // Pre-processing step 2a: Fix specific known problematic Korean characters
   const problematicKoreanPatternRegex = /("triggersCombat"\s*:\s*false)\s*(조회)\s*([\,\}\]])/g;
   const textAfterKoreanFix = originalTextForParsing.replace(problematicKoreanPatternRegex, '$1$3');
   if (textAfterKoreanFix !== originalTextForParsing) {
@@ -47,7 +53,6 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
     originalTextForParsing = textAfterKoreanFix;
   }
 
-  // Pre-processing step 2b: Fix specific known problematic Chinese text/comments
   const problematicChineseCommentRegex = /("triggersCombat"\s*:\s*(?:true|false))\s*(打了.*?)\s*([\,\}\]])/gs;
   const textAfterChineseCommentFix = originalTextForParsing.replace(problematicChineseCommentRegex, '$1$3');
   if (textAfterChineseCommentFix !== originalTextForParsing) {
@@ -55,18 +60,13 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
     originalTextForParsing = textAfterChineseCommentFix;
   }
   
-  // Pre-processing step 2c: Specific fix for Bengali script + "Before generating..."
-  // ("triggersCombat"\s*:\s*(true|false))             // Group 1: The valid "triggersCombat" part
-  // (\s*ইংরে[\s\S]*?Before generating[\s\S]*?)       // Group 2: The injected block (Bengali script, "Before generating...", and arbitrary content)
-  // (?=([\,\}\]]))                                   // Positive Lookahead (Group 3 effectively): Ensures it's followed by a valid JSON closing character
   const specificBengaliBlockWithSuffixRegex = /("triggersCombat"\s*:\s*(?:true|false))(\s*ইংরে[\s\S]*?Before generating[\s\S]*?)(?=([\,\}\]]))/g;
-  const textAfterSpecificBengaliFix = originalTextForParsing.replace(specificBengaliBlockWithSuffixRegex, '$1'); // Keep only group 1
+  const textAfterSpecificBengaliFix = originalTextForParsing.replace(specificBengaliBlockWithSuffixRegex, '$1'); 
   if (textAfterSpecificBengaliFix !== originalTextForParsing) {
     wasPreprocessedBengaliBeforeGenerating = true;
     originalTextForParsing = textAfterSpecificBengaliFix;
   }
 
-  // Pre-processing step 2d: Fix general unquoted prose injected after "triggersCombat" (should run after specific fixes)
   const problematicGeneralProseRegex = /("triggersCombat"\s*:\s*(?:true|false))(\s*[^"'{}\[\],][^}\],]*?\s*)(?=([\,\}]))/gs;
   const textAfterGeneralProseFix = originalTextForParsing.replace(problematicGeneralProseRegex, '$1');
   if (textAfterGeneralProseFix !== originalTextForParsing) {
@@ -74,7 +74,6 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
     originalTextForParsing = textAfterGeneralProseFix;
   }
   
-  // Pre-processing step 3: Fix missing comma between choice objects
   const missingCommaRegex = /(\})\s*(\{)/g;
   const textAfterMissingCommaFix = originalTextForParsing.replace(missingCommaRegex, '$1,$2');
   if (textAfterMissingCommaFix !== originalTextForParsing) {
@@ -82,14 +81,12 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
     originalTextForParsing = textAfterMissingCommaFix;
   }
 
-  // Attempt 1: Direct parse
   try {
     return JSON.parse(originalTextForParsing.trim()) as T;
   } catch (e) {
     directParseError = e as Error;
   }
 
-  // Attempt 2: Fenced block (if direct parse failed)
   const fenceRegex = /```(?:json)?\s*\n?(.*?)\n?\s*```/s;
   const match = originalTextForParsing.match(fenceRegex);
   if (match && match[1]) {
@@ -105,7 +102,6 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
     }
   }
 
-  // Attempt 3: First '{' to last '}' heuristic (if direct and (fenced parse failed or fence not found/empty))
   const firstBrace = originalTextForParsing.indexOf('{');
   const lastBrace = originalTextForParsing.lastIndexOf('}');
   if (firstBrace !== -1 && lastBrace > firstBrace) {
@@ -121,7 +117,6 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
     }
   }
 
-  // All attempts failed if we reach here
   const errorDetails = {
     directParseError: directParseError?.message,
     fencedBlockFound: !!match,
@@ -133,7 +128,7 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
     wasPreprocessedUnclosedBoolean: wasPreprocessedUnclosedBoolean,
     wasPreprocessedKorean: wasPreprocessedKorean,
     wasPreprocessedChineseComment: wasPreprocessedChineseComment,
-    wasPreprocessedBengaliBeforeGenerating: wasPreprocessedBengaliBeforeGenerating, // Include new flag
+    wasPreprocessedBengaliBeforeGenerating: wasPreprocessedBengaliBeforeGenerating,
     wasPreprocessedGeneralProse: wasPreprocessedGeneralProse,
     wasPreprocessedMissingComma: wasPreprocessedMissingComma,
   };
@@ -150,63 +145,87 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
 }
 
 export interface InitialStoryData extends GeminiApiResponse {
-  // This interface remains mostly for type safety in App.tsx, though not strictly needed now
 }
 
 export const fetchInitialStory = async (selectedTheme: string): Promise<InitialStoryData> => {
   if (!ai) throw new Error("Gemini API client not initialized. API_KEY might be missing, invalid, or client instantiation failed.");
-  let apiCallResponse: GenerateContentResponse | undefined;
-
+  
   const themedInitialPromptJson = INITIAL_GAME_PROMPT_JSON.replace(
     "[SCENARIO_THEME_PLACEHOLDER]",
     selectedTheme 
   );
 
-  try {
-    apiCallResponse = await ai.models.generateContent({
-      model: GEMINI_MODEL_NAME,
-      contents: themedInitialPromptJson,
-      config: {
-        systemInstruction: GEMINI_SYSTEM_INSTRUCTION_JSON,
-        maxOutputTokens: 8000,
-      },
-    });
+  const MAX_ATTEMPTS = 2;
+  let attempts = 0;
+  let lastError: Error | undefined;
+  let apiCallResponse: GenerateContentResponse | undefined;
 
-    const responseText = apiCallResponse.text;
-    if (!responseText) {
-        throw new Error("Received empty response text from Gemini API for initial story.");
-    }
-    const parsedResponse = parseGeminiJsonResponse<GeminiApiResponse>(responseText);
+  while (attempts < MAX_ATTEMPTS) {
+    attempts++;
+    apiCallResponse = undefined; // Reset for each attempt
+    try {
+      apiCallResponse = await ai.models.generateContent({
+        model: GEMINI_MODEL_NAME,
+        contents: themedInitialPromptJson,
+        config: {
+          systemInstruction: GEMINI_SYSTEM_INSTRUCTION_JSON,
+          maxOutputTokens: 8000,
+        },
+      });
 
-    if (!parsedResponse.persistentThreatDetails?.name) {
-      console.warn("AI did not provide full persistentThreatDetails. Using defaults.");
-      parsedResponse.persistentThreatDetails = {
-        name: "The Nameless Dread",
-        description: "A chilling presence that haunts your steps.",
-        maxHealth: 50,
-      };
-    }
-    if (!parsedResponse.initialInventory || parsedResponse.initialInventory.length === 0) {
-      console.warn("AI did not provide initialInventory. Player will start with no items.");
-      parsedResponse.initialInventory = [];
-    }
-    if (parsedResponse.persistentThreatDetails && typeof parsedResponse.persistentThreatDetails.maxHealth !== 'number') {
-        parsedResponse.persistentThreatDetails.maxHealth = 50;
-    }
-
-    return parsedResponse;
-  } catch (error) {
-    console.error("Error fetching initial story from Gemini:", error);
-    if (apiCallResponse) {
-      console.error("Gemini API Diagnostic Info (Initial Story):");
-      console.error("  Finish Reason:", apiCallResponse.candidates?.[0]?.finishReason);
-      console.error("  Safety Ratings:", JSON.stringify(apiCallResponse.candidates?.[0]?.safetyRatings, null, 2));
-      if (apiCallResponse.promptFeedback) {
-        console.error("  Prompt Feedback:", JSON.stringify(apiCallResponse.promptFeedback, null, 2));
+      const responseText = apiCallResponse.text;
+      if (!responseText) {
+          throw new Error(`Received empty response text from Gemini API for initial story on attempt ${attempts}.`);
       }
+      const parsedResponse = parseGeminiJsonResponse<GeminiApiResponse>(responseText);
+
+      if (!parsedResponse.persistentThreatDetails?.name) {
+        console.warn("AI did not provide full persistentThreatDetails. Using defaults.");
+        parsedResponse.persistentThreatDetails = {
+          name: "The Nameless Dread",
+          description: "A chilling presence that haunts your steps.",
+          maxHealth: 50,
+          senses: [],
+        };
+      }
+      if (!parsedResponse.initialInventory || parsedResponse.initialInventory.length === 0) {
+        console.warn("AI did not provide initialInventory. Player will start with no items.");
+        parsedResponse.initialInventory = [];
+      }
+      if (parsedResponse.persistentThreatDetails && typeof parsedResponse.persistentThreatDetails.maxHealth !== 'number') {
+          parsedResponse.persistentThreatDetails.maxHealth = 50;
+      }
+      if (parsedResponse.persistentThreatDetails && !parsedResponse.persistentThreatDetails.senses) {
+        parsedResponse.persistentThreatDetails.senses = [];
+      }
+
+
+      return parsedResponse; // Success
+    } catch (error) {
+      lastError = error as Error;
+      console.error(`Attempt ${attempts} failed for initial story:`, error);
+      if (apiCallResponse) {
+        console.error("Gemini API Diagnostic Info (Initial Story - Attempt ${attempts}):");
+        console.error("  Finish Reason:", apiCallResponse.candidates?.[0]?.finishReason);
+        console.error("  Safety Ratings:", JSON.stringify(apiCallResponse.candidates?.[0]?.safetyRatings, null, 2));
+        if (apiCallResponse.promptFeedback) {
+          console.error("  Prompt Feedback:", JSON.stringify(apiCallResponse.promptFeedback, null, 2));
+        }
+        console.error(`Raw response text on failed attempt ${attempts} (Initial Story):\n${apiCallResponse.text?.substring(0, 1000) || "N/A"}`);
+      } else {
+        console.error(`Raw response text was unavailable on failed attempt ${attempts} (Initial Story).`);
+      }
+
+
+      if (attempts >= MAX_ATTEMPTS) {
+        console.error(`All ${MAX_ATTEMPTS} attempts failed for initial story. Rethrowing last error.`);
+        throw lastError;
+      }
+      console.warn(`Retrying API call for initial story (attempt ${attempts + 1} of ${MAX_ATTEMPTS})...`);
     }
-    throw error;
   }
+  // Fallback, should ideally be caught by the rethrow in the loop
+  throw lastError || new Error("All API call attempts for initial story failed.");
 };
 
 export const fetchNextStorySegment = async (
@@ -222,7 +241,6 @@ export const fetchNextStorySegment = async (
   currentPlayerAbilities: { name: string; description: string; uses?: number }[]
 ): Promise<GeminiApiResponse> => {
   if (!ai) throw new Error("Gemini API client not initialized. API_KEY might be missing, invalid, or client instantiation failed.");
-  let apiCallResponse: GenerateContentResponse | undefined;
 
   const inventoryString = inventory.length > 0 ? `[${inventory.map(item => `"${item}"`).join(", ")}]` : "[] (empty)";
 
@@ -266,30 +284,51 @@ Provide a "memoryLogSummary" for the current turn.
 If combat is occurring or starting, provide "combatOutcome" and "combatChoices".
 Otherwise, provide standard "sceneDescription" and "choices".`;
 
-  try {
-    apiCallResponse = await ai.models.generateContent({
-      model: GEMINI_MODEL_NAME,
-      contents: prompt,
-      config: {
-        systemInstruction: GEMINI_SYSTEM_INSTRUCTION_JSON,
-        maxOutputTokens: 8000,
-      },
-    });
-    const responseText = apiCallResponse.text;
-     if (!responseText) {
-        throw new Error("Received empty response text from Gemini API for next segment.");
-    }
-    return parseGeminiJsonResponse<GeminiApiResponse>(responseText);
-  } catch (err) {
-    console.error("Error fetching next story segment from Gemini:", err);
-    if (apiCallResponse) {
-      console.error("Gemini API Diagnostic Info (Next Story Segment):");
-      console.error("  Finish Reason:", apiCallResponse.candidates?.[0]?.finishReason);
-      console.error("  Safety Ratings:", JSON.stringify(apiCallResponse.candidates?.[0]?.safetyRatings, null, 2));
-      if (apiCallResponse.promptFeedback) {
-        console.error("  Prompt Feedback:", JSON.stringify(apiCallResponse.promptFeedback, null, 2));
+  const MAX_ATTEMPTS = 2;
+  let attempts = 0;
+  let lastError: Error | undefined;
+  let apiCallResponse: GenerateContentResponse | undefined;
+
+  while (attempts < MAX_ATTEMPTS) {
+    attempts++;
+    apiCallResponse = undefined; // Reset for each attempt
+    try {
+      apiCallResponse = await ai.models.generateContent({
+        model: GEMINI_MODEL_NAME,
+        contents: prompt,
+        config: {
+          systemInstruction: GEMINI_SYSTEM_INSTRUCTION_JSON,
+          maxOutputTokens: 8000,
+        },
+      });
+      const responseText = apiCallResponse.text;
+      if (!responseText) {
+          throw new Error(`Received empty response text from Gemini API for next segment on attempt ${attempts}.`);
       }
+      return parseGeminiJsonResponse<GeminiApiResponse>(responseText); // Success
+    } catch (err) {
+      lastError = err as Error;
+      console.error(`Attempt ${attempts} failed for next story segment:`, err);
+      if (apiCallResponse) {
+        console.error("Gemini API Diagnostic Info (Next Story Segment - Attempt ${attempts}):");
+        console.error("  Finish Reason:", apiCallResponse.candidates?.[0]?.finishReason);
+        console.error("  Safety Ratings:", JSON.stringify(apiCallResponse.candidates?.[0]?.safetyRatings, null, 2));
+        if (apiCallResponse.promptFeedback) {
+          console.error("  Prompt Feedback:", JSON.stringify(apiCallResponse.promptFeedback, null, 2));
+        }
+        console.error(`Raw response text on failed attempt ${attempts} (Next Story Segment):\n${apiCallResponse.text?.substring(0,1000) || "N/A"}`);
+      } else {
+         console.error(`Raw response text was unavailable on failed attempt ${attempts} (Next Story Segment).`);
+      }
+
+
+      if (attempts >= MAX_ATTEMPTS) {
+        console.error(`All ${MAX_ATTEMPTS} attempts failed for next story segment. Rethrowing last error.`);
+        throw lastError;
+      }
+      console.warn(`Retrying API call for next story segment (attempt ${attempts + 1} of ${MAX_ATTEMPTS})...`);
     }
-    throw err;
   }
+  // Fallback, should ideally be caught by the rethrow in the loop
+  throw lastError || new Error("All API call attempts for next story segment failed.");
 };
