@@ -1,7 +1,7 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { GEMINI_MODEL_NAME, GEMINI_SYSTEM_INSTRUCTION_JSON, INITIAL_GAME_PROMPT_JSON } from '../constants';
 import { GeminiApiResponse, PersistentThreat, PlayerAbilityEffect, StoryFlagEffect } from '../types';
-import { API_KEY } from './env.js'; // Import the key from our new file
+import { API_KEY } from '../env.js'; // This is the correct path
 
 let ai: GoogleGenAI | null = null;
 
