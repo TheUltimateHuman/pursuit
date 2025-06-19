@@ -43,7 +43,8 @@ jobs:
           fi
 
           echo "Build Step: Executing esbuild command..."
-          npx esbuild index.tsx \
+          # Using direct call to esbuild after global installation
+          esbuild index.tsx \
             --bundle \
             --outfile=bundle.js \
             --platform=browser \
@@ -53,7 +54,7 @@ jobs:
             --external:react-dom/client \
             --external:react/jsx-runtime \
             --external:@google/genai \
-            --define:process.env.API_KEY="\"$GH_API_KEY\"" # Shell uses double quotes, esbuild sees value as "$GH_API_KEY_value"
+            --define:process.env.API_KEY="\"$GH_API_KEY\""
 
           echo "Build Step: esbuild command finished."
 
