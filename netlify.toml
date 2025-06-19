@@ -1,0 +1,8 @@
+[build]
+  command = "npx esbuild index.tsx --bundle --outfile=bundle.js --platform=browser --format=esm --minify --external:react --external:react-dom/client --external:react/jsx-runtime --external:@google/genai --define:process.env.API_KEY=\"\\\"$API_KEY\\\"\""
+  publish = "."
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
