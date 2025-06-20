@@ -19,30 +19,7 @@ import { GeminiApiResponse, PersistentThreat, PlayerAbilityEffect, StoryFlagEffe
 // --- END CONFIGURATION PROTOCOL ---
 
 
-// --- AI LABS PREVIEW CONFIGURATION ---
-// This section should be UNCOMMENTED for AI Labs Preview.
-// It relies solely on process.env.API_KEY provided by the AI Labs environment.
-/*
-let ai: GoogleGenAI | null = null;
-let effectiveApiKey: string | undefined = undefined;
 
-if (typeof process.env.API_KEY === 'string' && process.env.API_KEY.trim() !== '') {
-  effectiveApiKey = process.env.API_KEY;
-  console.log("geminiService.ts: Using API_KEY from process.env for AI Labs Preview.");
-}
-
-if (effectiveApiKey) {
-  try {
-    ai = new GoogleGenAI({ apiKey: effectiveApiKey });
-  } catch (e) {
-    console.error("Critical Error (AI Labs Config): Failed to initialize GoogleGenAI client. Services will be unavailable.", e);
-    ai = null;
-  }
-} else {
-  console.warn("API Key is not available from process.env.API_KEY (AI Labs Config). Gemini services will not function.");
-}
-*/
-// --- END AI LABS PREVIEW CONFIGURATION ---
 
 
 // --- MVP DEPLOYMENT CONFIGURATION ---
