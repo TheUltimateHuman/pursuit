@@ -37,7 +37,7 @@ jobs:
         run: |
           echo "Build Step: Creating temporary environment file at ./services/env.js"
             # Create env.js inside the services/ directory to match the import path.
-          echo "export const API_KEY = '${{ env.API_KEY }}';" > services/env.js
+          echo "export const API_KEY = '${{ env.API_KEY }}';" > env.js
           echo "Build Step: Executing esbuild command..."
           npx esbuild index.tsx \
             --bundle \
