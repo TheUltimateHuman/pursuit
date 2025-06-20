@@ -78,6 +78,8 @@ export interface GeminiApiResponse {
   memoryLogSummary?: string; // Concise summary of the current turn for the memory log
   gameplayEffects?: GameplayEffect[]; // New field for emergent effects
   gameOverSummary?: string; // New: Concise summary of game end (e.g., "You perished.")
+  gameEndType?: 'player_defeat' | 'pursuer_combat_defeat' | 'alternate_win' | 'alternate_loss'; // New field for specific game end types
+
 
   persistentThreatDetails?: { // For initial generation
     name: string;

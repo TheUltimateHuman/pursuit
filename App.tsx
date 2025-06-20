@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect } from './types';
 import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/geminiService';
@@ -8,17 +10,68 @@ import ApiKeyMissingBanner from './components/ApiKeyMissingBanner';
 import InventoryDisplay from './components/InventoryDisplay';
 import PersistentThreatDisplay from './components/PersistentThreatDisplay';
 import { MAX_PLAYER_HEALTH, SCENARIO_THEMES_LIST } from './constants';
-import { API_KEY } from './env.js'; // Import the key from our new file
 
-const API_KEY_AVAILABLE = typeof API_KEY === 'string' && API_KEY.trim() !== "";
+// --- CONFIGURATION PROTOCOL ---
+// To switch between AI Labs Preview and Live MVP Deployment for API Key Checking:
+// 1. For AI LABS PREVIEW:
+//    - Ensure the "AI LABS PREVIEW API KEY CONFIGURATION" section below is UNCOMMENTED.
+//    - Ensure the "MVP DEPLOYMENT API KEY CONFIGURATION" section below is COMMENTED OUT.
+//    - Ensure the import of API_KEY_FROM_ENV_JS from './env.js' is COMMENTED OUT.
+// 2. For LIVE MVP DEPLOYMENT (e.g., Netlify, Vercel):
+//    - Ensure the "AI LABS PREVIEW API KEY CONFIGURATION" section below is COMMENTED OUT.
+//    - Ensure the "MVP DEPLOYMENT API KEY CONFIGURATION" section below is UNCOMMENTED.
+//    - Ensure the import of API_KEY_FROM_ENV_JS from './env.js' is UNCOMMENTED.
+// --- END CONFIGURATION PROTOCOL ---
+
+
+// --- AI LABS PREVIEW API KEY CONFIGURATION ---
+// This section should be UNCOMMENTED for AI Labs Preview.
+// It relies solely on process.env.API_KEY provided by the AI Labs environment.
+/*
+const effectiveApiKey = (typeof process.env.API_KEY === 'string' && process.env.API_KEY.trim() !== "") ? process.env.API_KEY : undefined;
+const API_KEY_AVAILABLE = typeof effectiveApiKey === 'string' && effectiveApiKey.trim() !== "";
+if (API_KEY_AVAILABLE) {
+  console.log("App.tsx: Using API_KEY from process.env for AI Labs Preview.");
+} else {
+  console.warn("App.tsx: API_KEY from process.env is not available for AI Labs Preview.");
+}
+*/
+// --- END AI LABS PREVIEW API KEY CONFIGURATION ---
+
+
+// --- MVP DEPLOYMENT API KEY CONFIGURATION ---
+// This section should be COMMENTED OUT for AI Labs Preview.
+// UNCOMMENT this section for Live MVP Deployment.
+
+import { API_KEY as API_KEY_FROM_ENV_JS } from './env.js'; 
+
+const getEffectiveApiKey = (): string | undefined => {
+  if (typeof process.env.API_KEY === 'string' && process.env.API_KEY.trim() !== "") {
+    console.log("App.tsx: Using API_KEY from process.env for MVP Deployment.");
+    return process.env.API_KEY;
+  }
+  if (typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FROM_ENV_JS.trim() !== "") {
+    console.log("App.tsx: Using API_KEY from env.js as fallback for MVP Deployment.");
+    return API_KEY_FROM_ENV_JS;
+  }
+  return undefined;
+};
+
+const effectiveApiKey = getEffectiveApiKey();
+const API_KEY_AVAILABLE = typeof effectiveApiKey === 'string' && effectiveApiKey.trim() !== "";
+
+// --- END MVP DEPLOYMENT API KEY CONFIGURATION ---
+
 
 const MAX_MEMORY_LOG_ENTRIES = 5;
+
+type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fantasy";
 
 
 const App: React.FC = () => {
   const [currentStory, setCurrentStory] = useState<StoryState>({
-    sceneDescription: "Welcome to PURSUIT.",
-    choices: ["Begin"],
+    sceneDescription: "Welcome to QUARRY.",
+    choices: ["Begin"], // "Begin" choice signifies initial state for button display
     
     persistentThreat: null,
     threatEncounterMessage: null,
@@ -45,14 +98,16 @@ const App: React.FC = () => {
 
   const [isCustomChoiceInputVisible, setIsCustomChoiceInputVisible] = useState<boolean>(false);
   const [customChoiceText, setCustomChoiceText] = useState<string>("");
+  const [lastUsedThemeType, setLastUsedThemeType] = useState<ThemeType | null>(null);
+
 
   useEffect(() => {
     // Diagnostic log for the build process
-    console.log("DEBUG: API_KEY as seen by app:", API_KEY ? `Exists (length: ${API_KEY.length})` : 'Does not exist or is not a string');
+    console.log("DEBUG: effectiveApiKey as seen by app:", effectiveApiKey ? `Exists (length: ${effectiveApiKey.length})` : 'Does not exist or is not a string');
     console.log("DEBUG: API_KEY_AVAILABLE evaluates to:", API_KEY_AVAILABLE);
 
     if (!API_KEY_AVAILABLE) {
-      console.error("API_KEY is not available. Check the build process and the generated env.js file.");
+      console.error("API_KEY is not available. Check environment configuration (process.env.API_KEY for AI Labs, or env.js / process.env.API_KEY for deployment).");
     }
   }, []); // Runs once on mount
 
@@ -201,7 +256,7 @@ const App: React.FC = () => {
 
       if (isInitial) {
         setInventory(initialInventory?.slice(0, 3) || []); 
-        setIsInitialLoad(false);
+        setIsInitialLoad(false); // Game has started, not initial load anymore
         tempPlayerHealth = MAX_PLAYER_HEALTH; 
         setPlayerHealth(MAX_PLAYER_HEALTH); 
         setCombatLog([]); 
@@ -337,20 +392,18 @@ const App: React.FC = () => {
       setIsLoading(false);
     }
   }, [
-      isGameOver, // Read-only state for conditional reset
+      isGameOver, 
       handleFatalError, 
-      // Functions to set state, not values that change often themselves
       setInventory, setCurrentStory, setIsLoading, setError, setIsInitialLoad, 
       setPersistentThreat, setIsInCombat, setCombatLog, setMemoryLog, 
       setStoryFlags, setPlayerAbilities, setIsCustomChoiceInputVisible, 
       setGameOverSummaryText, setPlayerHealth,
-      // Values that might be part of dependency if not reset correctly inside, but they are.
       playerHealth, persistentThreat, isInCombat, combatLog, memoryLog, storyFlags, playerAbilities, gameOverSummaryText
     ]);
 
 
   const startGame = useCallback(() => {
-    setIsInitialLoad(true);
+    setIsInitialLoad(true); // Signal that we are in the initial setup phase
     
     setInventory([]);
     setPlayerHealth(MAX_PLAYER_HEALTH);
@@ -364,31 +417,98 @@ const App: React.FC = () => {
     setStoryFlags({}); 
     setPlayerAbilities([]); 
     setIsCustomChoiceInputVisible(false); 
+    setLastUsedThemeType(null); // Reset last used theme type
     setCurrentStory({
-        sceneDescription: "Welcome to PURSUIT.",
-        choices: ["Begin"],
+        sceneDescription: "Welcome to QUARRY.", // Updated game name
+        choices: ["Begin"], // This specific choice indicates the app is ready for initial theme selection
         
         persistentThreat: null,
         threatEncounterMessage: null,
         combatLog: [],
         isInCombat: false,
     });
-  }, [setIsCustomChoiceInputVisible, setMemoryLog, setStoryFlags, setPlayerAbilities, setGameOverSummaryText]);
+  }, [setIsCustomChoiceInputVisible, setMemoryLog, setStoryFlags, setPlayerAbilities, setGameOverSummaryText, setLastUsedThemeType]);
+
+  // Helper function to get themes based on ThemeType
+  const getThemesByType = (themeType: ThemeType): string[] => {
+    switch (themeType) {
+        case "random":
+            return [...SCENARIO_THEMES_LIST];
+        case "realism":
+            return SCENARIO_THEMES_LIST.filter(theme => theme.startsWith("REALISM:"));
+        case "historical":
+            return SCENARIO_THEMES_LIST.filter(theme =>
+                theme.startsWith("Historical:") || theme.startsWith("Mythological & Folkloric:")
+            );
+        case "modern":
+            return SCENARIO_THEMES_LIST.filter(theme =>
+                theme.startsWith("Mystery/Thriller:") ||
+                theme.startsWith("Occupational & Mundane Catastrophe:") ||
+                theme.startsWith("Contemporary & Mundane:")
+            );
+        case "sci_fi":
+            return SCENARIO_THEMES_LIST.filter(theme =>
+                theme.startsWith("Science Fiction:") ||
+                theme.startsWith("Cosmic & Eldritch Horror:") ||
+                theme.startsWith("Unique & Surreal Environments:")
+            );
+        case "fantasy":
+            return SCENARIO_THEMES_LIST.filter(theme =>
+                theme.startsWith("Fantasy:") ||
+                theme.startsWith("Psychological & Existential Horror:")
+            );
+        default:
+            console.warn(`Unknown themeType '${themeType}' in getThemesByType. Falling back to all themes.`);
+            return [...SCENARIO_THEMES_LIST];
+    }
+  };
+
+  // Helper function to select a random theme from a given list
+  const selectRandomTheme = (themes: string[]): string => {
+    if (themes.length > 0) {
+        const randomIndex = Math.floor(Math.random() * themes.length);
+        return themes[randomIndex];
+    }
+    // Fallback if the provided list is empty
+    console.warn(`Theme list for selection was empty. Falling back to general random theme from master list or absolute fallback.`);
+    if (SCENARIO_THEMES_LIST.length > 0) {
+        const randomIndex = Math.floor(Math.random() * SCENARIO_THEMES_LIST.length);
+        return SCENARIO_THEMES_LIST[randomIndex];
+    }
+    // Absolute fallback if even the master list is empty (should ideally not happen)
+    return "Unique & Surreal Environments: Abstract Conceptual Realm Made Manifest";
+  };
+
+
+  const handleStartGameWithTheme = useCallback((themeType: ThemeType) => {
+    startGame(); 
+    setLastUsedThemeType(themeType); // Set the last used theme type
+    if (!API_KEY_AVAILABLE) {
+        setError("API Key is not configured. Please ensure it's set up in the environment.");
+        return;
+    }
+
+    const themesToConsider = getThemesByType(themeType);
+    const selectedTheme = selectRandomTheme(themesToConsider);
+
+    if (!selectedTheme) {
+        console.error("Critical: Could not select a theme. Master list might be empty or filter yielded no results. Aborting start.");
+        setError("Failed to select a scenario theme. Please try again or check configuration.");
+        return;
+    }
+
+    processApiResponse(fetchInitialStory(selectedTheme), true);
+  }, [startGame, processApiResponse, setLastUsedThemeType, setError]);
+
 
   const handleChoiceSelected = useCallback((choice: string | ChoiceType) => {
-    if (isGameOver && (typeof choice === 'string' && choice !== "Begin")) return;
+    if (isGameOver) return;
 
     const choiceText = typeof choice === 'string' ? choice : choice.text;
     const isTriggeringCombat = typeof choice !== 'string' && !!choice.triggersCombat;
 
-    if (choiceText === "Begin") { 
-       startGame(); 
-       if (API_KEY_AVAILABLE) {
-            const randomIndex = Math.floor(Math.random() * SCENARIO_THEMES_LIST.length);
-            const randomTheme = SCENARIO_THEMES_LIST[randomIndex] || "Unique & Surreal Environments: Abstract Conceptual Realm Made Manifest"; // Fallback
-            processApiResponse(fetchInitialStory(randomTheme), true);
-       }
-    } else if (!isInitialLoad) {
+    // "Begin" choice is no longer handled here; it's managed by dedicated start buttons.
+    if (!isInitialLoad) { // Only process choices if the game has actually started (not on initial button screen)
       processApiResponse(fetchNextStorySegment(
         currentStory.sceneDescription,
         choiceText,
@@ -401,10 +521,12 @@ const App: React.FC = () => {
         storyFlags, 
         playerAbilities 
       ));
+    } else {
+      console.warn("handleChoiceSelected called while isInitialLoad is true for a non-start action. This might be an error in logic.");
     }
   }, [
       isInitialLoad, currentStory.sceneDescription, inventory, playerHealth, persistentThreat, 
-      isInCombat, isGameOver, startGame, processApiResponse, memoryLog, storyFlags, playerAbilities 
+      isInCombat, isGameOver, processApiResponse, memoryLog, storyFlags, playerAbilities
     ]);
 
   const handleCustomChoiceSubmit = useCallback(() => {
@@ -430,10 +552,23 @@ const App: React.FC = () => {
 
   const handleRegenerateInitialScene = useCallback(() => {
     if (!API_KEY_AVAILABLE || isLoading) return;
-    const randomIndex = Math.floor(Math.random() * SCENARIO_THEMES_LIST.length);
-    const randomTheme = SCENARIO_THEMES_LIST[randomIndex] || "Unique & Surreal Environments: Abstract Conceptual Realm Made Manifest"; // Fallback
-    processApiResponse(fetchInitialStory(randomTheme), true);
-  }, [processApiResponse, isLoading]);
+
+    const themeTypeToUse = lastUsedThemeType || "random"; // Fallback to random if not set
+    
+    const themesToConsider = getThemesByType(themeTypeToUse);
+    const selectedTheme = selectRandomTheme(themesToConsider);
+
+    if (!selectedTheme) {
+        console.error("Critical: Could not select a theme for regeneration. Aborting.");
+        setError("Failed to select a scenario theme for regeneration. Please try again.");
+        return;
+    }
+    
+    // startGame() is called within processApiResponse when isInitial is true,
+    // so no need to call it explicitly here for state resets.
+    // lastUsedThemeType is preserved for this specific regeneration path.
+    processApiResponse(fetchInitialStory(selectedTheme), true);
+  }, [processApiResponse, isLoading, lastUsedThemeType, setError]);
 
 
   if (!API_KEY_AVAILABLE) {
@@ -442,25 +577,51 @@ const App: React.FC = () => {
   
   const currentDisplayedChoices = currentStory.choices;
 
-  const isInitialButton = isInitialLoad && currentDisplayedChoices.length === 1 && typeof currentDisplayedChoices[0] === 'string' && currentDisplayedChoices[0] === "Begin";
+  // Condition to show "Random" and "Realism" buttons
+  const isDisplayingInitialStartOptions = isInitialLoad && !isLoading && currentStory.choices.length === 1 && typeof currentStory.choices[0] === 'string' && currentStory.choices[0] === "Begin";
   
   const showRegenerateButton = !isInitialLoad && !isLoading && !isGameOver && !isCustomChoiceInputVisible && memoryLog.length <= 1 && currentDisplayedChoices.length > 0;
+
+  const themeButtonBaseClass = "w-full font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none";
+  const randomThemeButtonClass = `${themeButtonBaseClass} bg-yellow-500 text-black font-bold hover:bg-yellow-400 focus:ring-yellow-300`;
+  const realismThemeButtonClass = `${themeButtonBaseClass} text-white bg-red-800 hover:bg-red-700 focus:ring-red-600 disabled:bg-red-900 disabled:text-gray-300`;
+  const specificThemeButtonClass = `${themeButtonBaseClass} text-white bg-gray-600 hover:bg-gray-500 focus:ring-gray-400 disabled:bg-gray-400`;
 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-center p-4 selection:bg-red-700 selection:text-white">
-      {isLoading && <LoadingIndicator message={isInitialLoad ? "Loading..." : "Processing..."} />} 
+      {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8">
-        <h1 className="text-5xl uppercase font-medium tracking-wider text-yellow-400">
-          PURSUIT
+        <h1 className="text-8xl uppercase font-medium tracking-wider text-yellow-400 italic">
+          QUARRY
         </h1>
       </header>
 
       <main className="w-full max-w-3xl flex flex-col items-center">
         
-        {(!isInitialLoad || currentStory.sceneDescription !== "Welcome to PURSUIT.") && ( 
-            <StoryDisplay text={currentStory.sceneDescription} />
+        {(!isInitialLoad || currentStory.sceneDescription !== "Welcome to QUARRY.") && (
+             <div className="flex justify-center items-start w-full max-w-3xl mb-8"> 
+                <div className={showRegenerateButton ? "flex-grow min-w-0" : "w-full"}> 
+                    <StoryDisplay text={currentStory.sceneDescription} />
+                </div>
+                {showRegenerateButton && (
+                    <button
+                        onClick={handleRegenerateInitialScene}
+                        disabled={isLoading}
+                        className="ml-3 mt-1 bg-sky-700 text-white font-semibold p-2 rounded-full shadow-md 
+                                    transition-all duration-150 ease-in-out 
+                                    hover:bg-sky-600 hover:shadow-lg transform hover:scale-105 
+                                    focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-75 
+                                    disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
+                                    text-xl border border-sky-600 shrink-0"
+                        title="Regenerate Initial Scene (same category)"
+                        aria-label="Regenerate Initial Scene (same category)"
+                    >
+                        🔄
+                    </button>
+                )}
+            </div>
         )}
 
         {currentStory.persistentThreat && !isGameOver && !isInitialLoad && (
@@ -512,8 +673,6 @@ const App: React.FC = () => {
           </div>
         )}
 
-
-        {/* Game Over UI for defeat or other non-victory ends */}
         {isGameOver && persistentThreat?.status !== 'defeated' && (
           <div className="bg-black bg-opacity-80 p-6 rounded-lg shadow-xl mb-6 max-w-3xl w-full text-center border-2 border-red-700">
             <h2 className="text-3xl font-bold text-red-500 mb-3">GAME OVER</h2>
@@ -529,9 +688,12 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* Standalone Play Again button for VICTORY condition */}
         {isGameOver && persistentThreat?.status === 'defeated' && (
            <div className="w-full max-w-3xl flex flex-col items-center my-6">
+            <p className="text-4xl font-bold text-green-400 my-4 tracking-wider uppercase" 
+               aria-live="polite">
+                SUCCESS
+            </p>
             <button 
               onClick={startGame}
               className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md 
@@ -559,117 +721,98 @@ const App: React.FC = () => {
           </div>
         )}
         
-        <div className="w-full max-w-3xl flex flex-col items-center">
-          {isInitialButton && !isLoading && (
-            <button
-              onClick={() => handleChoiceSelected("Begin")} 
-              className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md 
-                        transition-all duration-150 ease-in-out 
-                        hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 
-                        focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 
-                        text-lg my-4"
-            >
-              Begin
-            </button>
-          )}
+        <div className="w-full max-w-xl flex flex-col items-center mt-4 md:mt-6">
 
-          {!isInitialButton && !isGameOver && !isCustomChoiceInputVisible && currentDisplayedChoices.length > 0 && !isLoading && (
-             <div className="w-full flex flex-col sm:flex-row items-center justify-center sm:space-x-3 space-y-3 sm:space-y-0">
-                <ChoicesDisplay 
-                  choices={currentDisplayedChoices} 
-                  onChoiceSelected={handleChoiceSelected}
-                  disabled={isLoading}
-                />
-             </div>
-          )}
-        </div>
-        
-        {!isInitialButton && !isGameOver && !isCustomChoiceInputVisible && !isLoading && (
-           <div className="flex items-center mt-6 space-x-3">
-            <button
-                onClick={() => {
-                setIsCustomChoiceInputVisible(true);
-                setCustomChoiceText(""); 
-                }}
-                disabled={isLoading}
-                className="bg-gray-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md 
-                            transition-all duration-150 ease-in-out 
-                            hover:bg-gray-600 hover:shadow-lg transform hover:scale-105 
-                            focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 
-                            disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
-                            border border-gray-600"
-            >
-                Custom...
-            </button>
-            {showRegenerateButton && (
-                <button
-                    onClick={handleRegenerateInitialScene}
-                    disabled={isLoading}
-                    className="bg-sky-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md 
-                                transition-all duration-150 ease-in-out 
-                                hover:bg-sky-600 hover:shadow-lg transform hover:scale-105 
-                                focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-75 
-                                disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
-                                text-xl border border-sky-600"
-                    title="Regenerate Initial Scene"
-                    aria-label="Regenerate Initial Scene"
-                >
-                    🔄
-                </button>
+            {isDisplayingInitialStartOptions && (
+                 <div className="w-full grid grid-cols-2 gap-4">
+                    <button
+                        key="random"
+                        onClick={() => handleStartGameWithTheme("random")}
+                        className={randomThemeButtonClass}
+                        disabled={isLoading}
+                    >
+                        Random
+                    </button>
+                    <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>Realism</button>
+                    <button key="historical" onClick={() => handleStartGameWithTheme("historical")} className={specificThemeButtonClass} disabled={isLoading}>Historical</button>
+                    <button key="modern" onClick={() => handleStartGameWithTheme("modern")} className={specificThemeButtonClass} disabled={isLoading}>Modern</button>
+                    <button key="scifi" onClick={() => handleStartGameWithTheme("sci_fi")} className={specificThemeButtonClass} disabled={isLoading}>Sci-Fi</button>
+                    <button key="fantasy" onClick={() => handleStartGameWithTheme("fantasy")} className={specificThemeButtonClass} disabled={isLoading}>Fantasy</button>
+                </div>
             )}
-            </div>
-        )}
 
+            {!isDisplayingInitialStartOptions && isCustomChoiceInputVisible && !isGameOver && !isLoading && (
+                <div className="w-full flex flex-col items-center space-y-3">
+                    <textarea
+                        value={customChoiceText}
+                        onChange={(e) => setCustomChoiceText(e.target.value)}
+                        placeholder="Enter your action..."
+                        rows={3}
+                        className="w-full p-3 bg-gray-800 text-white border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150"
+                        disabled={isLoading}
+                        aria-label="Custom action input"
+                    />
+                    <div className="flex space-x-3 w-full sm:w-auto">
+                        <button
+                            onClick={handleCustomChoiceSubmit}
+                            disabled={isLoading || !customChoiceText.trim()}
+                            className="flex-1 sm:flex-none bg-gray-600 text-white font-semibold py-3 px-5 rounded-lg shadow-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        >
+                            Submit
+                        </button>
+                        <button
+                            onClick={() => setIsCustomChoiceInputVisible(false)}
+                            disabled={isLoading}
+                            className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
 
-        {isCustomChoiceInputVisible && !isGameOver && !isLoading && (
-          <div className="w-full max-w-3xl flex flex-col items-center mt-4 space-y-3">
-            <textarea
-              value={customChoiceText}
-              onChange={(e) => setCustomChoiceText(e.target.value)}
-              placeholder="Enter your action..." 
-              rows={3}
-              className="w-full p-3 bg-gray-800 text-white border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150"
-              disabled={isLoading}
-            />
-            <div className="flex space-x-3 w-full sm:w-auto">
-              <button
-                onClick={handleCustomChoiceSubmit}
-                disabled={isLoading || !customChoiceText.trim()}
-                className="flex-1 sm:flex-none bg-gray-600 text-white font-semibold py-3 px-5 rounded-lg shadow-md 
-                           hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 
-                           disabled:bg-gray-400 disabled:cursor-not-allowed" 
-              >
-                Submit
-              </button>
-              <button
-                onClick={() => setIsCustomChoiceInputVisible(false)}
-                disabled={isLoading}
-                className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md 
-                           hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 
-                           disabled:bg-gray-500 disabled:cursor-not-allowed" 
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
+            {!isDisplayingInitialStartOptions && !isGameOver && !isCustomChoiceInputVisible && !isLoading && (
+                <>
+                    <button
+                        onClick={() => {
+                            setIsCustomChoiceInputVisible(true);
+                            setCustomChoiceText("");
+                        }}
+                        disabled={isLoading}
+                        className="w-full bg-gray-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md 
+                                   transition-all duration-150 ease-in-out 
+                                   hover:bg-gray-600 hover:shadow-lg transform hover:scale-105 
+                                   focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 
+                                   disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
+                                   border border-gray-600 mb-4" // Added mb-4 for spacing
+                    >
+                        Write your own...
+                    </button>
 
-         {!isLoading && !error && !isGameOver && currentDisplayedChoices.length === 0 && !isInitialLoad && !isCustomChoiceInputVisible && (
-           <div className="text-center mt-8 p-4 bg-gray-800 rounded-lg border border-gray-700">
-             <p className="text-xl text-gray-400">No clear path...</p> 
-             <button 
-               onClick={startGame}
-               className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 border border-gray-500" 
-             >
-               Restart?
-             </button>
-           </div>
-         )}
+                    {currentDisplayedChoices.length > 0 && (
+                        <ChoicesDisplay
+                            choices={currentDisplayedChoices}
+                            onChoiceSelected={handleChoiceSelected}
+                            disabled={isLoading}
+                        />
+                    )}
+                </>
+            )}
+            
+            {!isDisplayingInitialStartOptions && !isLoading && !error && !isGameOver && currentDisplayedChoices.length === 0 && !isCustomChoiceInputVisible && (
+                 <div className="text-center p-4 bg-gray-800 rounded-lg border border-gray-700 w-full">
+                     <p className="text-xl text-gray-400">No clear path...</p>
+                     <button
+                         onClick={startGame}
+                         className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 border border-gray-500"
+                     >
+                         Restart?
+                     </button>
+                 </div>
+             )}
+        </div> 
       </main>
 
-      <footer className="w-full max-w-3xl text-center mt-8 md:mt-12 text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} PURSUIT.</p> 
-      </footer>
     </div>
   );
 };

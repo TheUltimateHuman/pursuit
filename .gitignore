@@ -1,34 +1,24 @@
-# .gitignore
-
-# Dependencies
-# Ignore the directory where all the npm packages are installed.
-/node_modules
-
-# Build output
-# Ignore the JavaScript bundle created by esbuild.
-/bundle.js
-
-# Environment Variables
-# CRITICAL: Ignore the temporary environment file created during the CI/CD build.
-# This file contains the secret API_KEY and must NOT be committed to the repository.
-/src/env.js
-
 # Logs
-# Ignore log files that might be generated.
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# IDE and editor directories
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
 .idea
-.vscode/
-
-# Operating System generated files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

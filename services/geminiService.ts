@@ -1,24 +1,80 @@
 
+
 // services/geminiService.ts
 
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { GEMINI_MODEL_NAME, GEMINI_SYSTEM_INSTRUCTION_JSON, INITIAL_GAME_PROMPT_JSON } from '../constants';
 import { GeminiApiResponse, PersistentThreat, PlayerAbilityEffect, StoryFlagEffect } from '../types';
-import { API_KEY } from '../env.js'; // This line is correct
 
+// --- CONFIGURATION PROTOCOL ---
+// To switch between AI Labs Preview and Live MVP Deployment:
+// 1. For AI LABS PREVIEW:
+//    - Ensure the "AI LABS PREVIEW CONFIGURATION" section below is UNCOMMENTED.
+//    - Ensure the "MVP DEPLOYMENT CONFIGURATION" section below is COMMENTED OUT.
+//    - Ensure the import from './env.js' further below is COMMENTED OUT.
+// 2. For LIVE MVP DEPLOYMENT (e.g., Netlify, Vercel):
+//    - Ensure the "AI LABS PREVIEW CONFIGURATION" section below is COMMENTED OUT.
+//    - Ensure the "MVP DEPLOYMENT CONFIGURATION" section below is UNCOMMENTED.
+//    - Ensure the import from './env.js' further below is UNCOMMENTED.
+// --- END CONFIGURATION PROTOCOL ---
+
+
+// --- AI LABS PREVIEW CONFIGURATION ---
+// This section should be UNCOMMENTED for AI Labs Preview.
+// It relies solely on process.env.API_KEY provided by the AI Labs environment.
+/*
 let ai: GoogleGenAI | null = null;
+let effectiveApiKey: string | undefined = undefined;
 
-// This logic correctly uses the imported API_KEY
-if (typeof API_KEY === 'string' && API_KEY.trim() !== '') {
+if (typeof process.env.API_KEY === 'string' && process.env.API_KEY.trim() !== '') {
+  effectiveApiKey = process.env.API_KEY;
+  console.log("geminiService.ts: Using API_KEY from process.env for AI Labs Preview.");
+}
+
+if (effectiveApiKey) {
   try {
-    ai = new GoogleGenAI({ apiKey: API_KEY });
+    ai = new GoogleGenAI({ apiKey: effectiveApiKey });
   } catch (e) {
-    console.error("Critical Error: Failed to initialize GoogleGenAI client during module load. Services will be unavailable.", e);
+    console.error("Critical Error (AI Labs Config): Failed to initialize GoogleGenAI client. Services will be unavailable.", e);
     ai = null;
   }
 } else {
-  console.warn("API Key was not imported or is empty. Gemini services will not function.");
+  console.warn("API Key is not available from process.env.API_KEY (AI Labs Config). Gemini services will not function.");
 }
+*/
+// --- END AI LABS PREVIEW CONFIGURATION ---
+
+
+// --- MVP DEPLOYMENT CONFIGURATION ---
+// This section should be COMMENTED OUT for AI Labs Preview.
+// UNCOMMENT this section for Live MVP Deployment.
+
+import { API_KEY as API_KEY_FROM_ENV_JS } from './env.js';
+
+let ai: GoogleGenAI | null = null;
+let effectiveApiKey: string | undefined = undefined;
+
+// Prioritize process.env.API_KEY (available in AI Studio and defined by Vite for builds)
+if (typeof process.env.API_KEY === 'string' && process.env.API_KEY.trim() !== '') {
+  effectiveApiKey = process.env.API_KEY;
+} else if (typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FROM_ENV_JS.trim() !== '') {
+  // Fallback to the MVP's method if process.env.API_KEY is not set
+  console.log("geminiService.ts: Using API_KEY from env.js as fallback for MVP Deployment.");
+  effectiveApiKey = API_KEY_FROM_ENV_JS;
+}
+
+if (effectiveApiKey) {
+  try {
+    ai = new GoogleGenAI({ apiKey: effectiveApiKey });
+  } catch (e) {
+    console.error("Critical Error (MVP Deployment Config): Failed to initialize GoogleGenAI client with effectiveApiKey. Services will be unavailable.", e);
+    ai = null;
+  }
+} else {
+  console.warn("API Key is not available from process.env.API_KEY or env.js (MVP Deployment Config). Gemini services will not function.");
+}
+
+// --- END MVP DEPLOYMENT CONFIGURATION ---
 
 
 function parseGeminiJsonResponse<T>(responseText: string): T {
