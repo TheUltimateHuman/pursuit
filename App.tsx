@@ -23,41 +23,11 @@ import { MAX_PLAYER_HEALTH, SCENARIO_THEMES_LIST } from './constants';
 //    - Ensure the import of API_KEY_FROM_ENV_JS from './env.js' is UNCOMMENTED.
 // --- END CONFIGURATION PROTOCOL ---
 
-
-// --- AI LABS PREVIEW API KEY CONFIGURATION ---
-// This section should be UNCOMMENTED for AI Labs Preview.
-// It relies solely on process.env.API_KEY provided by the AI Labs environment.
-/*
-const effectiveApiKey = (typeof process.env.API_KEY === 'string' && process.env.API_KEY.trim() !== "") ? process.env.API_KEY : undefined;
-const API_KEY_AVAILABLE = typeof effectiveApiKey === 'string' && effectiveApiKey.trim() !== "";
-if (API_KEY_AVAILABLE) {
-  console.log("App.tsx: Using API_KEY from process.env for AI Labs Preview.");
-} else {
-  console.warn("App.tsx: API_KEY from process.env is not available for AI Labs Preview.");
-}
-*/
-// --- END AI LABS PREVIEW API KEY CONFIGURATION ---
-
-
 // --- MVP DEPLOYMENT API KEY CONFIGURATION ---
-// This section should be COMMENTED OUT for AI Labs Preview.
-// UNCOMMENT this section for Live MVP Deployment.
 
 import { API_KEY as API_KEY_FROM_ENV_JS } from './env.js'; 
 
-const getEffectiveApiKey = (): string | undefined => {
-  if (typeof process.env.API_KEY === 'string' && process.env.API_KEY.trim() !== "") {
-    console.log("App.tsx: Using API_KEY from process.env for MVP Deployment.");
-    return process.env.API_KEY;
-  }
-  if (typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FROM_ENV_JS.trim() !== "") {
-    console.log("App.tsx: Using API_KEY from env.js as fallback for MVP Deployment.");
-    return API_KEY_FROM_ENV_JS;
-  }
-  return undefined;
-};
-
-const effectiveApiKey = getEffectiveApiKey();
+const effectiveApiKey = API_KEY_FROM_ENV_JS;
 const API_KEY_AVAILABLE = typeof effectiveApiKey === 'string' && effectiveApiKey.trim() !== "";
 
 // --- END MVP DEPLOYMENT API KEY CONFIGURATION ---
