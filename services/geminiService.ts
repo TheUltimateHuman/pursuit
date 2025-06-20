@@ -49,7 +49,7 @@ if (effectiveApiKey) {
 // This section should be COMMENTED OUT for AI Labs Preview.
 // UNCOMMENT this section for Live MVP Deployment.
 
-import { API_KEY as API_KEY_FROM_ENV_JS } from './env.js';
+import { API_KEY as API_KEY_FROM_ENV_JS } from '../env.js'; // Use ../ to go up to the root
 
 let ai: GoogleGenAI | null = null;
 let effectiveApiKey: string | undefined = undefined;
