@@ -290,7 +290,7 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "REALISM: Shark-Infested Waters",
   "REALISM: A Mountaineering Disaster During a Blizzard",
   "REALISM: Deep-Sea Diver with a Ruptured Air Line",
-  "REALISM: Bank Heist Hostage Situation",
+  "REALISM: Escaping a Bank Heist Hostage Situation",
   "REALISM: Lost in the Desert with a Limited Water Supply",
   "REALISM: Hunted by Drug Cartel Enforcers",
   "REALISM: Fleeing a Rising Flood or Tsunami",
