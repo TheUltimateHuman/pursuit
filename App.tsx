@@ -1,6 +1,6 @@
-// App.tsx (Corrected and Final Version)
+// App.tsx (with Custom Scenario Selection Feature)
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect } from './types';
 import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/geminiService';
 import StoryDisplay from './components/StoryDisplay';
@@ -10,6 +10,7 @@ import ApiKeyMissingBanner from './components/ApiKeyMissingBanner';
 import InventoryDisplay from './components/InventoryDisplay';
 import PersistentThreatDisplay from './components/PersistentThreatDisplay';
 import { MAX_PLAYER_HEALTH, SCENARIO_THEMES_LIST } from './constants';
+import ScenarioSelectorModal from './components/ScenarioSelectorModal'; // <-- IMPORT THE NEW COMPONENT
 
 // --- This is the ONLY configuration needed. It uses the env.js file. ---
 import { API_KEY as API_KEY_FROM_ENV_JS } from './env.js'; 
@@ -47,8 +48,10 @@ const App: React.FC = () => {
   const [isCustomChoiceInputVisible, setIsCustomChoiceInputVisible] = useState<boolean>(false);
   const [customChoiceText, setCustomChoiceText] = useState<string>("");
   const [lastUsedThemeType, setLastUsedThemeType] = useState<ThemeType | null>(null);
+  
+  // --- NEW STATE FOR THE CUSTOM SCENARIO MODAL ---
+  const [isCustomScenarioModalVisible, setIsCustomScenarioModalVisible] = useState<boolean>(false);
 
-  // This useEffect hook is no longer needed for complex debugging.
   useEffect(() => {
     if (!API_KEY_AVAILABLE) {
       console.error("API_KEY is not available. Check deployment secrets and the local env.js file.");
@@ -114,35 +117,31 @@ const App: React.FC = () => {
       if (!sceneDescription || (!choices && !combatChoices && !isGameOver && !(combatOutcome && (combatOutcome.isPlayerDefeated || combatOutcome.isEnemyDefeated)) && !gameOverSummary)) {
         throw new Error("AI response incomplete. Missing essential data.");
       }
-
       
       let tempPlayerHealth = playerHealth; 
       let tempPersistentThreat = persistentThreat;
       let tempMemoryLog = memoryLog;
       let tempStoryFlags = storyFlags;
-      let tempPlayerAbilities = [...playerAbilities]; // Create a new array to modify
+      let tempPlayerAbilities = [...playerAbilities];
       let localIsGameOver = isGameOver;
       let localGameOverSummaryText = gameOverSummaryText;
 
-
       if (memoryLogSummary) {
-        tempMemoryLog = isInitial ? [memoryLogSummary] : [...tempMemoryLog, memoryLogSummary]; // Reset log if initial
+        tempMemoryLog = isInitial ? [memoryLogSummary] : [...tempMemoryLog, memoryLogSummary];
         if (tempMemoryLog.length > MAX_MEMORY_LOG_ENTRIES) {
           tempMemoryLog = tempMemoryLog.slice(tempMemoryLog.length - MAX_MEMORY_LOG_ENTRIES);
         }
         setMemoryLog(tempMemoryLog);
       } else if (isInitial) {
-        setMemoryLog([]); // Clear memory log if initial and no summary provided
+        setMemoryLog([]);
       }
 
-
-      if (isInitial) { // Reset these states fully for an initial load or regenerate
+      if (isInitial) {
         setStoryFlags({});
         setPlayerAbilities([]);
         tempStoryFlags = {};
         tempPlayerAbilities = [];
       }
-
 
       if (gameplayEffects && gameplayEffects.length > 0) {
         gameplayEffects.forEach(effect => {
@@ -162,17 +161,14 @@ const App: React.FC = () => {
             case "pursuer_modifier":
               if (tempPersistentThreat) {
                 if (effect.modifierType === "weaken_permanently") {
-                  let reductionFactor = 0;
-                  if (effect.magnitude === "minor") reductionFactor = 0.1;
-                  else if (effect.magnitude === "moderate") reductionFactor = 0.2;
+                  let reductionFactor = 0.1;
+                  if (effect.magnitude === "moderate") reductionFactor = 0.2;
                   else if (effect.magnitude === "major") reductionFactor = 0.3;
                   
-                  if (reductionFactor > 0) {
-                    const healthReduction = Math.floor(tempPersistentThreat.maxHealth * reductionFactor);
-                    const newMaxHealth = Math.max(1, tempPersistentThreat.maxHealth - healthReduction); 
-                    const newCurrentHealth = Math.min(newMaxHealth, Math.max(0, tempPersistentThreat.currentHealth - healthReduction));
-                    tempPersistentThreat = { ...tempPersistentThreat, maxHealth: newMaxHealth, currentHealth: newCurrentHealth };
-                  }
+                  const healthReduction = Math.floor(tempPersistentThreat.maxHealth * reductionFactor);
+                  const newMaxHealth = Math.max(1, tempPersistentThreat.maxHealth - healthReduction); 
+                  const newCurrentHealth = Math.min(newMaxHealth, Math.max(0, tempPersistentThreat.currentHealth - healthReduction));
+                  tempPersistentThreat = { ...tempPersistentThreat, maxHealth: newMaxHealth, currentHealth: newCurrentHealth };
                 }
               }
               break;
@@ -192,18 +188,15 @@ const App: React.FC = () => {
         });
         setStoryFlags(tempStoryFlags);
       }
-      // Set player abilities after processing all effects
       setPlayerAbilities(tempPlayerAbilities);
-
 
       if (isInitial) {
         setInventory(initialInventory?.slice(0, 3) || []); 
-        setIsInitialLoad(false); // Game has started, not initial load anymore
+        setIsInitialLoad(false);
         tempPlayerHealth = MAX_PLAYER_HEALTH; 
         setPlayerHealth(MAX_PLAYER_HEALTH); 
         setCombatLog([]); 
         setIsInCombat(false);
-        // memoryLog, storyFlags, playerAbilities already handled above for isInitial
 
         if (persistentThreatDetails) {
           const newThreat: PersistentThreat = {
@@ -211,27 +204,25 @@ const App: React.FC = () => {
             description: persistentThreatDetails.description,
             maxHealth: persistentThreatDetails.maxHealth,
             currentHealth: persistentThreatDetails.maxHealth,
-            senses: persistentThreatDetails.senses || [], // Initialize senses
+            senses: persistentThreatDetails.senses || [],
             status: updatedThreatStatus || 'distant',
             lastKnownAction: threatEncounterMessage || "Lurking...",
           };
           tempPersistentThreat = newThreat;
           setPersistentThreat(newThreat);
-          
         } else {
-            setPersistentThreat(null); // Ensure threat is cleared if not provided
+            setPersistentThreat(null);
         }
       } else { 
         if (tempPersistentThreat && (updatedThreatStatus || threatEncounterMessage || combatOutcome || gameplayEffects?.some(e => e.type === 'pursuer_modifier'))) {
           let newStatus = updatedThreatStatus || tempPersistentThreat.status;
-          if (combatOutcome && combatOutcome.isEnemyDefeated) newStatus = 'defeated';
-          else if (combatOutcome && combatOutcome.combatContinues) newStatus = 'engaged'; 
+          if (combatOutcome?.isEnemyDefeated) newStatus = 'defeated';
+          else if (combatOutcome?.combatContinues) newStatus = 'engaged'; 
           
           tempPersistentThreat = {
             ...tempPersistentThreat, 
             status: newStatus,
             lastKnownAction: combatOutcome?.narration || threatEncounterMessage || tempPersistentThreat.lastKnownAction,
-            // Senses are set at creation and don't typically change mid-game unless a specific effect modifies them
           };
         }
       }
@@ -270,8 +261,7 @@ const App: React.FC = () => {
           return; 
         }
         
-        const enemyHealthAfterThisTurnDamage = tempPersistentThreat ? tempPersistentThreat.currentHealth : 0;
-        if (combatOutcome.isEnemyDefeated || (tempPersistentThreat && enemyHealthAfterThisTurnDamage <= 0)) {
+        if (combatOutcome.isEnemyDefeated || (tempPersistentThreat && tempPersistentThreat.currentHealth <= 0)) {
           newCombatLog = [...newCombatLog, `${tempPersistentThreat?.name || 'The pursuer'} has been defeated!`];
           setCombatLog(newCombatLog);
           newIsInCombat = false;
@@ -294,12 +284,7 @@ const App: React.FC = () => {
         setIsGameOver(true);
         localGameOverSummaryText = gameOverSummary;
         setGameOverSummaryText(localGameOverSummaryText);
-        setCurrentStory(prev => ({
-            ...prev,
-            sceneDescription: sceneDescription,
-            choices: [],
-            isInCombat: false,
-        }));
+        setCurrentStory(prev => ({ ...prev, sceneDescription, choices: [], isInCombat: false }));
       }
 
       setIsInCombat(newIsInCombat);
@@ -317,7 +302,6 @@ const App: React.FC = () => {
       setCurrentStory({
         sceneDescription, 
         choices: localIsGameOver ? [] : (newChoicesToDisplay || []),
-        
         persistentThreat: tempPersistentThreat,
         threatEncounterMessage: threatEncounterMessage || null,
         combatLog: newCombatLog,
@@ -328,23 +312,16 @@ const App: React.FC = () => {
       console.error("Error processing AI response:", err);
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
       handleFatalError(`Story Interrupted: ${errorMessage}`);
-      
     } finally {
       setIsLoading(false);
     }
   }, [
-      isGameOver, 
-      handleFatalError, 
-      setInventory, setCurrentStory, setIsLoading, setError, setIsInitialLoad, 
-      setPersistentThreat, setIsInCombat, setCombatLog, setMemoryLog, 
-      setStoryFlags, setPlayerAbilities, setIsCustomChoiceInputVisible, 
-      setGameOverSummaryText, setPlayerHealth,
-      playerHealth, persistentThreat, isInCombat, combatLog, memoryLog, storyFlags, playerAbilities, gameOverSummaryText
-    ]);
+      isGameOver, handleFatalError, playerHealth, persistentThreat, isInCombat, 
+      combatLog, memoryLog, storyFlags, playerAbilities, gameOverSummaryText
+  ]);
 
   const startGame = useCallback(() => {
-    setIsInitialLoad(true); // Signal that we are in the initial setup phase
-    
+    setIsInitialLoad(true);
     setInventory([]);
     setPlayerHealth(MAX_PLAYER_HEALTH);
     setIsGameOver(false);
@@ -357,132 +334,88 @@ const App: React.FC = () => {
     setStoryFlags({}); 
     setPlayerAbilities([]); 
     setIsCustomChoiceInputVisible(false); 
-    setLastUsedThemeType(null); // Reset last used theme type
+    setLastUsedThemeType(null);
     setCurrentStory({
-        sceneDescription: "Welcome to QUARRY.", // Updated game name
-        choices: ["Begin"], // This specific choice indicates the app is ready for initial theme selection
-        
+        sceneDescription: "Welcome to QUARRY.",
+        choices: ["Begin"],
         persistentThreat: null,
         threatEncounterMessage: null,
         combatLog: [],
         isInCombat: false,
     });
-  }, [setIsCustomChoiceInputVisible, setMemoryLog, setStoryFlags, setPlayerAbilities, setGameOverSummaryText, setLastUsedThemeType]);
+  }, []);
 
-  // Helper function to get themes based on ThemeType
   const getThemesByType = (themeType: ThemeType): string[] => {
     switch (themeType) {
-        case "random":
-            return [...SCENARIO_THEMES_LIST];
-        case "realism":
-            return SCENARIO_THEMES_LIST.filter(theme => theme.startsWith("REALISM:"));
-        case "historical":
-            return SCENARIO_THEMES_LIST.filter(theme =>
-                theme.startsWith("Historical:") || theme.startsWith("Mythological & Folkloric:")
-            );
-        case "modern":
-            return SCENARIO_THEMES_LIST.filter(theme =>
-                theme.startsWith("Mystery/Thriller:") ||
-                theme.startsWith("Occupational & Mundane Catastrophe:") ||
-                theme.startsWith("Contemporary & Mundane:")
-            );
-        case "sci_fi":
-            return SCENARIO_THEMES_LIST.filter(theme =>
-                theme.startsWith("Science Fiction:") ||
-                theme.startsWith("Cosmic & Eldritch Horror:") ||
-                theme.startsWith("Unique & Surreal Environments:")
-            );
-        case "fantasy":
-            return SCENARIO_THEMES_LIST.filter(theme =>
-                theme.startsWith("Fantasy:") ||
-                theme.startsWith("Psychological & Existential Horror:")
-            );
+        case "random": return [...SCENARIO_THEMES_LIST];
+        case "realism": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("REALISM:"));
+        case "historical": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Historical:") || t.startsWith("Mythological & Folkloric:"));
+        case "modern": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Mystery/Thriller:") || t.startsWith("Occupational & Mundane Catastrophe:") || t.startsWith("Contemporary & Mundane:"));
+        case "sci_fi": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Science Fiction:") || t.startsWith("Cosmic & Eldritch Horror:") || t.startsWith("Unique & Surreal Environments:"));
+        case "fantasy": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Fantasy:") || t.startsWith("Psychological & Existential Horror:"));
         default:
-            console.warn(`Unknown themeType '${themeType}' in getThemesByType. Falling back to all themes.`);
+            console.warn(`Unknown themeType '${themeType}'.`);
             return [...SCENARIO_THEMES_LIST];
     }
   };
 
-  // Helper function to select a random theme from a given list
   const selectRandomTheme = (themes: string[]): string => {
     if (themes.length > 0) {
-        const randomIndex = Math.floor(Math.random() * themes.length);
-        return themes[randomIndex];
+      return themes[Math.floor(Math.random() * themes.length)];
     }
-    // Fallback if the provided list is empty
-    console.warn(`Theme list for selection was empty. Falling back to general random theme from master list or absolute fallback.`);
-    if (SCENARIO_THEMES_LIST.length > 0) {
-        const randomIndex = Math.floor(Math.random() * SCENARIO_THEMES_LIST.length);
-        return SCENARIO_THEMES_LIST[randomIndex];
-    }
-    // Absolute fallback if even the master list is empty (should ideally not happen)
-    return "Unique & Surreal Environments: Abstract Conceptual Realm Made Manifest";
+    console.warn(`Theme list was empty.`);
+    return SCENARIO_THEMES_LIST[Math.floor(Math.random() * SCENARIO_THEMES_LIST.length)] || "Unique & Surreal Environments: Abstract Conceptual Realm Made Manifest";
   };
-
 
   const handleStartGameWithTheme = useCallback((themeType: ThemeType) => {
     startGame(); 
-    setLastUsedThemeType(themeType); // Set the last used theme type
+    setLastUsedThemeType(themeType);
     if (!API_KEY_AVAILABLE) {
         setError("API Key is not configured. Please ensure it's set up in the environment.");
         return;
     }
-
     const themesToConsider = getThemesByType(themeType);
     const selectedTheme = selectRandomTheme(themesToConsider);
-
     if (!selectedTheme) {
-        console.error("Critical: Could not select a theme. Master list might be empty or filter yielded no results. Aborting start.");
-        setError("Failed to select a scenario theme. Please try again or check configuration.");
+        setError("Failed to select a scenario theme.");
         return;
     }
-
     processApiResponse(fetchInitialStory(selectedTheme), true);
   }, [startGame, processApiResponse, setLastUsedThemeType, setError]);
 
+  // --- NEW HANDLER FOR CUSTOM SCENARIO SELECTION ---
+  const handleCustomScenarioSelected = useCallback((scenario: string) => {
+    if (!API_KEY_AVAILABLE) {
+      setError("API Key is not configured.");
+      return;
+    }
+    setIsCustomScenarioModalVisible(false);
+    startGame();
+    setLastUsedThemeType(null);
+    processApiResponse(fetchInitialStory(scenario), true);
+  }, [startGame, processApiResponse, setError]);
 
   const handleChoiceSelected = useCallback((choice: string | ChoiceType) => {
     if (isGameOver) return;
-
     const choiceText = typeof choice === 'string' ? choice : choice.text;
     const isTriggeringCombat = typeof choice !== 'string' && !!choice.triggersCombat;
-
-    // "Begin" choice is no longer handled here; it's managed by dedicated start buttons.
-    if (!isInitialLoad) { // Only process choices if the game has actually started (not on initial button screen)
+    if (!isInitialLoad) {
       processApiResponse(fetchNextStorySegment(
-        currentStory.sceneDescription,
-        choiceText,
-        inventory,
-        playerHealth,
-        persistentThreat,
-        isInCombat, 
-        isTriggeringCombat,
-        memoryLog,
-        storyFlags, 
-        playerAbilities 
+        currentStory.sceneDescription, choiceText, inventory, playerHealth, 
+        persistentThreat, isInCombat, isTriggeringCombat, memoryLog, storyFlags, playerAbilities 
       ));
-    } else {
-      console.warn("handleChoiceSelected called while isInitialLoad is true for a non-start action. This might be an error in logic.");
     }
   }, [
       isInitialLoad, currentStory.sceneDescription, inventory, playerHealth, persistentThreat, 
       isInCombat, isGameOver, processApiResponse, memoryLog, storyFlags, playerAbilities
-    ]);
+  ]);
 
   const handleCustomChoiceSubmit = useCallback(() => {
     if (!customChoiceText.trim() || isInitialLoad) return;
     setIsCustomChoiceInputVisible(false); 
     processApiResponse(fetchNextStorySegment(
-      currentStory.sceneDescription,
-      customChoiceText.trim(),
-      inventory,
-      playerHealth,
-      persistentThreat,
-      isInCombat,
-      false, 
-      memoryLog,
-      storyFlags, 
-      playerAbilities 
+      currentStory.sceneDescription, customChoiceText.trim(), inventory, playerHealth, 
+      persistentThreat, isInCombat, false, memoryLog, storyFlags, playerAbilities 
     ));
     setCustomChoiceText(""); 
   }, [
@@ -492,40 +425,29 @@ const App: React.FC = () => {
 
   const handleRegenerateInitialScene = useCallback(() => {
     if (!API_KEY_AVAILABLE || isLoading) return;
-
-    const themeTypeToUse = lastUsedThemeType || "random"; // Fallback to random if not set
-    
+    const themeTypeToUse = lastUsedThemeType || "random";
     const themesToConsider = getThemesByType(themeTypeToUse);
     const selectedTheme = selectRandomTheme(themesToConsider);
-
     if (!selectedTheme) {
-        console.error("Critical: Could not select a theme for regeneration. Aborting.");
-        setError("Failed to select a scenario theme for regeneration. Please try again.");
+        setError("Failed to select a scenario theme for regeneration.");
         return;
     }
-    
-    // startGame() is called within processApiResponse when isInitial is true,
-    // so no need to call it explicitly here for state resets.
-    // lastUsedThemeType is preserved for this specific regeneration path.
     processApiResponse(fetchInitialStory(selectedTheme), true);
   }, [processApiResponse, isLoading, lastUsedThemeType, setError]);
-
 
   if (!API_KEY_AVAILABLE) {
     return <ApiKeyMissingBanner />;
   }
   
   const currentDisplayedChoices = currentStory.choices;
-
-  // Condition to show "Random" and "Realism" buttons
-  const isDisplayingInitialStartOptions = isInitialLoad && !isLoading && currentStory.choices.length === 1 && typeof currentStory.choices[0] === 'string' && currentStory.choices[0] === "Begin";
-  
+  const isDisplayingInitialStartOptions = isInitialLoad && !isLoading && currentStory.choices.length === 1 && currentStory.choices[0] === "Begin";
   const showRegenerateButton = !isInitialLoad && !isLoading && !isGameOver && !isCustomChoiceInputVisible && memoryLog.length <= 1 && currentDisplayedChoices.length > 0;
 
   const themeButtonBaseClass = "w-full font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none";
   const randomThemeButtonClass = `${themeButtonBaseClass} bg-yellow-500 text-black font-bold hover:bg-yellow-400 focus:ring-yellow-300`;
   const realismThemeButtonClass = `${themeButtonBaseClass} text-white bg-red-800 hover:bg-red-700 focus:ring-red-600 disabled:bg-red-900 disabled:text-gray-300`;
   const specificThemeButtonClass = `${themeButtonBaseClass} text-white bg-gray-600 hover:bg-gray-500 focus:ring-gray-400 disabled:bg-gray-400`;
+  const customThemeButtonClass = `${themeButtonBaseClass} text-yellow-300 bg-gray-700 hover:bg-gray-600 focus:ring-gray-500 disabled:bg-gray-800 md:col-span-3`;
 
 
   return (
@@ -549,12 +471,7 @@ const App: React.FC = () => {
                     <button
                         onClick={handleRegenerateInitialScene}
                         disabled={isLoading}
-                        className="ml-3 mt-1 bg-sky-700 text-white font-semibold p-2 rounded-full shadow-md 
-                                     transition-all duration-150 ease-in-out 
-                                     hover:bg-sky-600 hover:shadow-lg transform hover:scale-105 
-                                     focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-75 
-                                     disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
-                                     text-xl border border-sky-600 shrink-0"
+                        className="ml-3 mt-1 bg-sky-700 text-white font-semibold p-2 rounded-full shadow-md transition-all duration-150 ease-in-out hover:bg-sky-600 hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-75 disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none text-xl border border-sky-600 shrink-0"
                         title="Regenerate Initial Scene (same category)"
                         aria-label="Regenerate Initial Scene (same category)"
                     >
@@ -597,7 +514,7 @@ const App: React.FC = () => {
                 <ul className="list-none text-gray-200 flex flex-col space-y-1 custom-scroll max-h-24 overflow-y-auto pr-2">
                     {playerAbilities.map((ability, index) => (
                         <li key={index} className="text-sm py-0.5 hover:text-purple-100 transition-colors duration-150" title={ability.description}>
-                            <span className="text-purple-300 mr-1.5">&#✦</span> {ability.name} {ability.uses !== undefined ? `(<span class="math-inline">\{ability\.uses\} use</span>{ability.uses === 1 ? '' : 's'} left)` : ''}
+                            <span className="text-purple-300 mr-1.5">&#✦</span> {ability.name} {ability.uses !== undefined ? `(${ability.uses} use${ability.uses === 1 ? '' : 's'} left)` : ''}
                         </li>
                     ))}
                 </ul>
@@ -636,17 +553,12 @@ const App: React.FC = () => {
             </p>
             <button 
               onClick={startGame}
-              className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md 
-                         transition-all duration-150 ease-in-out 
-                         hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 
-                         focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 
-                         text-lg"
+              className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-150 ease-in-out hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 text-lg"
             >
               Play Again
             </button>
            </div>
         )}
-
 
         {error && !isGameOver && ( 
           <div className="bg-red-800 bg-opacity-90 p-4 rounded-lg shadow-md mb-6 max-w-3xl w-full text-center">
@@ -664,7 +576,7 @@ const App: React.FC = () => {
         <div className="w-full max-w-xl flex flex-col items-center mt-4 md:mt-6">
 
             {isDisplayingInitialStartOptions && (
-                 <div className="w-full grid grid-cols-2 gap-4">
+                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <button
                         key="random"
                         onClick={() => handleStartGameWithTheme("random")}
@@ -678,6 +590,14 @@ const App: React.FC = () => {
                     <button key="modern" onClick={() => handleStartGameWithTheme("modern")} className={specificThemeButtonClass} disabled={isLoading}>Modern</button>
                     <button key="scifi" onClick={() => handleStartGameWithTheme("sci_fi")} className={specificThemeButtonClass} disabled={isLoading}>Sci-Fi</button>
                     <button key="fantasy" onClick={() => handleStartGameWithTheme("fantasy")} className={specificThemeButtonClass} disabled={isLoading}>Fantasy</button>
+                    <button
+                      key="custom"
+                      onClick={() => setIsCustomScenarioModalVisible(true)}
+                      className={customThemeButtonClass}
+                      disabled={isLoading}
+                    >
+                      CUSTOM
+                    </button>
                 </div>
             )}
 
@@ -752,6 +672,13 @@ const App: React.FC = () => {
              )}
         </div> 
       </main>
+      
+      <ScenarioSelectorModal
+        isOpen={isCustomScenarioModalVisible}
+        onClose={() => setIsCustomScenarioModalVisible(false)}
+        onScenarioSelected={handleCustomScenarioSelected}
+        scenarios={SCENARIO_THEMES_LIST}
+      />
 
     </div>
   );
