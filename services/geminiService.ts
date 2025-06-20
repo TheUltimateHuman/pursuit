@@ -46,32 +46,23 @@ if (effectiveApiKey) {
 
 
 // --- MVP DEPLOYMENT CONFIGURATION ---
-// This section should be COMMENTED OUT for AI Labs Preview.
-// UNCOMMENT this section for Live MVP Deployment.
 
 import { API_KEY as API_KEY_FROM_ENV_JS } from '../env.js'; // Use ../ to go up to the root
 
 let ai: GoogleGenAI | null = null;
-let effectiveApiKey: string | undefined = undefined;
 
-// Prioritize process.env.API_KEY (available in AI Studio and defined by Vite for builds)
-if (typeof process.env.API_KEY === 'string' && process.env.API_KEY.trim() !== '') {
-  effectiveApiKey = process.env.API_KEY;
-} else if (typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FROM_ENV_JS.trim() !== '') {
-  // Fallback to the MVP's method if process.env.API_KEY is not set
-  console.log("geminiService.ts: Using API_KEY from env.js as fallback for MVP Deployment.");
-  effectiveApiKey = API_KEY_FROM_ENV_JS;
-}
+// Directly use the key imported from the env.js file created during the build.
+const effectiveApiKey: string | undefined = API_KEY_FROM_ENV_JS;
 
 if (effectiveApiKey) {
-  try {
-    ai = new GoogleGenAI({ apiKey: effectiveApiKey });
-  } catch (e) {
-    console.error("Critical Error (MVP Deployment Config): Failed to initialize GoogleGenAI client with effectiveApiKey. Services will be unavailable.", e);
-    ai = null;
-  }
+  try {
+    ai = new GoogleGenAI({ apiKey: effectiveApiKey });
+  } catch (e) {
+    console.error("Critical Error (MVP Deployment Config): Failed to initialize GoogleGenAI client with effectiveApiKey. Services will be unavailable.", e);
+    ai = null;
+  }
 } else {
-  console.warn("API Key is not available from process.env.API_KEY or env.js (MVP Deployment Config). Gemini services will not function.");
+  console.warn("API Key is not available from env.js (MVP Deployment Config). Gemini services will not function.");
 }
 
 // --- END MVP DEPLOYMENT CONFIGURATION ---
