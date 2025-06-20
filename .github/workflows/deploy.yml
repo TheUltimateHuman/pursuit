@@ -30,7 +30,10 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
-
+      - name: Find Problematic String in Source Files
+        run: |
+          echo "Searching for 'process.env.API_KEY' in all source files..."
+          grep -r "process.env.API_KEY" . || echo "String not found, proceeding."
       - name: Build Application
         env:
           API_KEY: ${{ secrets.API_KEY }}

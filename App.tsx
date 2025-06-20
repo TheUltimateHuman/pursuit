@@ -1,4 +1,4 @@
-
+// App.tsx (Corrected and Final Version)
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect } from './types';
@@ -11,38 +11,18 @@ import InventoryDisplay from './components/InventoryDisplay';
 import PersistentThreatDisplay from './components/PersistentThreatDisplay';
 import { MAX_PLAYER_HEALTH, SCENARIO_THEMES_LIST } from './constants';
 
-// --- CONFIGURATION PROTOCOL ---
-// To switch between AI Labs Preview and Live MVP Deployment for API Key Checking:
-// 1. For AI LABS PREVIEW:
-//    - Ensure the "AI LABS PREVIEW API KEY CONFIGURATION" section below is UNCOMMENTED.
-//    - Ensure the "MVP DEPLOYMENT API KEY CONFIGURATION" section below is COMMENTED OUT.
-//    - Ensure the import of API_KEY_FROM_ENV_JS from './env.js' is COMMENTED OUT.
-// 2. For LIVE MVP DEPLOYMENT (e.g., Netlify, Vercel):
-//    - Ensure the "AI LABS PREVIEW API KEY CONFIGURATION" section below is COMMENTED OUT.
-//    - Ensure the "MVP DEPLOYMENT API KEY CONFIGURATION" section below is UNCOMMENTED.
-//    - Ensure the import of API_KEY_FROM_ENV_JS from './env.js' is UNCOMMENTED.
-// --- END CONFIGURATION PROTOCOL ---
-
-// --- MVP DEPLOYMENT API KEY CONFIGURATION ---
-
+// --- This is the ONLY configuration needed. It uses the env.js file. ---
 import { API_KEY as API_KEY_FROM_ENV_JS } from './env.js'; 
-
-const effectiveApiKey = API_KEY_FROM_ENV_JS;
-const API_KEY_AVAILABLE = typeof effectiveApiKey === 'string' && effectiveApiKey.trim() !== "";
-
-// --- END MVP DEPLOYMENT API KEY CONFIGURATION ---
-
+const API_KEY_AVAILABLE = typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FROM_ENV_JS.trim() !== "";
+// --- End Configuration ---
 
 const MAX_MEMORY_LOG_ENTRIES = 5;
-
 type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fantasy";
-
 
 const App: React.FC = () => {
   const [currentStory, setCurrentStory] = useState<StoryState>({
     sceneDescription: "Welcome to QUARRY.",
-    choices: ["Begin"], // "Begin" choice signifies initial state for button display
-    
+    choices: ["Begin"],
     persistentThreat: null,
     threatEncounterMessage: null,
     combatLog: [],
@@ -53,7 +33,6 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
   
-
   const [playerHealth, setPlayerHealth] = useState<number>(MAX_PLAYER_HEALTH);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [gameOverSummaryText, setGameOverSummaryText] = useState<string | null>(null);
@@ -65,22 +44,16 @@ const App: React.FC = () => {
   const [storyFlags, setStoryFlags] = useState<Record<string, any>>({});
   const [playerAbilities, setPlayerAbilities] = useState<{ name: string; description: string; uses?: number }[]>([]);
 
-
   const [isCustomChoiceInputVisible, setIsCustomChoiceInputVisible] = useState<boolean>(false);
   const [customChoiceText, setCustomChoiceText] = useState<string>("");
   const [lastUsedThemeType, setLastUsedThemeType] = useState<ThemeType | null>(null);
 
-
+  // This useEffect hook is no longer needed for complex debugging.
   useEffect(() => {
-    // Diagnostic log for the build process
-    console.log("DEBUG: effectiveApiKey as seen by app:", effectiveApiKey ? `Exists (length: ${effectiveApiKey.length})` : 'Does not exist or is not a string');
-    console.log("DEBUG: API_KEY_AVAILABLE evaluates to:", API_KEY_AVAILABLE);
-
     if (!API_KEY_AVAILABLE) {
-      console.error("API_KEY is not available. Check environment configuration (process.env.API_KEY for AI Labs, or env.js / process.env.API_KEY for deployment).");
+      console.error("API_KEY is not available. Check deployment secrets and the local env.js file.");
     }
-  }, []); // Runs once on mount
-
+  }, []);
 
   const handleFatalError = useCallback((message: string, gameOver: boolean = true, isNarrativeDefeat: boolean = false, narrativeDemiseScene?: string) => {
     setIsLoading(false);
@@ -107,7 +80,6 @@ const App: React.FC = () => {
       }));
     }
   }, [setCurrentStory, setError, setIsLoading, setIsGameOver, setIsInCombat, setIsCustomChoiceInputVisible]);
-
 
   const processApiResponse = useCallback(async (
     apiResponsePromise: Promise<GeminiApiResponse | InitialStoryData>, 
@@ -179,9 +151,9 @@ const App: React.FC = () => {
               if (!tempPlayerAbilities.find(ab => ab.name === effect.abilityName)) {
                 tempPlayerAbilities.push({ name: effect.abilityName, description: effect.description, uses: effect.uses });
               } else {
-                 tempPlayerAbilities = tempPlayerAbilities.map(ab => 
-                    ab.name === effect.abilityName ? { ...ab, description: effect.description, uses: effect.uses ?? ab.uses } : ab
-                 );
+                  tempPlayerAbilities = tempPlayerAbilities.map(ab => 
+                      ab.name === effect.abilityName ? { ...ab, description: effect.description, uses: effect.uses ?? ab.uses } : ab
+                  );
               }
               break;
             case "story_flag_set":
@@ -250,18 +222,18 @@ const App: React.FC = () => {
             setPersistentThreat(null); // Ensure threat is cleared if not provided
         }
       } else { 
-         if (tempPersistentThreat && (updatedThreatStatus || threatEncounterMessage || combatOutcome || gameplayEffects?.some(e => e.type === 'pursuer_modifier'))) {
-            let newStatus = updatedThreatStatus || tempPersistentThreat.status;
-            if (combatOutcome && combatOutcome.isEnemyDefeated) newStatus = 'defeated';
-            else if (combatOutcome && combatOutcome.combatContinues) newStatus = 'engaged'; 
-            
-            tempPersistentThreat = {
-              ...tempPersistentThreat, 
-              status: newStatus,
-              lastKnownAction: combatOutcome?.narration || threatEncounterMessage || tempPersistentThreat.lastKnownAction,
-              // Senses are set at creation and don't typically change mid-game unless a specific effect modifies them
-            };
-          }
+        if (tempPersistentThreat && (updatedThreatStatus || threatEncounterMessage || combatOutcome || gameplayEffects?.some(e => e.type === 'pursuer_modifier'))) {
+          let newStatus = updatedThreatStatus || tempPersistentThreat.status;
+          if (combatOutcome && combatOutcome.isEnemyDefeated) newStatus = 'defeated';
+          else if (combatOutcome && combatOutcome.combatContinues) newStatus = 'engaged'; 
+          
+          tempPersistentThreat = {
+            ...tempPersistentThreat, 
+            status: newStatus,
+            lastKnownAction: combatOutcome?.narration || threatEncounterMessage || tempPersistentThreat.lastKnownAction,
+            // Senses are set at creation and don't typically change mid-game unless a specific effect modifies them
+          };
+        }
       }
       
       let newIsInCombat = isInCombat;
@@ -314,7 +286,7 @@ const App: React.FC = () => {
       } else if (tempPersistentThreat?.status === 'engaged' && !combatChoices) {
         newIsInCombat = true; 
       } else if (tempPersistentThreat?.status !== 'engaged') {
-         newIsInCombat = false; 
+        newIsInCombat = false; 
       }
 
       if (gameOverSummary && !combatOutcome && !localIsGameOver) { 
@@ -332,7 +304,6 @@ const App: React.FC = () => {
 
       setIsInCombat(newIsInCombat);
       setPersistentThreat(tempPersistentThreat);
-
 
       if (addItem) {
         setInventory(prevInventory => prevInventory.includes(addItem) ? prevInventory : [...prevInventory, addItem]);
@@ -370,7 +341,6 @@ const App: React.FC = () => {
       setGameOverSummaryText, setPlayerHealth,
       playerHealth, persistentThreat, isInCombat, combatLog, memoryLog, storyFlags, playerAbilities, gameOverSummaryText
     ]);
-
 
   const startGame = useCallback(() => {
     setIsInitialLoad(true); // Signal that we are in the initial setup phase
@@ -571,7 +541,7 @@ const App: React.FC = () => {
       <main className="w-full max-w-3xl flex flex-col items-center">
         
         {(!isInitialLoad || currentStory.sceneDescription !== "Welcome to QUARRY.") && (
-             <div className="flex justify-center items-start w-full max-w-3xl mb-8"> 
+              <div className="flex justify-center items-start w-full max-w-3xl mb-8"> 
                 <div className={showRegenerateButton ? "flex-grow min-w-0" : "w-full"}> 
                     <StoryDisplay text={currentStory.sceneDescription} />
                 </div>
@@ -580,18 +550,18 @@ const App: React.FC = () => {
                         onClick={handleRegenerateInitialScene}
                         disabled={isLoading}
                         className="ml-3 mt-1 bg-sky-700 text-white font-semibold p-2 rounded-full shadow-md 
-                                    transition-all duration-150 ease-in-out 
-                                    hover:bg-sky-600 hover:shadow-lg transform hover:scale-105 
-                                    focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-75 
-                                    disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
-                                    text-xl border border-sky-600 shrink-0"
+                                     transition-all duration-150 ease-in-out 
+                                     hover:bg-sky-600 hover:shadow-lg transform hover:scale-105 
+                                     focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-75 
+                                     disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
+                                     text-xl border border-sky-600 shrink-0"
                         title="Regenerate Initial Scene (same category)"
                         aria-label="Regenerate Initial Scene (same category)"
                     >
                         🔄
                     </button>
                 )}
-            </div>
+              </div>
         )}
 
         {currentStory.persistentThreat && !isGameOver && !isInitialLoad && (
@@ -627,7 +597,7 @@ const App: React.FC = () => {
                 <ul className="list-none text-gray-200 flex flex-col space-y-1 custom-scroll max-h-24 overflow-y-auto pr-2">
                     {playerAbilities.map((ability, index) => (
                         <li key={index} className="text-sm py-0.5 hover:text-purple-100 transition-colors duration-150" title={ability.description}>
-                            <span className="text-purple-300 mr-1.5">&#✦</span> {ability.name} {ability.uses !== undefined ? `(${ability.uses} use${ability.uses === 1 ? '' : 's'} left)` : ''}
+                            <span className="text-purple-300 mr-1.5">&#✦</span> {ability.name} {ability.uses !== undefined ? `(<span class="math-inline">\{ability\.uses\} use</span>{ability.uses === 1 ? '' : 's'} left)` : ''}
                         </li>
                     ))}
                 </ul>
@@ -667,14 +637,14 @@ const App: React.FC = () => {
             <button 
               onClick={startGame}
               className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md 
-                        transition-all duration-150 ease-in-out 
-                        hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 
-                        focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 
-                        text-lg"
+                         transition-all duration-150 ease-in-out 
+                         hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 
+                         focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 
+                         text-lg"
             >
               Play Again
             </button>
-          </div>
+           </div>
         )}
 
 
@@ -750,11 +720,11 @@ const App: React.FC = () => {
                         }}
                         disabled={isLoading}
                         className="w-full bg-gray-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md 
-                                   transition-all duration-150 ease-in-out 
-                                   hover:bg-gray-600 hover:shadow-lg transform hover:scale-105 
-                                   focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 
-                                   disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
-                                   border border-gray-600 mb-4" // Added mb-4 for spacing
+                                     transition-all duration-150 ease-in-out 
+                                     hover:bg-gray-600 hover:shadow-lg transform hover:scale-105 
+                                     focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 
+                                     disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
+                                     border border-gray-600 mb-4" // Added mb-4 for spacing
                     >
                         Write your own...
                     </button>
