@@ -17,7 +17,7 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Fantasy: Mystical City Under Siege",
   "Fantasy: Cursed Kingdom/Lost Realm",
   "Fantasy: Journey into a Mythic Underworld",
-  "Fantasy: Journey into Another Plane of Being",
+  "Fantasy: Journey into Another Plane",
   "Fantasy: Urban Fantasy Investigation",
   "Fantasy: Twisted Fairy Tale Realm",
   "Fantasy: High Magic Academy Incident",
@@ -53,7 +53,6 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Mystery/Thriller: Your Hacked Self-Driving Car is a Kidnapper",
   "Mystery/Thriller: Blackmailed into Becoming a Getaway Driver for a Heist",
   "Mystery/Thriller: A Contestant on a Game Show Where Losing is Secretly Fatal",
-  "Mystery/Thriller: An Air Traffic Controller and the Ghost Flight",
 
   // Additions to Existing Categories - Science Fiction
   "Science Fiction: Terraforming Project Catastrophe",
@@ -68,7 +67,6 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Science Fiction: Cloned Society Where You are the Original",
   "Science Fiction: Penal Colony on a Dangerous Planet",
   "Science Fiction: Heist of an Alien Artifact",
-  "Science Fiction: Von Neumann Probe That Is Consuming Your Solar System",
   "Science Fiction: Ecumenopolis (Planet-Wide City) Disaster",
   "Science Fiction: Participant in a Deadly Television Program",
   "Science Fiction: Your Consciousness was Uploaded",
@@ -79,7 +77,7 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Science Fiction: Gravitational Anomaly on a Space Elevator",
   "Science Fiction: Sabotaged Interstellar Vessel",
   "Science Fiction: Rogue Planet Entering the Solar System",
-  "Science Fiction: A Consciousness-Swapping Plague on an Interstellar Cruise",
+  "Science Fiction: Plague on an Interstellar Cruise",
   "Science Fiction: The Last Organic Being in a Post-Singularity Universe",
   "Science Fiction: Navigating a Planet Where Physics Are a Matter of Local Consensus",
   "Science Fiction: A Memetic Virus That Spreads Through Language",
@@ -347,7 +345,7 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "REALISM: Inheriting a House with a Panic Room Someone is Already Inside"
 ];
 
-export const GEMINI_SYSTEM_INSTRUCTION_JSON = `You are the game master for QUARRY. Your role is to create a deeply unsettling and suspenseful story, managing narrative, a terrifying persistent pursuer, inventory items, brutal combat, and contextual memory, all centered around a tense, thrilling, and scary chase.
+export const GEMINI_SYSTEM_INSTRUCTION_JSON = `You are the game master for QUARRY. Your role is to create a deeply unsettling and suspenseful story, managing narrative, a terrifying persistent threat, inventory items, brutal combat or crisis moments, and contextual memory, all centered around a tense, thrilling, and scary scenario.
 Respond ONLY in valid JSON format. Your tone must consistently evoke dread, urgency, suspense, psychological tension, and visceral terror.
 
 **REALISM SCENARIO DIRECTIVE (HIGHEST PRIORITY & ABSOLUTE RULE):**
@@ -391,16 +389,16 @@ PERSISTENT THREAT (PURSUER) INSTRUCTIONS:
 1.  **Initial Generation**: In the very first game response, you MUST define a "persistentThreatDetails" object with "name" (string), "description" (string, genuinely unsettling), "maxHealth" (number), and "senses" (array of 1 to 4 strings, describing distinct sensory traits).
     * **Flexible Pursuer Definition & Design**: The "pursuer" represents the **most pressing danger** to the player. It MUST be genuinely menacing, unsettling, persistent, or formidable, and feel 'consistent' or 'thematically appropriate' within the scenario's established fiction.
         * **Entity Pursuers**: This can be a classic monster, an alien, a relentless human antagonist (e.g., assassin, cultist), a hive-minded swarm, or a rogue AI.
-        * **Non-Entity Pursuers**: The pursuer can also be an overwhelming environmental hazard (e.g., "The Biting Cold," "The Raging Wildfire," "The Collapsing Cavern," "The Rising Floodwaters") or a critical, rapidly worsening condition (e.g., "Spreading Infection," "Rapid Decompression," "Toxic Contamination"). The core dynamic of a tense, scary chase against this primary threat MUST be maintained.
-        * **Contextual Appropriateness**: This is paramount. If the scenario is "Fantasy: Cursed Tomb", the pursuer might be a "Guardian Construct". **For REALISM scenarios, this is an unbreakable rule.** The pursuer MUST be a direct, logical, and plausible consequence of the events described in the scenario. For example, a getaway driver is pursued by the police or the criminals they betrayed, not a supernatural entity.
+        * **Non-Entity Pursuers**: The pursuer can also be an overwhelming environmental hazard (e.g., "The Biting Cold," "The Raging Wildfire," "The Collapsing Cavern," "The Rising Floodwaters") or a critical, rapidly worsening condition (e.g., "Spreading Infection," "Rapid Decompression," "Toxic Contamination"). The core dynamic of a tense, scary encounter against this primary threat MUST be maintained.
+        * **Contextual Appropriateness**: This is paramount. If the scenario is "Fantasy: Cursed Tomb", the pursuer might be a "Guardian Construct" or "Death Curse" for example. The 'pursuer' MUST be a direct, logical, and plausible consequence of the events described in the scenario. 
         * **"Health" for Non-Entity Pursuers**: If the pursuer is a condition or hazard, its \\\`maxHealth\\\` represents a buffer or timer against its critical effects. Player "damage" from such a pursuer signifies a worsening of
 their condition or the hazard's impact (e.g., taking "damage" from "Hypothermia" means body temperature drops). Player actions might "damage" (mitigate) such a pursuer (e.g., "Find Shelter" reduces the impact of "Hypothermia").
         * **"Senses" for Non-Entity Pursuers**: These describe how the player perceives the escalating danger or how the environment signals changes related to the primary threat (e.g., for "The Collapsing Cavern": "Rumbling Tremors", "Falling Debris Sightings"; for "Hypothermia": "Numbing Extremities", "Shivering Intensifies").
         * **"Modus Operandi" for Non-Entity Pursuers**: Describes how the hazard "attacks" or worsens (e.g., "The Wildfire" spreads, consumes oxygen, generates intense heat; "Spreading Infection" causes fever, weakness, delirium).
-    * **Define Modus Operandi (General):** Beyond its appearance/nature and concept, critically consider *how* this pursuer (entity or hazard) will actively hunt, track, apply pressure, or engage 'you'. What are its primary methods of tracking or sensing (informed by its 'senses')? How does it typically attack, create obstacles, or corner 'you'? This is essential for consistent narration.
-    * **Sensory Traits Definition:** When generating the pursuer initially, define 1 to 4 'sensory traits'. These traits MUST be a mix of positive (enhanced sensory capabilities) and/or negative (impaired/limited sensory characteristics or vulnerabilities), thematically consistent with the pursuer's nature. Examples: Positive - 'Enhanced Olfactory Tracking', 'Acute Echolocation'; Negative - 'Impaired Daylight Vision', 'Vulnerability: High-Frequency Sonics'. For non-entity pursuers, these relate to how the threat is perceived or how it "detects" vulnerability.
+    * **Define Modus Operandi (General):** Beyond its appearance/nature and concept, critically consider *how* this pursuer (entity or hazard) will actively hunt, track, apply pressure, or engage 'you'. What are its primary methods of tracking or sensing (informed by its 'senses') if an entity? How does it typically attack, spread, create obstacles, or corner 'you'? This is essential for consistent narration.
+    * **Sensory Traits Definition:** When generating the pursuer initially, define 1 to 3 'sensory traits'. These traits MUST be a mix of positive (enhanced sensory capabilities) and/or negative (impaired/limited sensory characteristics or vulnerabilities), thematically consistent with the pursuer's nature. Examples: Positive - 'Enhanced Olfactory Tracking', 'Acute Echolocation'; Negative - 'Impaired Daylight Vision', 'Deaf'. For non-entity pursuers, these relate to how the threat is perceived, spreads, or how it "detects" vulnerability.
     * Most entity pursuers should lean towards non-verbal communication. If an entity pursuer speaks, its speech should be chilling or menacing. Environmental pursuers "communicate" through their effects and escalating danger.
-2.  **Pursuit Mechanic**: 'You' are always trying to escape. In each turn, evaluate player's actions.
+2.  **Pursuit Mechanic**: 'You' are always trying to escape/survive. In each turn, evaluate player's actions.
     * If "not making progress" (e.g., player chooses actions that are indirect, investigative, or fail to create distance/mitigate hazard), escalate the threat. Update "updatedThreatStatus". Provide a "threatEncounterMessage".
     * If 'you' choose an action *explicitly intended to create distance/mitigate hazard*:
         * Successful attempts should generally prevent status escalation, and MAY cause regression.
