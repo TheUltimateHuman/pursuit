@@ -1,49 +1,43 @@
-
-
 import React from 'react';
 import { PersistentThreat } from '../types';
 
 interface PersistentThreatDisplayProps {
   threat: PersistentThreat | null;
   message?: string | null;
-  isInCombat?: boolean; // New prop
+  isInCombat?: boolean;
 }
 
-const getStatusColor = (status: PersistentThreat['status'], isInCombat?: boolean) => {
-  if (isInCombat && status === 'engaged') return 'text-red-500 animate-pulse'; // Prominent combat warning
-  switch (status) {
-    case 'hidden': return 'text-gray-400';
-    case 'very_distant': return 'text-sky-300'; 
-    case 'distant': return 'text-blue-300';
-    case 'closing_in': return 'text-yellow-400'; 
-    case 'nearby': return 'text-yellow-300'; 
-    case 'imminent': return 'text-orange-400';
-    case 'engaged': return 'text-red-600 font-bold';
-    case 'defeated': return 'text-green-400';
-    default: return 'text-gray-300';
-  }
-};
-
-const getDisplayStatusText = (status: PersistentThreat['status'], isInCombat?: boolean): string => {
+const getVisualIndicator = (status: PersistentThreat['status'], isInCombat?: boolean) => {
   if (isInCombat && status === 'engaged') {
-    return "WARNING!";
+    return {
+      position: 5,
+      color: 'text-red-500',
+      animation: 'animate-pulse',
+      title: 'WARNING! Combat Engaged'
+    };
   }
+  
   switch (status) {
-    case 'hidden': return "Dormant";
-    case 'very_distant': return "Remote";
-    case 'distant': return "Approaching";
-    case 'closing_in': return "Drawing Near";
-    case 'nearby': return "Near";
-    case 'imminent': return "Critical";
-    case 'engaged': return "Crisis";
-    case 'defeated': return "Neutralized";
-    default: 
-      // If status somehow ends up here and is not one of the known types,
-      // TypeScript infers it as 'never'. Casting to string allows the fallback.
-      return String(status).replace(/_/g, ' '); 
+    case 'hidden':
+      return { position: 0, color: 'text-gray-400', animation: '', title: 'Hidden/Dormant' };
+    case 'very_distant':
+      return { position: 1, color: 'text-sky-300', animation: '', title: 'Very Distant' };
+    case 'distant':
+      return { position: 2, color: 'text-blue-300', animation: '', title: 'Distant' };
+    case 'closing_in':
+      return { position: 3, color: 'text-yellow-400', animation: 'animate-pulse', title: 'Closing In' };
+    case 'nearby':
+      return { position: 4, color: 'text-yellow-300', animation: 'animate-pulse', title: 'Nearby' };
+    case 'imminent':
+      return { position: 5, color: 'text-orange-400', animation: 'animate-pulse', title: 'Imminent' };
+    case 'engaged':
+      return { position: 5, color: 'text-red-600', animation: 'animate-pulse', title: 'Engaged' };
+    case 'defeated':
+      return { position: 0, color: 'text-green-400', animation: '', title: 'Defeated' };
+    default:
+      return { position: 0, color: 'text-gray-300', animation: '', title: 'Unknown Status' };
   }
 };
-
 
 const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threat, message, isInCombat }) => {
   if (!threat) {
@@ -51,10 +45,9 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
   }
 
   const displayMessage = message || threat.lastKnownAction;
-  const statusColor = getStatusColor(threat.status, isInCombat);
-  const statusDisplayText = getDisplayStatusText(threat.status, isInCombat);
+  const visualIndicator = getVisualIndicator(threat.status, isInCombat);
   
-  const ariaStatusDescription = statusDisplayText === "WARNING!" ? "Warning: Combat Engaged" : `Status: ${statusDisplayText}`;
+  const ariaStatusDescription = visualIndicator.title;
 
   return (
     <div
@@ -66,19 +59,40 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
         Threat: <span className="text-red-200 font-bold">{threat.name}</span>
       </h4>
       {displayMessage && !isInCombat && ( 
-         <p className={`text-sm italic ${statusColor}`}>
+         <p className="text-sm italic text-red-300">
             "{displayMessage}"
         </p>
       )}
-      <p className={`text-sm uppercase tracking-wider font-medium mt-1 ${statusColor}`}>
-        {statusDisplayText.startsWith("WARNING:") ? statusDisplayText : `Status: ${statusDisplayText}`}
-      </p>
+      <div className="flex items-center justify-center mt-2">
+        {threat.status === 'engaged' ? (
+          <div className="text-red-500 animate-pulse font-bold text-lg" title="WARNING! Combat Engaged" aria-label="WARNING! Combat Engaged">
+            WARNING!
+          </div>
+        ) : threat.status === 'defeated' ? (
+          <div className="text-green-400 font-bold text-lg" title="Safe - Threat Defeated" aria-label="Safe - Threat Defeated">
+            SAFE
+          </div>
+        ) : (
+          <div className={`flex items-center space-x-1 ${visualIndicator.animation}`} title={visualIndicator.title} aria-label={visualIndicator.title}>
+            {[0, 1, 2, 3, 4, 5].map((pos) => (
+              <div
+                key={pos}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  pos === visualIndicator.position 
+                    ? `${visualIndicator.color} shadow-lg` 
+                    : 'bg-white bg-opacity-30'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
       {threat.senses && threat.senses.length > 0 && !isInCombat && (
         <div className="mt-2 pt-1 border-t border-red-700 border-opacity-50">
           <ul className="text-xs text-red-300 list-none p-0">
             {threat.senses.map((sense, index) => (
               <li key={index} className="inline-block mr-2 last:mr-0" title={sense}>
-                <span role="img" aria-label="indicator icon" className="mr-1">👁️</span>{sense.split('(')[0].trim()} {/* Show only name, full desc on hover */}
+                <span role="img" aria-label="indicator icon" className="mr-1">👁️</span>{sense.split('(')[0].trim()}
               </li>
             ))}
           </ul>
