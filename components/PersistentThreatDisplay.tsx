@@ -73,11 +73,11 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
             SAFE
           </div>
         ) : (
-          <div className={`flex items-center space-x-1 ${visualIndicator.animation}`} title={visualIndicator.title} aria-label={visualIndicator.title}>
+          <div className={`flex items-center justify-between w-full px-4 ${visualIndicator.animation}`} title={visualIndicator.title} aria-label={visualIndicator.title}>
             {[0, 1, 2, 3, 4, 5].map((pos) => (
               <div
                 key={pos}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`h-2 flex-1 mx-1 rounded transition-all duration-300 ${
                   pos === visualIndicator.position 
                     ? `${visualIndicator.color} shadow-lg` 
                     : 'bg-white bg-opacity-30'
