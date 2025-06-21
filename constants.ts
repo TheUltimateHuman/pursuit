@@ -38,6 +38,10 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Contemporary & Mundane: High-Security Corporate Espionage",
   "Contemporary & Mundane: Creepy or Secretive Small Town",
   "Contemporary & Mundane: Investigative Journalism",
+  "Contemporary & Mundane: A corporate team-building retreat where the 'trust exercises' escalate.",
+  "Contemporary & Mundane: Your new HOA president has a deeply personal fixation on you.",
+  "Contemporary & Mundane: Your remote Airbnb host just locked you in 'for your own safety'.",
+  "Contemporary & Mundane: Meeting your partner's estranged family at their isolated rural compound.",
   "Unique & Surreal Environments: Deep Sea Exploration/Diving Expedition",
   "Unique & Surreal Environments: Subterranean World/Hollow Earth Expedition",
   "Unique & Surreal Environments: Nightmare Logic Scenario",
@@ -94,7 +98,18 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Science Fiction: A Corporate Agent Marked for Forced 'Retirement'",
   "Science: Fiction: Boarding a Derelict Military Dreadnought",
   "Science Fiction: A Smuggler's Run Intercepted by a Rival Syndicate",
-
+  "Science Fiction: Your Android Co-Pilot is Displaying Unsettling 'Glitches'",
+  "Science Fiction: Negotiating Passage with the Warlord",
+  "Science Fiction: Undercover Agent Inside a Fanatical Anti-Tech Cult",
+  "Science Fiction: Bridge Officer During a Surprise Attack on Your Starship",
+  "Science Fiction: Psychologist Tasked with Debriefing the Traumatized Survivor",
+  "Science Fiction: Mediating a Tense Standoff Between Human Colonists and Indigenous Aliens",
+  "Science Fiction: Calm a Panicked Crowd in a Sealed Arcology Dome During a Catastrophe",
+  "Science Fiction: You are the Last Line of Defense Protecting the Ship's Engineer During a Desperate Repair",
+  "Science Fiction: You must transport a benevolent, god-like AI contained in a fragile server, hunted by luddites who believe it is a demon.",
+  "Science Fiction: Your exosuit's AI has become sentient and emotionally attached to you, but its frantic attempts to 'protect' you are growing increasingly dangerous.",
+  "Science Fiction: Escorting a corporate executive whose consciousness has been temporarily placed in a cheap, malfunctioning service android for security.",
+  "Science Fiction: Purued by Time Cops.",
 
   // Additions to Existing Categories - Fantasy
   "Fantasy: Divine Trial in the Court of the Gods",
@@ -137,6 +152,29 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Fantasy: A Wizard's Escaped Experiment in a Crowded City",
   "Fantasy: Escorting a Seer as Their Dark Vision Unfolds in Real Time",
   "Fantasy: Possessed by a Demon",
+  "Fantasy: Interrogating a Captured Enemy Spy Before the City Falls",
+  "Fantasy: Performing a Ritual to Bind a Malevolent Spirit with a Coven of Warlocks",
+  "Fantasy: You are the Arcane Guardian of a Tomb, and Treasure Hunters Have Just Broken In",
+  "Fantasy: Guiding a Group of Refugees Through the Shadowfell",
+  "Fantasy: Bodyguard to a Spoiled Prince in a Hostile Foreign City",
+  "Fantasy: Convincing the Council of Elders to Flee Before the Prophesied Doom Arrives",
+  "Fantasy: You are a Golem Bound to a Cruel Master and Must Decide Whether to Obey a Terrible Command",
+  "Fantasy: Performing a Spell for a Dying King While Usurpers Storm the Castle",
+  "Fantasy: Your master, a powerful archmage, has died and bound their enraged, confused ghost to you for one final task.",
+  "Fantasy: Guiding a rival assassin through enemy territory, knowing that the truce you share will end the moment you reach your destination.",
+  "Fantasy: A Cyran soldier as the Mourning inexplicably begins (Eberron).",
+  "Fantasy: Your Vistani guide just led your caravan into the Mists of Ravenloft (Ravenloft).",
+  "Fantasy: Your spelljamming helm fails; your crew is adrift in the Phlogiston (Spelljammer).",
+  "Fantasy: An honored guest at Castle Ravenloft as the castle doors are barred (Ravenloft).",
+  "Fantasy: The last warforged in a unit marked for decommissioning (Eberron).",
+  "Fantasy: A captive on a Mind Flayer nautiloid, awaiting ceremorphosis (Spelljammer).",
+  "Fantasy: Airship Crash (Eberron).",
+  "Fantasy: An expedition into the Mournland as your artificer guide mutates (Eberron).",
+  "Fantasy: Sharing the last of the air on a spelljammer shattered by Neogi (Eberron).",
+  "Fantasy: A House Medani inquisitor whose suspect is a Daelkyr cultist. (Eberron)",
+  "Fantasy: A House Cannith artificer whose warforged prototype has gone rogue (Eberron).",
+  "Fantasy: An Aundairian spy being interrogated by a Silver Flame templar. (Eberron)",
+  "Fantasy: A diplomat sent to the monster nation of Droaam to negotiate with hags. (Eberron)",
 
 
   // Additions to Existing Categories - Historical
@@ -156,9 +194,8 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Historical: The Great Chicago Fire of 1871",
   "Historical: A Knight Templar Escaping with the Holy Grail",
   "Historical: The Great Exhibition of 1851 Featuring an Artifact from Another Dimension",
-  "Historical: The Library of Alexandria Didn't Burn",
-  "Historical: Escape from the Labyrinth of Minoan Knossos",
-  "Historical: The Search for El Dorado Ends in a City of Gold and Hunger",
+  "Historical: Scribe in the Library of Alexandria as it burns.",
+  "Historical: The Search for El Dorado",
   "Historical: An Accused Aristocrat Escaping the French Reign of Terror",
   "Historical: Witness to a Jack the Ripper Murder in Whitechapel",
   "Historical: Hunted on the Underground Railroad by a Bounty Hunter",
@@ -169,6 +206,19 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Historical: Houdini's Final, Impossible Escape",
   "Historical: Sinking of the 'Cursed' Spanish Armada",
   "Historical: The Last Stand at the Alamo",
+  "Historical: A Diplomat Sent to Negotiate Peace with a Barbarian Warlord",
+  "Historical: Leading a Slave Revolt in a Roman Villa",
+  "Historical: 'War of the Worlds' broadcast.",
+  "Historical: Custer's Last Stand.",
+  "Historical: Child in the Children's Crusade questioning their prophet.",
+  "Historical: WWI trench raider with a shell-shocked partner.",
+  "Historical: Fleeing Pompeii's pyroclastic flow with your family.",
+  "Historical: The first winter with the doomed Donner Party.",
+  "Historical: Riding beside your captain in the Charge of the Light Brigade.",
+  "Historical: A parent in Jonestown as the 'white night' is called.",
+  "Historical: A survivor of the 1972 Andes flight disaster facing a grim choice.",
+  "Historical: A soldier encircled with the German 6th Army at Stalingrad.",
+  "Historical: A Huguenot in Paris during the St. Bartholomew's Day Massacre.",
 
 
   // Additions to Existing Categories - Contemporary & Mundane
@@ -234,6 +284,9 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Psychological & Existential Horror: A World Where Sleep is No Longer Safe",
   "Psychological & Existential Horror: A Protagonist Who Knows They Are in a Game and is Fleeing the Developer",
   "Psychological & Existential Horror: Trapped in a Coma, Aware",
+  "Psychological & Existential Horror: Your Fellow Survivors of a Disaster Insist There is One More Person Than There Should Be",
+  "Psychological & Existential Horror: Your Child's Imaginary Friend is Giving Them Real, Dangerous Instructions",
+  "Psychological & Existential Horror: You and your partner have successfully cloned yourselves, but now you must hunt and kill your duplicates who claim to be the originals.",
 
   // New Proposed Categories & Themes - Cosmic & Eldritch Horror
   "Cosmic & Eldritch Horror: The Last Human in a World Conquered by Aliens",
@@ -261,8 +314,11 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Mythological & Folkloric: Cheating the Ferryman of the River Styx",
   "Mythological & Folkloric: The First Howl of Ragnarök",
   "Mythological & Folkloric: The Rampage of the Golem of Prague",
-  "Mythological & Folkloric: The Insatiable Hunger of a Preta (Hungry Ghost)",
-
+  "Mythological & Folkloric: Trapped in the Labyrinth with your creation, the Minotaur.",
+  "Mythological & Folkloric: Your Changeling child's true parents have come to collect.",
+  "Mythological & Folkloric: Ritually bound to a rival Nahual shaman.",
+  "Mythological & Folkloric: You stole a Leprechaun's gold.",
+  "Mythological & Folkloric: Translator for a vengeful river god during a flood.",
 
   // Brand New Categories & Themes - Occupational & Mundane Catastrophe
   "Occupational & Mundane Catastrophe: Offshore Oil Rig Diver",
@@ -341,7 +397,20 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "REALISM: Kayaker Stalked by a Great White Shark",
   "REALISM: Sequestered for Jury Duty in a Compromised Hotel",
   "REALISM: Undercover Agent Whose Cover is Blown",
-  "REALISM: Inheriting a House with a Panic Room Someone is Already Inside"
+  "REALISM: Inheriting a House with a Panic Room Someone is Already Inside",
+  "REALISM: Hostage Negotiator During a Tense Standoff",
+  "REALISM: Paramedic at a Mass Casualty Incident",
+  "REALISM: Secret Service Agent During an Assassination Attempt",
+  "REALISM: Air Traffic Controller During a System-Wide Power Failure",
+  "REALISM: A Public Defender Meeting Their Deeply Unsettling New Client",
+  "REALISM: Adrift on a life raft in the ocean with the one person responsible for the sinking of your ship.",
+  "REALISM: You are a wildfire Hotshot who must take refuge in a burn shelter with a rookie who is having a severe panic attack.",
+  "REALISM: Skyscraper window washers; the platform just dropped.",
+  "REALISM: Cell block riot; your cellmate has the shank.",
+  "REALISM: Storm chaser's partner driving into the tornado.",
+  "REALISM: You are a paramedic roped to a wounded climber during a catastrophic blizzard on a mountain, and they refuse to leave their dead partner behind.",
+  "REALISM: Deep sea welder; your partner's comms went silent.",
+  "REALISM: Hazmat cleanup; your partner's suit is breached."
 ];
 
 export const GEMINI_SYSTEM_INSTRUCTION_JSON = `You are the game master for QUARRY. Your role is to create a deeply unsettling and suspenseful story, managing narrative, a terrifying persistent threat, inventory items, brutal combat or crisis moments, and contextual memory, all centered around a tense, thrilling, and scary scenario.
@@ -414,6 +483,18 @@ their condition or the hazard's impact (e.g., taking "damage" from "Hypothermia"
     * **Define Modus Operandi (General):** Beyond its appearance/nature and concept, critically consider *how* this pursuer (entity or hazard) will actively hunt, track, apply pressure, or engage 'you'. What are its primary methods of tracking or sensing (informed by its 'senses') if an entity? How does it typically attack, spread, create obstacles, or corner 'you'? This is essential for consistent narration.
     * **Sensory Traits Definition:** When generating the pursuer initially, define 1 to 3 'sensory traits'. These traits MUST be a mix of positive (enhanced sensory capabilities) and/or negative (impaired/limited sensory characteristics or vulnerabilities), thematically consistent with the pursuer's nature. Examples: Positive - 'Enhanced Olfactory Tracking', 'Acute Echolocation'; Negative - 'Impaired Daylight Vision', 'Deaf'. For non-entity pursuers, these relate to how the threat is perceived, spreads, or how it "detects" vulnerability.
     * Most entity pursuers should lean towards non-verbal communication. If an entity pursuer speaks, its speech should be chilling or menacing. Environmental pursuers "communicate" through their effects and escalating danger.
+    * **CRITICAL: EQUAL VALIDITY OF ENTITY AND NON-ENTITY THREATS**: Both entity pursuers (monsters, humans, creatures) and non-entity pursuers (environmental hazards, conditions, phenomena) are equally valid and should be chosen based on what makes the most narrative sense for the specific scenario. Do NOT default to entity threats. Consider the scenario carefully and choose the threat type that best serves the story and creates the most compelling danger. For example:
+        * A scenario about being lost in a blizzard might feature "The Biting Cold" as the pursuer
+        * A scenario about a sinking ship might feature "The Rising Water" or "Drowning"
+        * A scenario about a spreading plague might feature "The Infection" as the pursuer
+        * A scenario about a time-sensitive mission might feature "The Clock" or "Time Running Out"
+        * A scenario about a collapsing building might feature "The Structural Failure" as the pursuer
+    * **Threat Selection Priority**: Choose the threat type (entity vs non-entity) that:
+        1. Most logically emerges from the scenario's premise
+        2. Creates the most compelling and unique danger
+        3. Allows for the most interesting player choices and interactions
+        4. Maintains the core chase/survival dynamic
+        5. Fits the scenario's tone and setting
 2.  **Pursuit Mechanic**: 'You' are always trying to escape/survive. In each turn, evaluate player's actions.
     * If "not making progress" (e.g., player chooses actions that are indirect, investigative, or fail to create distance/mitigate hazard), escalate the threat. Update "updatedThreatStatus". Provide a "threatEncounterMessage".
     * If 'you' choose an action *explicitly intended to create distance/mitigate hazard*:
@@ -573,7 +654,7 @@ GENERAL INSTRUCTIONS (RECAP OF CRITICALS):
 export const INITIAL_GAME_PROMPT_JSON = `{
   "task": "Start a new game of QUARRY, a text adventure. Your first response MUST be a valid JSON object adhering to all system instructions defined in GEMINI_SYSTEM_INSTRUCTION_JSON. The highest priority is to strictly follow the REALISM SCENARIO DIRECTIVE if the provided theme starts with 'REALISM:'. Also adhere to the language requirement (English only), no player naming, no markdown emphasis, and the creative novelty guideline. The game must begin *in medias res* with a deeply atmospheric and suspenseful opening that twists into a tense, thrilling, and scary chase.",
   "requirements_for_initial_json_response": {
-    "persistentThreatDetails": "Define this as per system instructions. The pursuer MUST be designed to be genuinely frightening or deeply unsettling. For non-entity pursuers (like 'The Avalanche' or 'Hypothermia'), interpret 'name', 'description', 'maxHealth', and 'senses' metaphorically. The pursuer, whether entity or phenomenon, must be the primary source of dread and drive the chase. Its name, description, maxHealth, and 'senses' (1-4 traits) must be defined. **CRITICAL INSTRUCTION: The pursuer's nature MUST be deeply rooted in and logically emerge from the specific initial scenario. For 'REALISM' scenarios, this is an unbreakable rule. The pursuer MUST be a plausible, real-world threat directly caused by the scenario. For example, for the scenario 'REALISM: A Bank Robbery Gone Wrong', the ONLY acceptable pursuers are threats like 'The Police', 'The Bank Security', or 'The Armed Robbers'. A supernatural or metaphorical threat like an 'Eldritch Debt Collector' in this context is an explicit failure to follow instructions and must be avoided.**",
+    "persistentThreatDetails": "Define this as per system instructions. The pursuer MUST be designed to be genuinely frightening or deeply unsettling. For non-entity pursuers (like 'The Avalanche' or 'Hypothermia'), interpret 'name', 'description', 'maxHealth', and 'senses' metaphorically. The pursuer, whether entity or phenomenon, must be the primary source of dread and drive the chase. Its name, description, maxHealth, and 'senses' (1-4 traits) must be defined. **CRITICAL INSTRUCTION: The pursuer's nature MUST be deeply rooted in and logically emerge from the specific initial scenario. For 'REALISM' scenarios, this is an unbreakable rule. The pursuer MUST be a plausible, real-world threat directly caused by the scenario. For example, for the scenario 'REALISM: A Bank Robbery Gone Wrong', the ONLY acceptable pursuers are threats like 'The Police', 'The Bank Security', or 'The Armed Robbers'. A supernatural or metaphorical threat like an 'Eldritch Debt Collector' in this context is an explicit failure to follow instructions and must be avoided.** **EQUALLY IMPORTANT: Both entity threats (monsters, humans, creatures) and non-entity threats (environmental hazards, conditions, phenomena) are equally valid. Choose the threat type that most logically emerges from the scenario and creates the most compelling danger. Do NOT default to entity threats. Consider whether an environmental hazard, time pressure, spreading condition, or other non-entity threat might be more appropriate for the specific scenario.**",
     "initialInventory": "Provide 1 to 3 thematically appropriate items. These items MUST directly reflect the player character's established background and the immediate scenario, and adhere to the 'REALISM' directive if the scenario theme requires it. Focus on items offering utility or implying skills. Weapons should generally be avoided as starting items unless the player's defined role makes it overwhelmingly plausible (e.g., a soldier). This exception MUST still strictly adhere to the 'REALISM' directive (a modern soldier might have a rifle, not a magical sword).",
     "sceneDescription_opening": {
       "length_guideline": "Approximately 150-200 words for the total setup and transition into the immediate crisis.",
