@@ -51,6 +51,8 @@ const App: React.FC = () => {
   
   // --- NEW STATE FOR THE CUSTOM SCENARIO MODAL --- 
   const [isCustomScenarioModalVisible, setIsCustomScenarioModalVisible] = useState<boolean>(false); 
+  // --- NEW STATE FOR TRACKING LAST USED CUSTOM SCENARIO ---
+  const [lastUsedCustomScenario, setLastUsedCustomScenario] = useState<string | null>(null);
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
@@ -335,6 +337,7 @@ const App: React.FC = () => {
     setPlayerAbilities([]); 
     setIsCustomChoiceInputVisible(false); 
     setLastUsedThemeType(null); 
+    setLastUsedCustomScenario(null); // Reset custom scenario state
     setCurrentStory({ 
         sceneDescription: "Welcome to QUARRY.", 
         choices: ["Begin"], 
@@ -392,6 +395,7 @@ const App: React.FC = () => {
     setIsCustomScenarioModalVisible(false); 
     startGame(); 
     setLastUsedThemeType(null); 
+    setLastUsedCustomScenario(scenario); // Store the selected custom scenario
     processApiResponse(fetchInitialStory(scenario), true); 
   }, [startGame, processApiResponse, setError]); 
 
@@ -425,6 +429,14 @@ const App: React.FC = () => {
 
   const handleRegenerateInitialScene = useCallback(() => { 
     if (!API_KEY_AVAILABLE || isLoading) return; 
+    
+    // If we have a stored custom scenario, use that instead of theme type
+    if (lastUsedCustomScenario) {
+      processApiResponse(fetchInitialStory(lastUsedCustomScenario), true);
+      return;
+    }
+    
+    // Otherwise, use the theme type logic for non-custom scenarios
     const themeTypeToUse = lastUsedThemeType || "random"; 
     const themesToConsider = getThemesByType(themeTypeToUse); 
     const selectedTheme = selectRandomTheme(themesToConsider); 
@@ -433,7 +445,7 @@ const App: React.FC = () => {
         return; 
     } 
     processApiResponse(fetchInitialStory(selectedTheme), true); 
-  }, [processApiResponse, isLoading, lastUsedThemeType, setError]); 
+  }, [processApiResponse, isLoading, lastUsedThemeType, lastUsedCustomScenario, setError]); 
 
   if (!API_KEY_AVAILABLE) { 
     return <ApiKeyMissingBanner />; 
