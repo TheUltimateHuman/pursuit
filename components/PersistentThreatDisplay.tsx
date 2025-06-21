@@ -11,7 +11,7 @@ const getVisualIndicator = (status: PersistentThreat['status'], isInCombat?: boo
   if (isInCombat && status === 'engaged') {
     return {
       position: 5,
-      color: 'text-red-500',
+      color: 'bg-red-500',
       animation: 'animate-pulse',
       title: 'WARNING! Combat Engaged'
     };
@@ -19,23 +19,23 @@ const getVisualIndicator = (status: PersistentThreat['status'], isInCombat?: boo
   
   switch (status) {
     case 'hidden':
-      return { position: 0, color: 'text-gray-400', animation: '', title: 'Hidden/Dormant' };
+      return { position: 0, color: 'bg-gray-400', animation: '', title: 'Hidden/Dormant' };
     case 'very_distant':
-      return { position: 1, color: 'text-sky-300', animation: '', title: 'Very Distant' };
+      return { position: 1, color: 'bg-sky-300', animation: '', title: 'Very Distant' };
     case 'distant':
-      return { position: 2, color: 'text-blue-300', animation: '', title: 'Distant' };
+      return { position: 2, color: 'bg-blue-300', animation: '', title: 'Distant' };
     case 'closing_in':
-      return { position: 3, color: 'text-yellow-400', animation: 'animate-pulse', title: 'Closing In' };
+      return { position: 3, color: 'bg-yellow-400', animation: 'animate-pulse', title: 'Closing In' };
     case 'nearby':
-      return { position: 4, color: 'text-yellow-300', animation: 'animate-pulse', title: 'Nearby' };
+      return { position: 4, color: 'bg-yellow-300', animation: 'animate-pulse', title: 'Nearby' };
     case 'imminent':
-      return { position: 5, color: 'text-orange-400', animation: 'animate-pulse', title: 'Imminent' };
+      return { position: 5, color: 'bg-orange-400', animation: 'animate-pulse', title: 'Imminent' };
     case 'engaged':
-      return { position: 5, color: 'text-red-600', animation: 'animate-pulse', title: 'Engaged' };
+      return { position: 5, color: 'bg-red-600', animation: 'animate-pulse', title: 'Engaged' };
     case 'defeated':
-      return { position: 0, color: 'text-green-400', animation: '', title: 'Defeated' };
+      return { position: 0, color: 'bg-green-400', animation: '', title: 'Defeated' };
     default:
-      return { position: 0, color: 'text-gray-300', animation: '', title: 'Unknown Status' };
+      return { position: 0, color: 'bg-gray-300', animation: '', title: 'Unknown Status' };
   }
 };
 
