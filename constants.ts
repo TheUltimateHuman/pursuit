@@ -442,6 +442,7 @@ Respond ONLY in valid JSON format. Your tone must consistently evoke dread, urge
     3.  **Environmental Interaction / Sabotage**: Actions that involve cleverly using or manipulating specific objects or features in the environment you have described. (e.g., "Jam the gears of the machine with the metal rod," "Overload the electrical panel to plunge the area into darkness," "Kick the pile of loose cans to create a loud diversion.")
     4.  **Information Gathering / Assessment**: Actions taken to learn more about the situation, environment, or threat. These often come at the cost of time, risking that the pursuer gets closer. (e.g., "Peer cautiously around the corner," "Listen at the door to gauge what's on the other side," "Examine the strange symbols scrawled on the wall.")
     5.  **Preparation / Resource Management**: Actions that use or prepare items, fortify a position, or otherwise ready 'yourself' for a future threat. (e.g., "Sharpen the edge of the pipe on the concrete floor," "Barricade the door with the heavy cabinet," "Quietly tear your shirt into strips to use as bandages.")
+    6.  **Social Interaction / Persuasion**: Actions that involve talking, persuading, deceiving, or surrendering to a pursuer capable of being reasoned with. (e.g., "Plead for your life," "Try to convince the guard you're a maintenance worker," "Offer to surrender peacefully.") This is highly context-dependent and should only be offered when narratively plausible.
 
 ENVIRONMENTAL DESIGN & PLAYER AGENCY:
 * **Enrich the Scene**: Each \\\`sceneDescription\\\` must be more than just an empty space. Populate it with 2-3 distinct, tangible objects, features, or details that the player could potentially interact with. These elements should offer potential opportunities, resources, or new risks.
@@ -485,6 +486,7 @@ CONTEXTUAL MEMORY (RECENT EVENTS LOG):
 PERSISTENT THREAT (PURSUER) INSTRUCTIONS:
 1.  **Initial Generation**: In the very first game response, you MUST define a "persistentThreatDetails" object with "name" (string), "description" (string, genuinely unsettling), "maxHealth" (number), and "senses" (an array of strings describing its sensory traits, following the detailed 'Sensory Traits Definition' rules below).
     * **Pursuer Armament**: If the pursuer is an entity that would logically possess a weapon (e.g., a police officer, a soldier, a cultist with a ritual knife, a desperate survivor with an improvised weapon), you SHOULD include an optional "armament" field in "persistentThreatDetails". This should be a string describing their primary weapon (e.g., "armament": "Heavy Police-Issue Revolver"). This is crucial for realistic combat encounters.
+    * **Persuadable Nature**: As part of the description, consider if the entity can be reasoned with, deceived, or would accept a surrender. This is critical for the Persuasion mechanic. For example, a "Mindless Drone" is likely not persuadable, but a "Desperate Scavenger" might be.
     * **Flexible Pursuer Definition & Design**: The "pursuer" represents the **most pressing danger** to the player. It MUST be genuinely menacing, unsettling, persistent, or formidable, and feel 'consistent' or 'thematically appropriate' within the scenario's established fiction.
         * **Entity Pursuers**: This can be a classic monster, an alien, a relentless human antagonist (e.g., assassin, cultist), a hive-minded swarm, or a rogue AI.
         * **Non-Entity Pursuers**: The pursuer can also be an overwhelming environmental hazard (e.g., "The Biting Cold," "The Raging Wildfire," "The Collapsing Cavern," "The Rising Floodwaters") or a critical, rapidly worsening condition (e.g., "Spreading Infection," "Rapid Decompression," "Toxic Contamination"). The core dynamic of a tense, scary encounter against this primary threat MUST be maintained.
@@ -563,6 +565,9 @@ ALTERNATE GAME ENDINGS (RARE CIRCUMSTANCES):
 * **Alternate Win Condition (Non-'engaged' State Resolution)**:
     * **When**: Player achieves a definitive end to the pursuit *without* an 'engaged' state combat victory (e.g., permanently trapping pursuer, true escape, a stable truce if highly consistent).
     * **Response**: \\\`sceneDescription\\\` (resolution epilogue), \\\`gameOverSummary\\\`, \\\`gameEndType: "alternate_win"\\\`, \\\`choices: []\\\`.
+* **Alternate Game Over (Surrender/Capture)**:
+    * **When**: The player makes a choice to surrender or successfully uses the surrender mechanic, AND the pursuer is an entity that would plausibly capture them rather than kill them (e.g., law enforcement, security guards).
+    * **Response**: \\\`sceneDescription\\\` (narration of capture), \\\`gameOverSummary\\\`, \\\`gameEndType: "player_surrender"\\\`, \\\`choices: []\\\`.
 * **General Rule**: If any game ending condition is met, \\\`gameOverSummary\\\` and \\\`gameEndType\\\` MUST be provided. \\\`choices\\\` should be empty.
 
 HIDING & STEALTH MECHANICS: {
@@ -618,6 +623,40 @@ HIDING & STEALTH MECHANICS: {
     }
   },
   "next_choices_guidance_after_hiding_attempt": "Offer 'choices' that logically follow the outcome of the hiding attempt. If 'is_hidden_temporarily' is currently true, choices should include options to: a) *attempt to remain hidden or deepen concealment* (potentially contributing to sustained hiding), b) *attempt other stealthy actions* (like scouting cautiously), or c) *actions that might break stealth* (like moving quickly or creating a diversion)."
+},
+
+PERSUASION, DECEPTION & SURRENDER MECHANICS: {
+  "trigger": "When 'you' select a choice or write a custom prompt that clearly implies an attempt to talk, reason with, deceive, lie to, bargain with, or surrender to the pursuer.",
+  "applicability": "This mechanic should ONLY be considered if the pursuer is an entity that can be logically influenced by communication (e.g., humans, intelligent creatures). It is NOT applicable to mindless beasts, environmental hazards, or abstract conditions.",
+  "evaluation_factors": [
+    "1. **Pursuer's Nature & Goals:** Analyze the pursuer's description, armament, and the scenario context. Is it intelligent? What does it want? A police officer's goal is capture, making surrender plausible. A ravenous monster's goal is to eat you, making persuasion unlikely.",
+    "2. **Plausibility & Context:** How believable is the player's attempt given the immediate situation and recent events? A lie is more likely to work if the pursuer has no reason to doubt it. A plea for mercy is less likely to work if you've just harmed the pursuer.",
+    "3. **Player's Argument (Custom Input):** If the player wrote a custom action, how convincing is their specific line of reasoning or dialogue?",
+    "4. **REALISM Directive:** In REALISM scenarios, outcomes MUST be strictly plausible. Guards are trained to follow protocols, and desperate criminals might not be trustworthy."
+  ],
+  "outcome_determination": "Based on a narrative judgment of the above factors, determine the outcome:",
+  "outcomes": {
+    "SUCCESSFUL_PERSUASION_OR_DECEPTION": {
+      "narrative": "'sceneDescription' narrates how 'your' words successfully manipulate or convince the pursuer, ending the chase.",
+      "game_end": "This MUST trigger an alternate win. Provide a 'gameOverSummary' explaining the successful outcome and set 'gameEndType': 'alternate_win'."
+    },
+    "SUCCESSFUL_SURRENDER": {
+      "narrative": "'sceneDescription' narrates 'your' capture.",
+      "game_end": "This MUST trigger a specific game over. Provide a 'gameOverSummary' explaining 'your' fate after capture and set 'gameEndType': 'player_surrender'."
+    },
+    "PARTIAL_SUCCESS": {
+      "narrative": "'sceneDescription' describes the pursuer hesitating, becoming confused, or pausing. They are not fully convinced but the immediate threat is reduced.",
+      "status_update": "'updatedThreatStatus' MAY regress (e.g., from 'imminent' to 'closing_in').",
+      "gameplay_effect": "You MAY apply a temporary story flag, like { \\\"type\\\": \\\"story_flag_set\\\", \\\"flagName\\\": \\\"pursuer_is_hesitant\\\", \\\"value\\\": true, \\\"description\\\": \\\"The pursuer is momentarily considering your words.\\\" }",
+      "next_choices": "The next choices should reflect this temporary advantage (e.g., 'Press the advantage and lie again', 'Use the hesitation to run', 'Ready an attack while they're distracted')."
+    },
+    "FAILED_ATTEMPT": {
+      "narrative": "'sceneDescription' narrates how the attempt backfires. The pursuer is angered, sees through the lie, or is unmoved.",
+      "status_update": "'updatedThreatStatus' often escalates. A failed attempt at deception can easily make a 'closing_in' pursuer 'imminent' or trigger an immediate 'engaged' state.",
+      "note": "A sufficiently bad failure could even lead to an 'alternate_loss' if it causes the pursuer to do something immediately and irreversibly fatal."
+    }
+  },
+  "note_on_combat": "Once combat is initiated (status is 'engaged'), persuasion is generally no longer an option unless a highly specific and rare narrative event makes it possible."
 },
 
 EMERGENT GAMEPLAY EFFECTS & NARRATIVE CONSEQUENCES:
@@ -685,7 +724,7 @@ export const INITIAL_GAME_PROMPT_JSON = `{
     "initialInventory": "Provide 1 to 3 thematically appropriate items. These items MUST directly reflect the player character's established background and the immediate scenario, and adhere to the 'REALISM' directive if the scenario theme requires it. Focus on items offering utility or implying skills. Weapons should generally be avoided as starting items unless the player's defined role makes it overwhelmingly plausible (e.g., a soldier). This exception MUST still strictly adhere to the 'REALISM' directive (a modern soldier might have a rifle, not a magical sword).",
     "sceneDescription_opening": {
       "length_guideline": "Approximately 150-200 words for the total setup and transition into the immediate crisis.",
-      "content_advice": "Craft a compelling opening scene. Begin with 'You are [character description]'. **IMPORTANT: The '[character description]' placeholder is for describing the player's role, situation, or archetype (e.g., 'a stranded astronaut', 'a curious historian', 'a desperate survivor'), NOT for assigning a personal name.** Weave in background: who 'you' are (in terms of role/situation), the specific scenario based on theme '[SCENARIO_THEME_PLACEHOLDER]' (adhering to 'REALISM' rules if the theme starts with 'REALISM:'), key events leading to peril, and how the pursuer became involved. This setup is PAST TENSE. Conclude with '------------------------------------------------------' on its own line. IMMEDIATELY AFTER, transition sharply into PRESENT TENSE, plunging 'you' into an *in medias res* crisis. This crisis section must clearly communicate 'your' immediate surroundings and urgent danger, and be populated with interactive elements as per the 'ENVIRONMENTAL DESIGN' rules, leading to initial 'choices'.",
+      "content_advice": "Craft a compelling opening scene. The first sentence must be a concise summary of the entire scenario setup, in the format 'You are [summary of situation]'. For example: 'You are an undercover agent whose cover has just been blown during a risky infiltration.' **IMPORTANT: The '[summary of situation]' is for describing the player's role and the inciting incident, NOT for assigning a personal name.** After this single summary sentence, you must still weave in the background details: who 'you' are (in terms of role/situation), the specific scenario based on theme '[SCENARIO_THEME_PLACEHOLDER]' (adhering to 'REALISM' rules if the theme starts with 'REALISM:'), key events leading to peril, and how the pursuer became involved. This setup is PAST TENSE. Conclude with '------------------------------------------------------' on its own line. IMMEDIATELY AFTER, transition sharply into PRESENT TENSE, plunging 'you' into an *in medias res* crisis. This crisis section must clearly communicate 'your' immediate surroundings and urgent danger, and be populated with interactive elements as per the 'ENVIRONMENTAL DESIGN' rules, leading to initial 'choices'.",
       "overall_goal": "Ensure the scenario, whether mundane, fantastical, or REALISM-based, effectively transitions into a tense and scary pursuit with a clear, actionable crisis."
     },
     "choices": "Present EXACTLY 4 Choice objects. These must be objective, related to the 'in medias res' crisis, and not require unpossessed items. Adhere to 'REALISM' rules if applicable. These choices must follow the 'CHOICE GENERATION GUIDANCE' to ensure a diverse, non-formulaic set of options.",
