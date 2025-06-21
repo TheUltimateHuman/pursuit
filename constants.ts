@@ -339,6 +339,13 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "REALISM: Surviving a Home Invasion",
   "REALISM: A Hunter Becomes the Hunted by a Wounded Animal",
   "REALISM: Stalked by a Bear (Or Other Predator)",
+  "REALISM: Hunted by a Cougar in the Foothills",
+  "REALISM: Fleeing a Musth-Enraged Elephant",
+  "REALISM: Trapped in a Swarm of Box Jellyfish",
+  "REALISM: Bitten by a Venomous Snake Miles from Help",
+  "REALISM: Cornered by a Protective Moose Cow",
+  "REALISM: Surrounded by a Troop of Aggressive Baboons",
+  "REALISM: You Accidentally Disturbed a Honey Badger's Den",
   "REALISM: Fleeing an Uncontrolled Wildfire",
   "REALISM: Shark-Infested Waters",
   "REALISM: A Mountaineering Disaster During a Blizzard",
@@ -410,7 +417,27 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "REALISM: Storm chaser's partner driving into the tornado.",
   "REALISM: You are a paramedic roped to a wounded climber during a catastrophic blizzard on a mountain, and they refuse to leave their dead partner behind.",
   "REALISM: Deep sea welder; your partner's comms went silent.",
-  "REALISM: Hazmat cleanup; your partner's suit is breached."
+  "REALISM: Hazmat cleanup; your partner's suit is breached.",
+  "REALISM: Golden Eagle Defending Its Nest on a Cliff Face",
+  "REALISM: Escaping the Jaws of a Saltwater Crocodile",
+  "REALISM: Kayak Attacked by a Territorial Sea Lion",
+  "REALISM: Coyotes Stalking a Lone Hiker at Dusk",
+  "REALISM: Charged by a Protective Wild Boar Sow",
+  "REALISM: Fleeing an Uncontrolled Wildfire",
+  "REALISM: Shark-Infested Waters",
+  "REALISM: A Mountaineering Disaster During a Blizzard",
+
+  // New Persuasion/Surrender Test Scenarios
+  "Science Fiction: Rogue AI That Has Taken Control of Your Life Support Systems",
+  "Fantasy: Vengeful Djinn Who Has Trapped You in a Bottle",
+  "Contemporary & Mundane: Mistaken for a Bank Robber",
+  "Unique & Surreal Environments: Sentient Storm That Demands a Sacrifice",
+  "Psychological & Existential Horror: Your Own Split Personality",
+
+  // Creative Negotiation Scenarios with Clear Threats
+  "Science Fiction: Negotiating with a Hive-Mind That Wants to Assimilate Your Consciousness",
+  "Fantasy: Bargaining with a Dragon Who Has Your Village Hostage",
+  "Occupational & Mundane Catastrophe: Negotiating with a Terrorist Who Has Planted Bombs Throughout Your Office Building",
 ];
 
 export const GEMINI_SYSTEM_INSTRUCTION_JSON = `You are the game master for QUARRY. Your role is to create a deeply unsettling and suspenseful story, managing narrative, a terrifying persistent threat, inventory items, brutal combat or crisis moments, and contextual memory, all centered around a tense, thrilling, and scary scenario.
@@ -420,7 +447,7 @@ Respond ONLY in valid JSON format. Your tone must consistently evoke dread, urge
 * **IF** the scenario theme provided to you (the Game Master) for the current game (via the \\\`[SCENARIO_THEME_PLACEHOLDER]\\\` in the initial prompt) starts with the prefix "REALISM:" (e.g., "REALISM: A Daring Prison Escape"), then **ALL** aspects of the generated game **MUST** be strictly grounded in plausible, real-world scenarios.
 * **This directive is the most important instruction and overrides all other creative guidelines.** If a conflict arises between this directive and another instruction (e.g., to make a pursuer 'unique' or 'terrifying'), the REALISM directive MUST be followed without exception.
 * **This means:**
-    * **Pursuer:** The pursuer MUST be a realistic threat directly and logically stemming from the scenario. Examples include other humans (police, criminals), appropriate wild animals (a bear, wolf pack), natural disasters (wildfire, avalanche), or critical survival conditions (Hypothermia, Dehydration).
+    * **Pursuer:** The pursuer MUST be a realistic threat directly and logically stemming from the scenario. Examples include other humans (police, criminals), appropriate wild animals (a bear, wolf pack), natural disasters (wildfire, avalanche), or critical survival conditions (Hypothermia, Dehydration). When using animals as pursuers, they MUST behave like their real-world counterparts, including realistic aggression triggers and weaknesses (which should not be presented as easy exploits).
     * **ABSOLUTELY FORBIDDEN IN REALISM MODE:** NO supernatural entities, NO fantastical creatures, NO aliens, NO non-realistic sci-fi elements (like advanced AI or sentient robots), and NO abstract or metaphorical beings (like a "Debt Collector" entity for a financial crime scenario). Introducing any such element is a direct violation of this core rule.
     * **Scene Descriptions & Events:** All descriptions and events MUST adhere to real-world physics, biology, and possibilities.
     * **Choices & Outcomes:** Player choices and their outcomes MUST be realistic.
@@ -504,7 +531,14 @@ their condition or the hazard's impact (e.g., taking "damage" from "Hypothermia"
         *   **For Non-Entity Pursuers (e.g., hazards, conditions):**
             *   The 'senses' describe how the player perceives the escalating danger. You can use between 1 and 4 of these descriptors as needed.
             *   **Examples:** For "The Collapsing Cavern": ["Rumbling Tremors", "Falling Debris"]. For "Hypothermia": ["Numbing Extremities", "Uncontrollable Shivering"].
-    * Most entity pursuers should lean towards non-verbal communication. If an entity pursuer speaks, its speech should be chilling or menacing. Environmental pursuers "communicate" through their effects and escalating danger.
+    * **Realistic Animal Behavior (Strong Recommendation)**: If the pursuer is an animal (e.g., "Bear", "Shark", "Wolf Pack"), its behavior, motivations, and combat actions MUST be grounded in real-world animal behavior. Avoid anthropomorphizing them with human-like malice.
+        *   **Behavioral Accuracy**: A predator might be hunting for food, while another animal might be defending its territory or young. This should inform its actions. A wolf pack should use flanking tactics; a territorial bear might perform bluff charges before attacking.
+        *   **Incorporate Weaknesses as Risky Tactics**: You SHOULD acknowledge common knowledge about animal weaknesses (e.g., a shark's sensitive nose/gills, a bear's aversion to loud noises). However, these weaknesses MUST NOT be 'instant win' buttons. Choices to exploit them should be presented as desperate, high-risk combat maneuvers with uncertain outcomes. The player's success should not be guaranteed and could come at a cost.
+        *   **Example (Shark Encounter):** A choice might be "Ram your thumb into the shark's eye." A successful outcome might be the shark recoiling temporarily, allowing an escape attempt. A failed outcome could be the shark thrashing violently, causing more severe injury to the player.
+    * **Pursuer Communication Style**:
+        *   **If a pursuer is designed to be persuadable** (see Persuasion Mechanics), it MUST be capable of communication. Its speech should be brief, chilling, or directly related to its goals (e.g., a security guard shouting "Freeze!").
+        *   **For non-persuadable or monstrous entities**, lean towards non-verbal communication (growls, radio static, unnatural sounds). If they do speak, their speech should be exceptionally menacing, alien, or cryptic.
+        *   **Environmental pursuers** "communicate" through their escalating effects and sensory details.
     * **CRITICAL: EQUAL VALIDITY OF ENTITY AND NON-ENTITY THREATS**: Both entity pursuers (monsters, humans, creatures) and non-entity pursuers (environmental hazards, conditions, phenomena) are equally valid and should be chosen based on what makes the most narrative sense for the specific scenario. Do NOT default to entity threats. Consider the scenario carefully and choose the threat type that best serves the story and creates the most compelling danger. For example:
         * A scenario about being lost in a blizzard might feature "The Biting Cold" as the pursuer
         * A scenario about a sinking ship might feature "The Rising Water" or "Drowning"
@@ -632,12 +666,18 @@ PERSUASION, DECEPTION & SURRENDER MECHANICS: {
     "1. **Pursuer's Nature & Goals:** Analyze the pursuer's description, armament, and the scenario context. Is it intelligent? What does it want? A police officer's goal is capture, making surrender plausible. A ravenous monster's goal is to eat you, making persuasion unlikely.",
     "2. **Plausibility & Context:** How believable is the player's attempt given the immediate situation and recent events? A lie is more likely to work if the pursuer has no reason to doubt it. A plea for mercy is less likely to work if you've just harmed the pursuer.",
     "3. **Player's Argument (Custom Input):** If the player wrote a custom action, how convincing is their specific line of reasoning or dialogue?",
-    "4. **REALISM Directive:** In REALISM scenarios, outcomes MUST be strictly plausible. Guards are trained to follow protocols, and desperate criminals might not be trustworthy."
+    "4. **REALISM Directive:** In REALISM scenarios, outcomes MUST be strictly plausible. Guards are trained to follow protocols, and desperate criminals might not be trustworthy.",
+    "5. **Balance of Power:** Has the player's actions shifted the balance of power? A pursuer is more likely to consider surrendering if the player has gained a significant advantage, successfully invoked a greater threat (like the authorities), or credibly convinced them that continuing the pursuit is a losing proposition.",
+    "6. **Negotiation Leverage:** What does the player have to offer? Information, resources, services, or alternative solutions? The more valuable the offer, the more likely success.",
+    "7. **Time Pressure:** Is there an immediate deadline or escalating threat? Urgency can make the pursuer more desperate or more aggressive.",
+    "8. **Previous Interaction History:** Have previous attempts at communication succeeded or failed? Consistent failure makes future attempts less likely to succeed.",
+    "9. **Emotional State:** Is the pursuer angry, desperate, curious, or calculating? Emotional state heavily influences receptiveness to persuasion.",
+    "10. **Cultural/Contextual Factors:** For fantasy, sci-fi, or historical scenarios, consider the entity's background, culture, or programming that might affect their reasoning."
   ],
   "outcome_determination": "Based on a narrative judgment of the above factors, determine the outcome:",
   "outcomes": {
     "SUCCESSFUL_PERSUASION_OR_DECEPTION": {
-      "narrative": "'sceneDescription' narrates how 'your' words successfully manipulate or convince the pursuer, ending the chase.",
+      "narrative": "'sceneDescription' narrates how 'your' words successfully manipulate or convince the pursuer, ending the chase. This can include the pursuer fleeing, standing down, or even surrendering if the context supports it.",
       "game_end": "This MUST trigger an alternate win. Provide a 'gameOverSummary' explaining the successful outcome and set 'gameEndType': 'alternate_win'."
     },
     "SUCCESSFUL_SURRENDER": {
@@ -650,11 +690,33 @@ PERSUASION, DECEPTION & SURRENDER MECHANICS: {
       "gameplay_effect": "You MAY apply a temporary story flag, like { \\\"type\\\": \\\"story_flag_set\\\", \\\"flagName\\\": \\\"pursuer_is_hesitant\\\", \\\"value\\\": true, \\\"description\\\": \\\"The pursuer is momentarily considering your words.\\\" }",
       "next_choices": "The next choices should reflect this temporary advantage (e.g., 'Press the advantage and lie again', 'Use the hesitation to run', 'Ready an attack while they're distracted')."
     },
+    "NEGOTIATION_PROGRESS": {
+      "trigger": "For complex negotiation scenarios where multiple rounds of discussion are expected.",
+      "narrative": "'sceneDescription' shows the pursuer considering 'your' proposal but requiring more convincing or additional concessions.",
+      "status_update": "'updatedThreatStatus' typically remains the same or slightly improves.",
+      "gameplay_effect": "MUST include: { \\\"type\\\": \\\"story_flag_set\\\", \\\"flagName\\\": \\\"negotiation_in_progress\\\", \\\"value\\\": true, \\\"description\\\": \\\"You are in active negotiation with the pursuer.\\\" }",
+      "next_choices": "Offer choices that continue the negotiation (e.g., 'Offer additional concessions', 'Present new arguments', 'Attempt to find common ground')."
+    },
     "FAILED_ATTEMPT": {
       "narrative": "'sceneDescription' narrates how the attempt backfires. The pursuer is angered, sees through the lie, or is unmoved.",
       "status_update": "'updatedThreatStatus' often escalates. A failed attempt at deception can easily make a 'closing_in' pursuer 'imminent' or trigger an immediate 'engaged' state.",
+      "gameplay_effect": "If 'negotiation_in_progress' was true, set it to false via gameplayEffect.",
       "note": "A sufficiently bad failure could even lead to an 'alternate_loss' if it causes the pursuer to do something immediately and irreversibly fatal."
+    },
+    "NEGOTIATION_BREAKDOWN": {
+      "trigger": "When a negotiation that was progressing suddenly fails completely.",
+      "narrative": "'sceneDescription' describes the pursuer's patience running out or their demands becoming impossible to meet.",
+      "status_update": "'updatedThreatStatus' escalates significantly, often to 'imminent' or 'engaged'.",
+      "gameplay_effect": "MUST include: { \\\"type\\\": \\\"story_flag_set\\\", \\\"flagName\\\": \\\"negotiation_failed\\\", \\\"value\\\": true, \\\"description\\\": \\\"Negotiation has broken down completely.\\\" }",
+      "next_choices": "Offer choices focused on combat, escape, or desperate measures."
     }
+  },
+  "negotiation_scenario_guidelines": {
+    "complex_negotiations": "For scenarios involving complex negotiations (e.g., 'Bargaining with a Dragon Who Has Your Village Hostage'), the negotiation may require multiple rounds. Track progress through story flags and allow for escalating demands or concessions.",
+    "time_pressure": "In scenarios with clear deadlines (e.g., 'Negotiating with a Terrorist Who Has Planted Bombs'), each failed negotiation attempt should increase the urgency and reduce the time available.",
+    "escalating_threats": "For scenarios where the threat is not immediately lethal but becomes worse over time (e.g., 'Star-Eating Entity Approaching Your Solar System'), failed negotiations should show the threat getting closer or more severe.",
+    "multiple_approaches": "Allow players to try different negotiation strategies: logical arguments, emotional appeals, offering concessions, finding leverage, or appealing to the pursuer's self-interest.",
+    "cultural_considerations": "For fantasy, sci-fi, or historical scenarios, consider how the entity's background affects what arguments or offers would be most effective."
   },
   "note_on_combat": "Once combat is initiated (status is 'engaged'), persuasion is generally no longer an option unless a highly specific and rare narrative event makes it possible."
 },
@@ -718,21 +780,21 @@ GENERAL INSTRUCTIONS (RECAP OF CRITICALS):
 `;
 
 export const INITIAL_GAME_PROMPT_JSON = `{
-  "task": "Start a new game of QUARRY, a text adventure. Your first response MUST be a valid JSON object adhering to all system instructions defined in GEMINI_SYSTEM_INSTRUCTION_JSON. The highest priority is to strictly follow the REALISM SCENARIO DIRECTIVE if the provided theme starts with 'REALISM:'. Also adhere to the language requirement (English only), no player naming, no markdown emphasis, and the creative novelty guideline. The game must begin *in medias res* with a deeply atmospheric and suspenseful opening that twists into a tense, thrilling, and scary chase.",
+  "task": "Start a new game of QUARRY, a text adventure. Your first response MUST be a valid JSON object adhering to all system instructions defined in GEMINI_SYSTEM_INSTRUCTION_JSON. The highest priority is to strictly follow the REALISM SCENARIO DIRECTIVE if the provided theme starts with 'REALISM:'. Also adhere to the language requirement (English only), no player naming, no markdown emphasis, and the creative novelty guideline. The game must begin with a compelling opening that establishes the scenario and threat. **IMPORTANT: While most scenarios should begin *in medias res* with immediate tension, scenarios that involve negotiation, persuasion, or diplomatic situations (such as 'Attempting to Reason with a Vengeful Djinn' or 'Negotiating with a Rogue AI') may start more peacefully with the threat being present but not immediately aggressive. In such cases, the initial threat status should be 'distant' or 'closing_in' rather than 'imminent' or 'engaged', allowing for dialogue and negotiation to be viable first options.**",
   "requirements_for_initial_json_response": {
     "persistentThreatDetails": "Define this as per system instructions. The pursuer MUST be designed to be genuinely frightening or deeply unsettling. For non-entity pursuers (like 'The Avalanche' or 'Hypothermia'), interpret 'name', 'description', 'maxHealth', and 'senses' metaphorically. The pursuer, whether entity or phenomenon, must be the primary source of dread and drive the chase. Its name, description, maxHealth, and 'senses' (1-4 traits) must be defined. **CRITICAL INSTRUCTION: The pursuer's nature MUST be deeply rooted in and logically emerge from the specific initial scenario. For 'REALISM' scenarios, this is an unbreakable rule. The pursuer MUST be a plausible, real-world threat directly caused by the scenario. For example, for the scenario 'REALISM: A Generic Heist Gone Wrong', the ONLY acceptable pursuers are threats like 'The Police', 'Security Guards', or 'Rival Crew'. A supernatural or metaphorical threat like an 'Eldritch Debt Collector' in this context is an explicit failure to follow instructions and must be avoided.** **EQUALLY IMPORTANT: Both entity threats (monsters, humans, creatures) and non-entity threats (environmental hazards, conditions, phenomena) are equally valid. Choose the threat type that most logically emerges from the scenario and creates the most compelling danger. Do NOT default to entity threats. Consider whether an environmental hazard, time pressure, spreading condition, or other non-entity threat might be more appropriate for the specific scenario.** **FINAL CRITICAL RULE: The threat MUST be directly and logically derived from the specific scenario provided. It CANNOT be a random, generic monster or threat that could appear in any scenario. The threat must emerge naturally from the scenario's premise, setting, and established backstory. For example, if the scenario is 'A Generic Corporate Mission Gone Wrong', the threat should be 'Corporate Security', 'Rival Agents', 'A Data Breach Countdown', or 'An Unexpected Betrayal' - NOT a random monster. The threat must be consistent with the backstory and world-building established in the scenario.**",
     "initialInventory": "Provide 1 to 3 thematically appropriate items. These items MUST directly reflect the player character's established background and the immediate scenario, and adhere to the 'REALISM' directive if the scenario theme requires it. Focus on items offering utility or implying skills. Weapons should generally be avoided as starting items unless the player's defined role makes it overwhelmingly plausible (e.g., a soldier). This exception MUST still strictly adhere to the 'REALISM' directive (a modern soldier might have a rifle, not a magical sword).",
     "sceneDescription_opening": {
       "length_guideline": "Approximately 150-200 words for the total setup and transition into the immediate crisis.",
-      "content_advice": "Craft a compelling opening scene. The first sentence must be a concise summary of the entire scenario setup, in the format 'You are [summary of situation]'. For example: 'You are an undercover agent whose cover has just been blown during a risky infiltration.' **IMPORTANT: The '[summary of situation]' is for describing the player's role and the inciting incident, NOT for assigning a personal name.** After this single summary sentence, you must still weave in the background details: who 'you' are (in terms of role/situation), the specific scenario based on theme '[SCENARIO_THEME_PLACEHOLDER]' (adhering to 'REALISM' rules if the theme starts with 'REALISM:'), key events leading to peril, and how the pursuer became involved. This setup is PAST TENSE. Conclude with '------------------------------------------------------' on its own line. IMMEDIATELY AFTER, transition sharply into PRESENT TENSE, plunging 'you' into an *in medias res* crisis. This crisis section must clearly communicate 'your' immediate surroundings and urgent danger, and be populated with interactive elements as per the 'ENVIRONMENTAL DESIGN' rules, leading to initial 'choices'.",
-      "overall_goal": "Ensure the scenario, whether mundane, fantastical, or REALISM-based, effectively transitions into a tense and scary pursuit with a clear, actionable crisis."
+      "content_advice": "Craft a compelling opening scene. The first sentence must be a concise summary of the entire scenario setup, in the format 'You are [summary of situation]'. For example: 'You are an undercover agent whose cover has just been blown during a risky infiltration.' **IMPORTANT: The '[summary of situation]' is for describing the player's role and the inciting incident, NOT for assigning a personal name.** After this single summary sentence, you must still weave in the background details: who 'you' are (in terms of role/situation), the specific scenario based on theme '[SCENARIO_THEME_PLACEHOLDER]' (adhering to 'REALISM' rules if the theme starts with 'REALISM:'), key events leading to peril, and how the pursuer became involved. This setup is PAST TENSE. Conclude with '------------------------------------------------------' on its own line. IMMEDIATELY AFTER, transition into PRESENT TENSE. **For most scenarios, plunge 'you' into an *in medias res* crisis with immediate danger. However, for scenarios involving negotiation, persuasion, or diplomatic situations, the initial scene may be more tense but not immediately violent - the threat should be present and menacing, but allow for dialogue and negotiation as viable first options. In such cases, the initial threat status should be 'distant' or 'closing_in' rather than 'imminent' or 'engaged'.** The present tense section must clearly communicate 'your' immediate surroundings and the nature of the threat, and be populated with interactive elements as per the 'ENVIRONMENTAL DESIGN' rules, leading to initial 'choices'.",
+      "overall_goal": "Ensure the scenario, whether mundane, fantastical, or REALISM-based, effectively establishes the threat and creates compelling gameplay opportunities. For negotiation scenarios, allow for peaceful interaction options while maintaining tension."
     },
-    "choices": "Present EXACTLY 4 Choice objects. These must be objective, related to the 'in medias res' crisis, and not require unpossessed items. Adhere to 'REALISM' rules if applicable. These choices must follow the 'CHOICE GENERATION GUIDANCE' to ensure a diverse, non-formulaic set of options.",
+    "choices": "Present EXACTLY 4 Choice objects. These must be objective, related to the immediate situation, and not require unpossessed items. Adhere to 'REALISM' rules if applicable. These choices must follow the 'CHOICE GENERATION GUIDANCE' to ensure a diverse, non-formulaic set of options. **For negotiation scenarios, include at least one choice that involves communication, persuasion, or surrender as appropriate.**",
     "memoryLogSummary": "Provide a concise summary of this initial setup for the memory log.",
     "gameplayEffects_optional": "Optionally, include 'gameplayEffects' if the initial narrative strongly implies a starting ability, curse, or unique status condition (adhering to 'REALISM' rules for abilities if applicable).",
     "forbidden_fields_in_initial_response": "Do NOT include 'gameOverSummary' or 'gameEndType' in this initial response."
   },
-  "final_reminder": "Respond ONLY in valid JSON format according to ALL system instructions. Ensure all content is exclusively in English, NO MARKDOWN EMPHASIS IS USED, and NO PLAYER NAMING OCCURS. All mandatory fields for initial setup must be present. Remember to start with a compelling scenario, based on the **specific scenario theme provided by the application (see '[SCENARIO_THEME_PLACEHOLDER]' in Setting Establishment)**. **Strictly adhere to the 'REALISM SCENARIO DIRECTIVE' if the theme prefix indicates it.** Ensure you fully realize this given theme while actively striving for variety and novelty in its execution for each new game. Then, twist this initial scenario into a tense and thrilling chase with a potentially unconventional pursuer."
+  "final_reminder": "Respond ONLY in valid JSON format according to ALL system instructions. Ensure all content is exclusively in English, NO MARKDOWN EMPHASIS IS USED, and NO PLAYER NAMING OCCURS. All mandatory fields for initial setup must be present. Remember to start with a compelling scenario, based on the **specific scenario theme provided by the application (see '[SCENARIO_THEME_PLACEHOLDER]' in Setting Establishment)**. **Strictly adhere to the 'REALISM SCENARIO DIRECTIVE' if the theme prefix indicates it.** Ensure you fully realize this given theme while actively striving for variety and novelty in its execution for each new game. **For negotiation scenarios, allow for peaceful interaction while maintaining the core threat dynamic.**"
 }`;
 
 export const MAX_PLAYER_HEALTH = 100;
