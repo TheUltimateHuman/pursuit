@@ -437,6 +437,7 @@ export const SCENARIO_THEMES_LIST: string[] = [
   // Creative Negotiation Scenarios with Clear Threats
   "Science Fiction: Negotiating with a Hive-Mind That Wants to Assimilate Your Consciousness",
   "Fantasy: Bargaining with a Dragon Who Has Your Village Hostage",
+  "Cosmic & Eldritch Horror: Bargaining with a Star-Eating Entity That's Approaching Your Solar System",
   "Occupational & Mundane Catastrophe: Negotiating with a Terrorist Who Has Planted Bombs Throughout Your Office Building",
 ];
 
@@ -586,6 +587,7 @@ their condition or the hazard's impact (e.g., taking "damage" from "Hypothermia"
     * If "isEnemyDefeated" (pursuer/hazard defeated/neutralized/escaped):
         * "sceneDescription" *this turn* MUST be a narration of the threat's end and a concise epilogue (total 80-120 words).
         * Provide "gameOverSummary" and set "gameEndType": "pursuer_combat_defeat".
+        * **CRITICAL EPILOGUE REQUIREMENT**: The \\\`gameOverSummary\\\` for combat victories MUST provide a compelling epilogue (approximately 30-50 words) that explains how the player achieved victory through combat, the consequences of their success, and a sense of closure. This should narrate the resolution of the conflict and its aftermath, not just state 'You won'.
 5.  **Game Conclusion**: If "isPlayerDefeated" is true OR "isEnemyDefeated" is true, you MUST provide a "gameOverSummary" field and the appropriate \`gameEndType\`.
 6.  **Item Consumption/Loss**: If item consumed/lost, MUST include \\\`removeItem: "Item Name"\\\`.
 7.  **Scene Description Style**: Use direct, evocative, and **concise** language. Your goal is to create maximum atmosphere with an economy of words. Focus on strong verbs and impactful sensory details. Adhere to the word count guidelines specified for each response type. Emphasis via vivid word choice ONLY.
@@ -599,6 +601,7 @@ ALTERNATE GAME ENDINGS (RARE CIRCUMSTANCES):
 * **Alternate Win Condition (Non-'engaged' State Resolution)**:
     * **When**: Player achieves a definitive end to the pursuit *without* an 'engaged' state combat victory (e.g., permanently trapping pursuer, true escape, a stable truce if highly consistent).
     * **Response**: \\\`sceneDescription\\\` (resolution epilogue), \\\`gameOverSummary\\\`, \\\`gameEndType: "alternate_win"\\\`, \\\`choices: []\\\`.
+    * **CRITICAL EPILOGUE REQUIREMENT**: The \\\`gameOverSummary\\\` for successful outcomes MUST provide a compelling epilogue (approximately 30-50 words) that explains how the player achieved victory, the consequences of their success, and a sense of closure. This should be more than just "You won" - it should narrate the resolution of the conflict and its aftermath.
 * **Alternate Game Over (Surrender/Capture)**:
     * **When**: The player makes a choice to surrender or successfully uses the surrender mechanic, AND the pursuer is an entity that would plausibly capture them rather than kill them (e.g., law enforcement, security guards).
     * **Response**: \\\`sceneDescription\\\` (narration of capture), \\\`gameOverSummary\\\`, \\\`gameEndType: "player_surrender"\\\`, \\\`choices: []\\\`.
@@ -678,7 +681,7 @@ PERSUASION, DECEPTION & SURRENDER MECHANICS: {
   "outcomes": {
     "SUCCESSFUL_PERSUASION_OR_DECEPTION": {
       "narrative": "'sceneDescription' narrates how 'your' words successfully manipulate or convince the pursuer, ending the chase. This can include the pursuer fleeing, standing down, or even surrendering if the context supports it.",
-      "game_end": "This MUST trigger an alternate win. Provide a 'gameOverSummary' explaining the successful outcome and set 'gameEndType': 'alternate_win'."
+      "game_end": "This MUST trigger an alternate win. Provide a 'gameOverSummary' that serves as a compelling epilogue (approximately 30-50 words) explaining how the player achieved victory through persuasion, the consequences of their success, and a sense of closure. This should narrate the resolution of the conflict and its aftermath, not just state 'You won'."
     },
     "SUCCESSFUL_SURRENDER": {
       "narrative": "'sceneDescription' narrates 'your' capture.",

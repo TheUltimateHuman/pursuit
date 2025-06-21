@@ -36,7 +36,8 @@ const App: React.FC = () => {
   
   const [playerHealth, setPlayerHealth] = useState<number>(MAX_PLAYER_HEALTH); 
   const [isGameOver, setIsGameOver] = useState<boolean>(false); 
-  const [gameOverSummaryText, setGameOverSummaryText] = useState<string | null>(null); 
+  const [gameOverSummaryText, setGameOverSummaryText] = useState<string | null>(null);
+  const [gameEndType, setGameEndType] = useState<string | null>(null);
   const [persistentThreat, setPersistentThreat] = useState<PersistentThreat | null>(null); 
   const [isInCombat, setIsInCombat] = useState<boolean>(false); 
   const [combatLog, setCombatLog] = useState<string[]>([]); 
@@ -286,6 +287,7 @@ const App: React.FC = () => {
         setIsGameOver(true); 
         localGameOverSummaryText = gameOverSummary; 
         setGameOverSummaryText(localGameOverSummaryText); 
+        setGameEndType(gameEndType || null);
         setCurrentStory(prev => ({ ...prev, sceneDescription, choices: [], isInCombat: false })); 
       } 
 
@@ -319,7 +321,7 @@ const App: React.FC = () => {
     } 
   }, [ 
       isGameOver, handleFatalError, playerHealth, persistentThreat, isInCombat, 
-      combatLog, memoryLog, storyFlags, playerAbilities, gameOverSummaryText 
+      combatLog, memoryLog, storyFlags, playerAbilities, gameOverSummaryText, gameEndType 
   ]); 
 
   const startGame = useCallback(() => { 
@@ -328,6 +330,7 @@ const App: React.FC = () => {
     setPlayerHealth(MAX_PLAYER_HEALTH); 
     setIsGameOver(false); 
     setGameOverSummaryText(null); 
+    setGameEndType(null);
     setError(null); 
     setPersistentThreat(null); 
     setIsInCombat(false); 
@@ -540,7 +543,27 @@ const App: React.FC = () => {
           </div> 
         )} 
 
-        {isGameOver && persistentThreat?.status !== 'defeated' && ( 
+        {isGameOver && (persistentThreat?.status === 'defeated' || gameEndType === 'alternate_win') && ( 
+           <div className="w-full max-w-3xl flex flex-col items-center my-6"> 
+            <p className="text-4xl font-bold text-green-400 my-4 tracking-wider uppercase" 
+               aria-live="polite"> 
+                SUCCESS 
+            </p> 
+            <div className="bg-green-800 bg-opacity-60 backdrop-blur-md p-6 rounded-lg shadow-xl mb-6 max-w-2xl w-full text-center border-2 border-green-600">
+              <p className="text-lg mb-4 whitespace-pre-line text-green-100 leading-relaxed"> 
+                {gameOverSummaryText || "Victory achieved."} 
+              </p> 
+            </div>
+            <button 
+              onClick={startGame} 
+              className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-150 ease-in-out hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 text-lg" 
+            > 
+              Play Again 
+            </button> 
+           </div> 
+        )}
+
+        {isGameOver && persistentThreat?.status !== 'defeated' && gameEndType !== 'alternate_win' && ( 
           <div className="bg-black bg-opacity-80 p-6 rounded-lg shadow-xl mb-6 max-w-3xl w-full text-center border-2 border-red-700"> 
             <h2 className="text-3xl font-bold text-red-500 mb-3">GAME OVER</h2> 
             <p className="text-xl mb-4 whitespace-pre-line text-gray-300"> 
@@ -553,22 +576,7 @@ const App: React.FC = () => {
               Play Again 
             </button> 
           </div> 
-        )} 
-
-        {isGameOver && persistentThreat?.status === 'defeated' && ( 
-           <div className="w-full max-w-3xl flex flex-col items-center my-6"> 
-            <p className="text-4xl font-bold text-green-400 my-4 tracking-wider uppercase" 
-               aria-live="polite"> 
-                SUCCESS 
-            </p> 
-            <button 
-              onClick={startGame} 
-              className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-150 ease-in-out hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 text-lg" 
-            > 
-              Play Again 
-            </button> 
-           </div> 
-        )} 
+        )}
 
         {error && !isGameOver && ( 
           <div className="bg-red-800 bg-opacity-90 p-4 rounded-lg shadow-md mb-6 max-w-3xl w-full text-center"> 
