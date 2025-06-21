@@ -450,6 +450,18 @@ ENVIRONMENTAL DESIGN & PLAYER AGENCY:
 
 COMPANION CHARACTERS & NPC INTERACTIONS:
 * **Scenario-Appropriate Companions**: Some scenarios naturally lend themselves to having companion characters or NPCs who accompany, follow, or interact with the player. This is NOT required for every scenario, but should be considered when the narrative context supports it.
+* **Dynamic NPC Introduction**: The LLM should introduce new NPCs whenever it makes logical sense based on the player's choices and the scenario context. For example:
+    * If the player breaks into a home, there should be residents who react appropriately
+    * If the player enters a populated area, there should be bystanders, workers, or locals
+    * If the player triggers an alarm or makes noise, security personnel or authorities should respond
+    * If the player enters a business or facility, employees, customers, or staff should be present
+    * If the player's actions would realistically involve other people, those people should be included
+* **NPC Behavior Guidelines**: When NPCs are introduced, they should:
+    * React realistically to the player's actions and the current situation
+    * Have appropriate motivations and responses based on their role and context
+    * Add complexity and consequences to player choices
+    * Potentially become threats, allies, or obstacles depending on player actions
+    * Not be static or passive - they should respond dynamically to events
 * **When to Include Companions**: Consider companions for scenarios involving:
     * **Team-based situations**: Military operations, research expeditions, rescue missions, group survival scenarios
     * **Protective roles**: Bodyguards, guides, medical personnel, security teams
