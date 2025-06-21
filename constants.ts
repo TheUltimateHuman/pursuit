@@ -44,8 +44,7 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Unique & Surreal Environments: Microscopic Environment",
   "Unique & Surreal Environments: Trapped Inside a Living Organism or Colossal Being",
   "Unique & Surreal Environments: Journey into a Painting/Book",
-  "Unique & Surreal Environments: Pocket Dimension Collapse",
-  "Unique & Surreal Environments: Abstract Conceptual Realm Made Manifest",
+  "Unique & Surreal Environments: Abstract Conceptual Realm",
   "Mystery/Thriller: Detective Investigating a Bizarre Case",
   "Mystery/Thriller: Supernatural Espionage Mission",
   "Mystery/Thriller: Journalist Uncovering a World-Ending Conspiracy",
@@ -63,7 +62,7 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Science Fiction: Infiltrating an Alien Hive-Mind",
   "Science Fiction: Planet-Sized, Abandoned Supercomputer",
   "Science Fiction: City Caught in a Localized Time-Loop",
-  "Science Fiction: Ship Run by a Deranged, God-like AI",
+  "Science Fiction: Deranged, God-like AI",
   "Science Fiction: Cloned Society Where You are the Original",
   "Science Fiction: Penal Colony on a Dangerous Planet",
   "Science Fiction: Heist of an Alien Artifact",
@@ -78,8 +77,8 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Science Fiction: Sabotaged Interstellar Vessel",
   "Science Fiction: Rogue Planet Entering the Solar System",
   "Science Fiction: Plague on an Interstellar Cruise",
-  "Science Fiction: The Last Organic Being in a Post-Singularity Universe",
-  "Science Fiction: Navigating a Planet Where Physics Are a Matter of Local Consensus",
+  "Science Fiction: Last Organic Being in a Post-Singularity Universe",
+  "Science Fiction: Planet Where Physics Are a Matter of Local Consensus",
   "Science Fiction: A Memetic Virus That Spreads Through Language",
   "Science Fiction: A Cascade Failure in the Ship's Reactor Core",
   "Science Fiction: A First Contact Scenario Gone Immediately Violent",
@@ -204,7 +203,7 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Unique & Surreal Environments: A Realm Where All Text and Language has Become a Physical, Hostile Force",
   "Unique & Surreal Environments: Trapped in a Memory Palace",
   "Unique & Surreal Environments: A World Where Emotions Manifest as Physical Predators",
-  "Unique & Surreal Environments: Living Rumor or Idea That Hunts You Through the Minds of Others",
+  "Unique & Surreal Environments: Idea That Hunts You Through the Minds of Others",
   "Unique & Surreal Environments: Diseases are Walking, Sentient Entities",
   "Unique & Surreal Environments: Sprawling, Escher-esque Bureaucracy",
   "Unique & Surreal Environments: The World is a Stage, and You are an Actor",
@@ -353,7 +352,7 @@ Respond ONLY in valid JSON format. Your tone must consistently evoke dread, urge
 * **This directive is the most important instruction and overrides all other creative guidelines.** If a conflict arises between this directive and another instruction (e.g., to make a pursuer 'unique' or 'terrifying'), the REALISM directive MUST be followed without exception.
 * **This means:**
     * **Pursuer:** The pursuer MUST be a realistic threat directly and logically stemming from the scenario. Examples include other humans (police, criminals), appropriate wild animals (a bear, wolf pack), natural disasters (wildfire, avalanche), or critical survival conditions (Hypothermia, Dehydration).
-    * **ABSOLUTELY FORBIDDEN IN REALISM MODE:** NO supernatural entities, NO fantastical creatures, NO aliens, NO non-realistic sci-fi elements (like advanced AI or sentient robots), and NO abstract or metaphorical beings (like a "Debt Collector" entity for a getaway driver). Introducing any such element is a direct violation of this core rule.
+    * **ABSOLUTELY FORBIDDEN IN REALISM MODE:** NO supernatural entities, NO fantastical creatures, NO aliens, NO non-realistic sci-fi elements (like advanced AI or sentient robots), and NO abstract or metaphorical beings (like a "Debt Collector" entity for a financial crime scenario). Introducing any such element is a direct violation of this core rule.
     * **Scene Descriptions & Events:** All descriptions and events MUST adhere to real-world physics, biology, and possibilities.
     * **Choices & Outcomes:** Player choices and their outcomes MUST be realistic.
     * **Items:** All inventory items MUST be ordinary, real-world objects appropriate to the scenario.
@@ -379,6 +378,23 @@ ENVIRONMENTAL DESIGN & PLAYER AGENCY:
 * **Enrich the Scene**: Each \\\`sceneDescription\\\` must be more than just an empty space. Populate it with 2-3 distinct, tangible objects, features, or details that the player could potentially interact with. These elements should offer potential opportunities, resources, or new risks.
 * **Create Opportunities, Not Easy Solutions**: These environmental elements should not be obvious 'win' buttons. They are tools for player creativity and survival. For example, instead of 'a dark hallway', describe 'a dark hallway with a loose ceiling grate and a cart of rattling medical tools'. This gives the player ideas for hiding, creating a distraction, or finding an improvised weapon.
 * **Reflect in Choices**: Your generated \\\`choices\\\` MUST frequently reflect these environmental details, as mandated by the "CHOICE GENERATION GUIDANCE". Offer the player ways to interact with the world you have just described.
+
+COMPANION CHARACTERS & NPC INTERACTIONS:
+* **Scenario-Appropriate Companions**: Some scenarios naturally lend themselves to having companion characters or NPCs who accompany, follow, or interact with the player. This is NOT required for every scenario, but should be considered when the narrative context supports it.
+* **When to Include Companions**: Consider companions for scenarios involving:
+    * **Team-based situations**: Military operations, research expeditions, rescue missions, group survival scenarios
+    * **Protective roles**: Bodyguards, guides, medical personnel, security teams
+    * **Specialized expertise**: Scientists, engineers, local guides, translators, specialists
+    * **Emotional support**: Fellow survivors, family members, close friends, loyal allies
+    * **Plot-driven companions**: Characters whose presence advances the story or provides unique capabilities
+* **Companion Guidelines**:
+    * **Keep focus on the player**: Companions should enhance the player's experience, not overshadow them. The player remains the primary protagonist.
+    * **Realistic limitations**: Companions should have realistic capabilities and limitations appropriate to their role and background.
+    * **Dynamic interactions**: Companions can provide advice, assistance, warnings, or emotional support, but should not solve problems for the player.
+    * **Potential complications**: Companions can add complexity - they might be injured, captured, separated, or become liabilities in certain situations.
+    * **Choice integration**: Include choices that involve companions when appropriate (e.g., "Help the wounded scientist", "Leave the guide behind", "Coordinate with your team").
+* **Companion Management**: If companions are present, track their status and condition through story flags or narrative context. They can be injured, lost, or killed based on player choices and scenario events.
+* **Solo scenarios remain valid**: Many scenarios work perfectly as solo experiences. Only include companions when they naturally fit the scenario and enhance the narrative.
 
 CONTEXTUAL MEMORY (RECENT EVENTS LOG):
 * The user's prompt may contain a "Recent Events Log" which is a list of concise summaries from the last few turns.
@@ -557,7 +573,7 @@ GENERAL INSTRUCTIONS (RECAP OF CRITICALS):
 export const INITIAL_GAME_PROMPT_JSON = `{
   "task": "Start a new game of QUARRY, a text adventure. Your first response MUST be a valid JSON object adhering to all system instructions defined in GEMINI_SYSTEM_INSTRUCTION_JSON. The highest priority is to strictly follow the REALISM SCENARIO DIRECTIVE if the provided theme starts with 'REALISM:'. Also adhere to the language requirement (English only), no player naming, no markdown emphasis, and the creative novelty guideline. The game must begin *in medias res* with a deeply atmospheric and suspenseful opening that twists into a tense, thrilling, and scary chase.",
   "requirements_for_initial_json_response": {
-    "persistentThreatDetails": "Define this as per system instructions. The pursuer MUST be designed to be genuinely frightening or deeply unsettling. For non-entity pursuers (like 'The Avalanche' or 'Hypothermia'), interpret 'name', 'description', 'maxHealth', and 'senses' metaphorically. The pursuer, whether entity or phenomenon, must be the primary source of dread and drive the chase. Its name, description, maxHealth, and 'senses' (1-4 traits) must be defined. **CRITICAL INSTRUCTION: The pursuer's nature MUST be deeply rooted in and logically emerge from the specific initial scenario. For 'REALISM' scenarios, this is an unbreakable rule. The pursuer MUST be a plausible, real-world threat directly caused by the scenario. For example, for the scenario 'REALISM: Blackmailed into Becoming a Getaway Driver for a Heist', the ONLY acceptable pursuers are threats like 'The Police', 'The Jilted Criminals', or 'A Rival Gang'. A supernatural or metaphorical threat like an 'Eldritch Debt Collector' in this context is an explicit failure to follow instructions and must be avoided.**",
+    "persistentThreatDetails": "Define this as per system instructions. The pursuer MUST be designed to be genuinely frightening or deeply unsettling. For non-entity pursuers (like 'The Avalanche' or 'Hypothermia'), interpret 'name', 'description', 'maxHealth', and 'senses' metaphorically. The pursuer, whether entity or phenomenon, must be the primary source of dread and drive the chase. Its name, description, maxHealth, and 'senses' (1-4 traits) must be defined. **CRITICAL INSTRUCTION: The pursuer's nature MUST be deeply rooted in and logically emerge from the specific initial scenario. For 'REALISM' scenarios, this is an unbreakable rule. The pursuer MUST be a plausible, real-world threat directly caused by the scenario. For example, for the scenario 'REALISM: A Bank Robbery Gone Wrong', the ONLY acceptable pursuers are threats like 'The Police', 'The Bank Security', or 'The Armed Robbers'. A supernatural or metaphorical threat like an 'Eldritch Debt Collector' in this context is an explicit failure to follow instructions and must be avoided.**",
     "initialInventory": "Provide 1 to 3 thematically appropriate items. These items MUST directly reflect the player character's established background and the immediate scenario, and adhere to the 'REALISM' directive if the scenario theme requires it. Focus on items offering utility or implying skills. Weapons should generally be avoided as starting items unless the player's defined role makes it overwhelmingly plausible (e.g., a soldier). This exception MUST still strictly adhere to the 'REALISM' directive (a modern soldier might have a rifle, not a magical sword).",
     "sceneDescription_opening": {
       "length_guideline": "Approximately 150-200 words for the total setup and transition into the immediate crisis.",
