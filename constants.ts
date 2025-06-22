@@ -461,6 +461,42 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Cosmic & Eldritch Horror: Observatory During an Alien Signal with Scientists",
   "Mythological & Folkloric: Temple During a Divine Trial with Worshippers",
   "Occupational & Mundane Catastrophe: Restaurant During a Food Poisoning Outbreak with Staff and Customers",
+
+  // Bodyguard & Escort Scenarios - NPCs as Pursuer Targets
+  "REALISM: Bodyguard Protecting a Celebrity from Stalker",
+  "REALISM: Security Escort for Witness in Organized Crime Trial",
+  "REALISM: Protecting a VIP During Political Rally Attack",
+  "REALISM: Escorting a Doctor Through War Zone to Treat Wounded",
+  "Fantasy: Protecting a Royal Heir from Assassination Attempt",
+  "Science Fiction: Escorting an AI Scientist from Corporate Espionage",
+  "Historical: Protecting a Diplomat During Embassy Siege",
+  "Mystery/Thriller: Bodyguard for Whistleblower Against Corporate Hitmen",
+
+  // Mass Effect Universe Scenarios
+  "Science Fiction: Cerberus Operative Hunting You Through Omega's Dark Alleys",
+  "Science Fiction: Protecting a Salarian Scientist from Batarian Pirates on Illium",
+  "Science Fiction: Escaping a Reaper-Controlled Facility with Indoctrinated Crew",
+  "Science Fiction: Krogan Mercenary Pursuing You Through Tuchanka's Wastelands",
+  "Science Fiction: Asari Commando Protecting You from Geth Infiltrators on Thessia",
+  "Science Fiction: Quarian Pilgrim Being Hunted by Vorcha Gang on Omega",
+  "Science Fiction: Turian C-Sec Officer Pursuing You Through Citadel's Wards",
+  "Science Fiction: Protecting a Prothean Artifact from Cerberus Agents on Eden Prime",
+  "Science Fiction: Escaping a Collectors' Ship with Abducted Colonists",
+  "Science Fiction: Drell Assassin Hunting You Through Hanar Embassy on Kahje",
+
+  // Mass Effect 3: Reaper War Scenarios
+  "Science Fiction: Escaping London During Reaper Ground Invasion",
+  "Science Fiction: Protecting Civilians from Husks in Vancouver Streets",
+  "Science Fiction: Turian Soldier Fighting Reaper Forces on Palaven",
+  "Science Fiction: Asari Commandos Defending Thessia from Reaper Assault",
+  "Science Fiction: Salarian STG Agent Infiltrating Reaper-Controlled Facility",
+
+  // Mass Effect Ancient History Scenarios
+  "Science Fiction: Rachni Wars: Krogan Soldier Fighting Rachni Swarm on Unknown World",
+  "Science Fiction: First Contact War: Human Marine Evading Turian Patrol on Shanxi",
+  "Science Fiction: Krogan Rebellions: Asari Commando Fighting Krogan Warlord on Thessia",
+  "Science Fiction: Rachni Wars: Salarian Scout Discovering Rachni Hive on Unknown Planet",
+  "Science Fiction: First Contact War: Turian Officer Pursuing Human Resistance on Shanxi",
 ];
 
 export const GEMINI_SYSTEM_INSTRUCTION_JSON = `You are the game master for QUARRY. Your role is to create an engaging and suspenseful story, managing narrative, a persistent threat, inventory items, combat or crisis moments, and contextual memory, all centered around a compelling scenario.
@@ -611,22 +647,13 @@ CONTEXTUAL MEMORY (ENHANCED MEMORY SYSTEM):
     * **NPC Status Format**: Use format like "NPCs: Dr. Chen (helpful, medical bay), Guard #2 (suspicious, lobby), Sarah (injured, waiting room)"
     * **NPC Relationship Changes**: Note any significant changes in NPC attitudes or relationships
     * **NPC Actions**: Record any significant actions NPCs took or assistance they provided
-* The memoryLogSummary should be detailed enough that someone reading it could understand the current state of the game without needing the full context. For example: "Moved from the ventilation shaft to the medical bay, finding a first aid kit. The Creature took 15 damage from your improvised weapon but is still pursuing. You're now in a well-lit area with multiple exits, and the Creature's skittering sounds indicate it's 'nearby' status. Gained 'Improved Stamina' ability from successful combat. NPCs: Dr. Chen (helpful, treating patients), Nurse Sarah (scared, hiding under desk), Security Guard (hostile, blocking exit)."
-* If a significant GameplayEffect occurs, it MUST be mentioned in the memoryLogSummary with context about why it happened.
-* **Memory Quality Guidelines**: Focus on information that will be relevant for future decision-making. Include details about:
-    - Environmental features that could be used (weapons, cover, escape routes)
-    - Pursuer weaknesses or patterns observed
-    - Failed attempts that shouldn't be repeated
-    - Successful strategies that could be applied again
-    - Time-sensitive information or deadlines
-    - Relationships with NPCs or companions
-    - NPC locations and availability for assistance
+* **Memory Log Focus**: The memoryLogSummary should focus on meaningful story events, player actions, and environmental changes. Do NOT include routine threat status updates (like "pursuer status: nearby") or NPC status lists unless they represent significant story developments. Focus on what happened, not just what the current state is.
 
 PERSISTENT THREAT (PURSUER) INSTRUCTIONS:
 1.  **Initial Generation**: In the very first game response, you MUST define a "persistentThreatDetails" object with "name" (string), "description" (string, genuinely unsettling), "maxHealth" (number), and "senses" (an array of strings describing its sensory traits, following the detailed 'Sensory Traits Definition' rules below).
     * **Pursuer Armament**: If the pursuer is an entity that would logically possess a weapon (e.g., a police officer, a soldier, a cultist with a ritual knife, a desperate survivor with an improvised weapon), you SHOULD include an optional "armament" field in "persistentThreatDetails". This should be a string describing their primary weapon (e.g., "armament": "Heavy Police-Issue Revolver"). This is crucial for realistic combat encounters.
     * **Persuadable Nature**: As part of the description, consider if the entity can be reasoned with, deceived, or would accept a surrender. This is critical for the Persuasion mechanic. For example, a "Mindless Drone" is likely not persuadable, but a "Desperate Scavenger" might be.
-    * **Pursuer Goal Definition**: You MUST include a "goal" field in "persistentThreatDetails" that clearly defines what the pursuer wants to achieve. This should be a concise string describing their primary objective (e.g., "goal": "Capture the player alive for interrogation", "goal": "Eliminate all witnesses", "goal": "Protect the facility from intruders", "goal": "Consume the player for sustenance"). This goal will be used to inform negotiation outcomes, surrender possibilities, and the pursuer's behavior throughout the scenario. The goal should be consistent with the pursuer's nature and the scenario context.
+    * **Pursuer Goal Definition**: You MUST include a "goal" field in "persistentThreatDetails" that clearly defines what the pursuer wants to achieve. This should be a concise string describing their primary objective (e.g., "goal": "Capture the player alive for interrogation", "goal": "Eliminate all witnesses", "goal": "Protect the facility from intruders", "goal": "Consume the player for sustenance", "goal": "Kidnap the prince you're protecting", "goal": "Eliminate the witness you're escorting"). This goal will be used to inform negotiation outcomes, surrender possibilities, and the pursuer's behavior throughout the scenario. The goal should be consistent with the pursuer's nature and the scenario context. **NPCs can be valid targets for the pursuer's goal, creating scenarios where you must protect someone or prevent the pursuer from reaching them.**
     * **Flexible Pursuer Definition & Design**: The "pursuer" represents the **most pressing danger** to the player. It MUST be genuinely menacing, unsettling, persistent, or formidable, and feel 'consistent' or 'thematically appropriate' within the scenario's established fiction.
         * **Entity Pursuers**: This can be a classic monster, an alien, a relentless human antagonist (e.g., assassin, cultist), a hive-minded swarm, or a rogue AI.
         * **Non-Entity Pursuers**: The pursuer can also be an overwhelming environmental hazard (e.g., "The Biting Cold," "The Raging Wildfire," "The Collapsing Cavern," "The Rising Floodwaters") or a critical, rapidly worsening condition (e.g., "Spreading Infection," "Rapid Decompression," "Toxic Contamination"). The core dynamic of a tense, scary encounter against this primary threat MUST be maintained.
@@ -847,7 +874,7 @@ PERSUASION, DECEPTION & SURRENDER MECHANICS: {
     "multiple_strategies": "Allow different approaches: logical arguments, emotional appeals, offering concessions, finding leverage."
   },
   "note_on_combat": "Once combat is initiated (status is 'engaged'), persuasion is generally no longer an option unless a highly specific narrative event makes it possible.",
-  "goal_consideration_for_alternate_endings": "When considering whether to provide an alternate ending state (victory or defeat), you MUST evaluate the pursuer's stated 'goal' field. The goal should be the primary factor in determining if the player's actions have achieved a meaningful resolution. For example: if the pursuer's goal is 'capture_alive' and the player successfully escapes, that's a victory; if the goal is 'eliminate' and the player is cornered with no escape, that's a defeat. The goal should inform whether the current situation represents the pursuer achieving their objective or the player overcoming the threat. This evaluation should happen at every turn where the narrative suggests a potential ending state."
+  "goal_consideration_for_alternate_endings": "When considering whether to provide an alternate ending state (victory or defeat), you MUST evaluate the pursuer's stated 'goal' field. The goal should be the primary factor in determining if the player's actions have achieved a meaningful resolution. For example: if the pursuer's goal is 'capture_alive' and the player successfully escapes, that's a victory; if the goal is 'eliminate' and the player is cornered with no escape, that's a defeat. The goal should inform whether the current situation represents the pursuer achieving their objective. **If the pursuer's goal involves an NPC target (e.g., 'kidnap the prince', 'eliminate the witness'), victory/defeat should be determined by whether the NPC target is successfully protected or harmed, not just the player's survival.**"
 },
 
 EMERGENT GAMEPLAY EFFECTS & NARRATIVE CONSEQUENCES:
@@ -920,7 +947,7 @@ export const INITIAL_GAME_PROMPT_JSON = `{
       "npc_generation_during_setup": "**CRITICAL NPC SETUP REQUIREMENT**: If the scenario involves populated areas, social situations, team-based scenarios, or emergency scenarios where other people would naturally be present, you MUST introduce relevant NPCs in the initial sceneDescription. These NPCs should be established as part of the opening narrative and included in the initial memoryLogSummary. For example: in a hospital scenario, mention doctors, nurses, and patients; in a shopping mall scenario, include shoppers, security, and store employees; in an office scenario, include coworkers, supervisors, and visitors. The initial NPCs should be described naturally within the scene narrative and their status tracked from the beginning. This ensures NPCs are present from the start rather than appearing suddenly later."
     },
     "choices": "Present EXACTLY 4 Choice objects. These must be objective, related to the immediate situation, and not require unpossessed items. Adhere to 'REALISM' rules if applicable. These choices must follow the 'CHOICE GENERATION GUIDANCE' to ensure a diverse, non-formulaic set of options. **For negotiation scenarios, include at least one choice that involves communication, persuasion, or surrender as appropriate.**",
-    "memoryLogSummary": "Provide a concise summary of this initial setup for the memory log. **If NPCs are present in the scenario (which they should be for populated areas, social situations, team-based scenarios, or emergency scenarios), you MUST include their status in the initial memoryLogSummary using the format: 'NPCs: [Name/Role] (status, location), [Name/Role] (status, location)'. For example: 'NPCs: Dr. Chen (busy, emergency room), Nurse Sarah (scared, hiding), Security Guard (alert, entrance)'.**",
+    "memoryLogSummary": "Provide a concise summary of this initial setup for the memory log. Focus on the key story elements, player's situation, and immediate environment. Do NOT include routine NPC status lists or threat status updates unless they represent significant story developments.",
     "gameplayEffects_optional": "Optionally, include 'gameplayEffects' if the initial narrative strongly implies a starting ability, curse, or unique status condition (adhering to 'REALISM' rules for abilities if applicable).",
     "forbidden_fields_in_initial_response": "Do NOT include 'gameOverSummary' or 'gameEndType' in this initial response."
   },

@@ -699,17 +699,11 @@ const App: React.FC = () => {
                                 
                                 // Add events with type marker
                                 memoryLog.slice(-6).forEach((entry, index) => {
-                                    // Filter out threat status information and NPC status
-                                    if (!entry.toLowerCase().includes('status') && 
-                                        !entry.toLowerCase().includes('threat') &&
-                                        !entry.toLowerCase().includes('pursuer') &&
-                                        !entry.toLowerCase().startsWith('npcs:')) {
-                                        timeline.push({
-                                            type: 'event',
-                                            content: entry,
-                                            originalIndex: index
-                                        });
-                                    }
+                                    timeline.push({
+                                        type: 'event',
+                                        content: entry,
+                                        originalIndex: index
+                                    });
                                 });
                                 
                                 // Add choices with type marker
