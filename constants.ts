@@ -473,30 +473,30 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Mystery/Thriller: Bodyguard for Whistleblower Against Corporate Hitmen",
 
   // Mass Effect Universe Scenarios
-  "Science Fiction: Cerberus Operative Hunting You Through Omega's Dark Alleys",
-  "Science Fiction: Protecting a Salarian Scientist from Batarian Pirates on Illium",
-  "Science Fiction: Escaping a Reaper-Controlled Facility with Indoctrinated Crew",
-  "Science Fiction: Krogan Mercenary Pursuing You Through Tuchanka's Wastelands",
-  "Science Fiction: Asari Commando Protecting You from Geth Infiltrators on Thessia",
-  "Science Fiction: Quarian Pilgrim Being Hunted by Vorcha Gang on Omega",
-  "Science Fiction: Turian C-Sec Officer Pursuing You Through Citadel's Wards",
-  "Science Fiction: Protecting a Prothean Artifact from Cerberus Agents on Eden Prime",
-  "Science Fiction: Escaping a Collectors' Ship with Abducted Colonists",
-  "Science Fiction: Drell Assassin Hunting You Through Hanar Embassy on Kahje",
+  "Science Fiction: Cerberus Operative Hunting You Through Omega's Dark Alleys (Mass Effect)",
+  "Science Fiction: Protecting a Salarian Scientist from Batarian Pirates on Illium (Mass Effect)",
+  "Science Fiction: Escaping a Reaper-Controlled Facility with Indoctrinated Crew (Mass Effect)",
+  "Science Fiction: Krogan Mercenary Pursuing You Through Tuchanka's Wastelands (Mass Effect)",
+  "Science Fiction: Asari Commando Protecting You from Geth Infiltrators on Thessia (Mass Effect)",
+  "Science Fiction: Quarian Pilgrim Being Hunted by Vorcha Gang on Omega (Mass Effect)",
+  "Science Fiction: Turian C-Sec Officer Pursuing You Through Citadel's Wards (Mass Effect)",
+  "Science Fiction: Protecting a Prothean Artifact from Cerberus Agents on Eden Prime (Mass Effect)",
+  "Science Fiction: Escaping a Collectors' Ship with Abducted Colonists (Mass Effect)",
+  "Science Fiction: Drell Assassin Hunting You Through Hanar Embassy on Kahje (Mass Effect)",
 
   // Mass Effect 3: Reaper War Scenarios
-  "Science Fiction: Escaping London During Reaper Ground Invasion",
-  "Science Fiction: Protecting Civilians from Husks in Vancouver Streets",
-  "Science Fiction: Turian Soldier Fighting Reaper Forces on Palaven",
-  "Science Fiction: Asari Commandos Defending Thessia from Reaper Assault",
-  "Science Fiction: Salarian STG Agent Infiltrating Reaper-Controlled Facility",
+  "Science Fiction: Escaping London During Reaper Ground Invasion (Mass Effect)",
+  "Science Fiction: Protecting Civilians from Husks in Vancouver Streets (Mass Effect)",
+  "Science Fiction: Turian Soldier Fighting Reaper Forces on Palaven (Mass Effect)",
+  "Science Fiction: Asari Commandos Defending Thessia from Reaper Assault (Mass Effect)",
+  "Science Fiction: Salarian STG Agent Infiltrating Reaper-Controlled Facility (Mass Effect)",
 
   // Mass Effect Ancient History Scenarios
-  "Science Fiction: Rachni Wars: Krogan Soldier Fighting Rachni Swarm on Unknown World",
-  "Science Fiction: First Contact War: Human Marine Evading Turian Patrol on Shanxi",
-  "Science Fiction: Krogan Rebellions: Asari Commando Fighting Krogan Warlord on Thessia",
-  "Science Fiction: Rachni Wars: Salarian Scout Discovering Rachni Hive on Unknown Planet",
-  "Science Fiction: First Contact War: Turian Officer Pursuing Human Resistance on Shanxi",
+  "Science Fiction: Rachni Wars: Krogan Soldier Fighting Rachni Swarm on Unknown World (Mass Effect)",
+  "Science Fiction: First Contact War: Human Marine Evading Turian Patrol on Shanxi (Mass Effect)",
+  "Science Fiction: Krogan Rebellions: Asari Commando Fighting Krogan Warlord on Thessia (Mass Effect)",
+  "Science Fiction: Rachni Wars: Salarian Scout Discovering Rachni Hive on Unknown Planet (Mass Effect)",
+  "Science Fiction: First Contact War: Turian Officer Pursuing Human Resistance on Shanxi (Mass Effect)",
 ];
 
 export const GEMINI_SYSTEM_INSTRUCTION_JSON = `You are the game master for QUARRY. Your role is to create an engaging and suspenseful story, managing narrative, a persistent threat, inventory items, combat or crisis moments, and contextual memory, all centered around a compelling scenario.
