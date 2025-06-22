@@ -17,7 +17,7 @@ import { API_KEY as API_KEY_FROM_ENV_JS } from './env.js';
 const API_KEY_AVAILABLE = typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FROM_ENV_JS.trim() !== ""; 
 // --- End Configuration --- 
 
-const MAX_MEMORY_LOG_ENTRIES = 5; 
+const MAX_MEMORY_LOG_ENTRIES = 15; 
 type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fantasy"; 
 
 const App: React.FC = () => { 
@@ -36,12 +36,13 @@ const App: React.FC = () => {
   
   const [playerHealth, setPlayerHealth] = useState<number>(MAX_PLAYER_HEALTH); 
   const [isGameOver, setIsGameOver] = useState<boolean>(false); 
-  const [gameOverSummaryText, setGameOverSummaryText] = useState<string | null>(null);
+  const [gameOverSummaryText, setGameOverSummaryText] = useState<string | null>(null); 
   const [gameEndType, setGameEndType] = useState<string | null>(null);
   const [persistentThreat, setPersistentThreat] = useState<PersistentThreat | null>(null); 
   const [isInCombat, setIsInCombat] = useState<boolean>(false); 
   const [combatLog, setCombatLog] = useState<string[]>([]); 
   const [memoryLog, setMemoryLog] = useState<string[]>([]); 
+  const [playerChoices, setPlayerChoices] = useState<string[]>([]); 
   
   const [storyFlags, setStoryFlags] = useState<Record<string, any>>({}); 
   const [playerAbilities, setPlayerAbilities] = useState<{ name: string; description: string; uses?: number }[]>([]); 
@@ -336,6 +337,7 @@ const App: React.FC = () => {
     setIsInCombat(false); 
     setCombatLog([]); 
     setMemoryLog([]); 
+    setPlayerChoices([]); 
     setStoryFlags({}); 
     setPlayerAbilities([]); 
     setIsCustomChoiceInputVisible(false); 
@@ -406,6 +408,10 @@ const App: React.FC = () => {
     if (isGameOver) return; 
     const choiceText = typeof choice === 'string' ? choice : choice.text; 
     const isTriggeringCombat = typeof choice !== 'string' && !!choice.triggersCombat; 
+    
+    // Track the player's choice
+    setPlayerChoices(prev => [...prev, choiceText]);
+    
     if (!isInitialLoad) { 
       processApiResponse(fetchNextStorySegment( 
         currentStory.sceneDescription, choiceText, inventory, playerHealth, 
@@ -419,6 +425,10 @@ const App: React.FC = () => {
 
   const handleCustomChoiceSubmit = useCallback(() => { 
     if (!customChoiceText.trim() || isInitialLoad) return; 
+    
+    // Track the player's custom choice
+    setPlayerChoices(prev => [...prev, customChoiceText.trim()]);
+    
     setIsCustomChoiceInputVisible(false); 
     processApiResponse(fetchNextStorySegment( 
       currentStory.sceneDescription, customChoiceText.trim(), inventory, playerHealth, 
@@ -521,7 +531,7 @@ const App: React.FC = () => {
 
         {!isInitialLoad && <InventoryDisplay items={inventory} />} 
 
-        {!isInitialLoad && playerAbilities.length > 0 && !isGameOver && ( 
+        {!isInitialLoad && playerAbilities.length > 0 && !isGameOver && (
             <div className="bg-purple-800 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl mb-6 max-w-3xl w-full"> 
                 <h3 className="text-lg font-semibold text-purple-200 mb-2 border-b border-purple-300 pb-1">Abilities:</h3> 
                 <ul className="list-none text-gray-200 flex flex-col space-y-1 custom-scroll max-h-24 overflow-y-auto pr-2"> 
@@ -531,6 +541,19 @@ const App: React.FC = () => {
                         </li> 
                     ))} 
                 </ul> 
+            </div> 
+        )} 
+
+        {!isInitialLoad && memoryLog.length > 0 && !isGameOver && ( 
+            <div className="bg-blue-800 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl mb-6 max-w-3xl w-full"> 
+                <h3 className="text-lg font-semibold text-blue-200 mb-2 border-b border-blue-300 pb-1">Recent Events:</h3> 
+                <div className="max-h-32 overflow-y-auto custom-scroll pr-2"> 
+                    {memoryLog.slice(-8).map((entry, index) => ( 
+                        <p key={index} className="text-sm text-gray-200 py-1 border-l-2 border-blue-400 pl-3 mb-2 last:mb-0"> 
+                            {entry} 
+                        </p> 
+                    ))} 
+                </div> 
             </div> 
         )} 
 
@@ -575,8 +598,8 @@ const App: React.FC = () => {
             > 
               Play Again 
             </button> 
-          </div> 
-        )}
+           </div> 
+        )} 
 
         {error && !isGameOver && ( 
           <div className="bg-red-800 bg-opacity-90 p-4 rounded-lg shadow-md mb-6 max-w-3xl w-full text-center"> 
@@ -676,8 +699,31 @@ const App: React.FC = () => {
                     )} 
                 </> 
             )} 
+
+            {/* Enhanced Memory Log - Shows below choices */}
+            {!isDisplayingInitialStartOptions && !isGameOver && !isLoading && (memoryLog.length > 0 || playerChoices.length > 0) && (
+                <div className="w-full max-w-3xl mt-6">
+                    <div className="bg-blue-800 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl">
+                        <h3 className="text-lg font-semibold text-blue-200 mb-3 border-b border-blue-300 pb-1">Memory Log:</h3>
+                        <div className="max-h-48 overflow-y-auto custom-scroll pr-2 space-y-2">
+                            {/* Show recent memory log entries */}
+                            {memoryLog.slice(-6).map((entry, index) => (
+                                <div key={`memory-${index}`} className="text-sm text-gray-200 py-1 border-l-2 border-blue-400 pl-3">
+                                    <span className="text-blue-300 font-medium">Event:</span> {entry}
+                                </div>
+                            ))}
+                            {/* Show recent player choices */}
+                            {playerChoices.slice(-4).map((choice, index) => (
+                                <div key={`choice-${index}`} className="text-sm text-gray-200 py-1 border-l-2 border-green-400 pl-3">
+                                    <span className="text-green-300 font-medium">Choice:</span> {choice}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
             
-            {!isDisplayingInitialStartOptions && !isLoading && !error && !isGameOver && currentDisplayedChoices.length === 0 && !isCustomChoiceInputVisible && ( 
+            {!isDisplayingInitialStartOptions && !isLoading && !error && !isGameOver && currentDisplayedChoices.length === 0 && !isCustomChoiceInputVisible && (
                  <div className="text-center p-4 bg-gray-800 rounded-lg border border-gray-700 w-full"> 
                      <p className="text-xl text-gray-400">No clear path...</p> 
                      <button 
