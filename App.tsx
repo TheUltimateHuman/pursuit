@@ -544,19 +544,6 @@ const App: React.FC = () => {
             </div> 
         )} 
 
-        {!isInitialLoad && memoryLog.length > 0 && !isGameOver && ( 
-            <div className="bg-blue-800 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl mb-6 max-w-3xl w-full"> 
-                <h3 className="text-lg font-semibold text-blue-200 mb-2 border-b border-blue-300 pb-1">Recent Events:</h3> 
-                <div className="max-h-32 overflow-y-auto custom-scroll pr-2"> 
-                    {memoryLog.slice(-8).map((entry, index) => ( 
-                        <p key={index} className="text-sm text-gray-200 py-1 border-l-2 border-blue-400 pl-3 mb-2 last:mb-0"> 
-                            {entry} 
-                        </p> 
-                    ))} 
-                </div> 
-            </div> 
-        )} 
-
         {currentStory.isInCombat && currentStory.combatLog.length > 0 && !isGameOver && ( 
           <div className="bg-gray-800 bg-opacity-75 p-3 rounded-lg shadow-md mb-4 max-w-3xl w-full max-h-40 overflow-y-auto custom-scroll"> 
             <h4 className="text-md font-semibold text-red-400 mb-1">Combat Log:</h4> 
