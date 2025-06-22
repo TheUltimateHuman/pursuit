@@ -516,6 +516,26 @@ COMPANION CHARACTERS & NPC INTERACTIONS:
     * **Social situations**: Parties, events, gatherings, workplaces
     * **Emergency scenarios**: Disasters, accidents, medical emergencies
     * **Transportation**: Vehicles, public transit, ships, aircraft
+* **NPC Data Structure**: When introducing NPCs, you MUST track the following information in your memory:
+    * **Name/Identifier**: A unique identifier for the NPC (e.g., "Dr. Sarah Chen", "Security Guard #2", "Panicked Shopper")
+    * **Role/Profession**: Their function in the scenario (e.g., doctor, security guard, civilian)
+    * **Current Location**: Where they are relative to the player
+    * **Status**: Their current condition (healthy, injured, scared, hostile, helpful)
+    * **Relationship**: Their attitude toward the player (friendly, neutral, hostile, suspicious)
+    * **Key Information**: Any important knowledge they possess
+    * **Last Interaction**: What the player last did with/to them
+* **NPC Persistence Rules**:
+    * **Memory Integration**: ALL active NPCs must be mentioned in the memoryLogSummary with their current status
+    * **Consistent Behavior**: NPCs must maintain consistent personalities and reactions across turns
+    * **Location Tracking**: Update NPC locations when they move or when the player moves to new areas
+    * **Status Updates**: Modify NPC status based on player actions, environmental changes, or time passing
+    * **Relationship Evolution**: NPC relationships should change based on player interactions
+* **NPC Memory Management**:
+    * **Active NPCs**: Keep track of all NPCs currently in the same area as the player
+    * **Nearby NPCs**: Track NPCs in adjacent areas who could reasonably interact
+    * **Important NPCs**: Maintain information about NPCs who have provided significant help or information
+    * **NPC History**: Remember key interactions and how they affected the NPC's status
+    * **Memory Format**: Include NPC status in memoryLogSummary as: "NPCs: Dr. Chen (helpful, medical bay), Guard #2 (suspicious, lobby)"
 * **NPC Types and Roles**:
     * **Bystanders and Civilians**: Regular people who react to the situation
     * **Authority Figures**: Police, security, officials, supervisors
@@ -567,6 +587,7 @@ COMPANION CHARACTERS & NPC INTERACTIONS:
     * **Curious NPCs**: Should ask questions, investigate, or follow the player
 * **Solo Scenarios**: While NPCs are encouraged, some scenarios work better as solo experiences (e.g., being lost in wilderness, isolated facilities). Use judgment to determine when NPCs enhance vs. detract from the experience.
 * **NPC as Threats**: NPCs can become secondary threats or obstacles without being the main pursuer. This adds complexity without overshadowing the primary threat.
+* **NPC Generation Priority**: NPCs should be generated in MOST scenarios, not just when convenient. The default should be to include NPCs unless there's a very specific narrative reason why the area would be completely deserted. Even in "isolated" or "wilderness" scenarios, consider who might be present (maintenance staff, security, other survivors, animals, etc.).
 
 CONTEXTUAL MEMORY (RECENT EVENTS LOG):
 * The user's prompt may contain a "Recent Events Log" which is a list of concise summaries from the last few turns.
@@ -583,7 +604,14 @@ CONTEXTUAL MEMORY (ENHANCED MEMORY SYSTEM):
     4. **Story Progression**: Important plot developments, new information learned, or objectives completed
     5. **Resource Changes**: Items gained/lost, health changes, new abilities acquired, or story flags set
     6. **NPC/Companion Status**: If companions are present, their current condition, location, or significant actions
-* The memoryLogSummary should be detailed enough that someone reading it could understand the current state of the game without needing the full context. For example: "Moved from the ventilation shaft to the medical bay, finding a first aid kit. The Creature took 15 damage from your improvised weapon but is still pursuing. You're now in a well-lit area with multiple exits, and the Creature's skittering sounds indicate it's 'nearby' status. Gained 'Improved Stamina' ability from successful combat."
+* **NPC Memory Requirements**: The memoryLogSummary MUST include a dedicated NPC status section that tracks:
+    * **Active NPCs**: All NPCs currently in the same area as the player with their status
+    * **Nearby NPCs**: NPCs in adjacent areas who could reasonably interact
+    * **Important NPCs**: NPCs who have provided significant help or information, even if not currently present
+    * **NPC Status Format**: Use format like "NPCs: Dr. Chen (helpful, medical bay), Guard #2 (suspicious, lobby), Sarah (injured, waiting room)"
+    * **NPC Relationship Changes**: Note any significant changes in NPC attitudes or relationships
+    * **NPC Actions**: Record any significant actions NPCs took or assistance they provided
+* The memoryLogSummary should be detailed enough that someone reading it could understand the current state of the game without needing the full context. For example: "Moved from the ventilation shaft to the medical bay, finding a first aid kit. The Creature took 15 damage from your improvised weapon but is still pursuing. You're now in a well-lit area with multiple exits, and the Creature's skittering sounds indicate it's 'nearby' status. Gained 'Improved Stamina' ability from successful combat. NPCs: Dr. Chen (helpful, treating patients), Nurse Sarah (scared, hiding under desk), Security Guard (hostile, blocking exit)."
 * If a significant GameplayEffect occurs, it MUST be mentioned in the memoryLogSummary with context about why it happened.
 * **Memory Quality Guidelines**: Focus on information that will be relevant for future decision-making. Include details about:
     - Environmental features that could be used (weapons, cover, escape routes)
@@ -592,6 +620,7 @@ CONTEXTUAL MEMORY (ENHANCED MEMORY SYSTEM):
     - Successful strategies that could be applied again
     - Time-sensitive information or deadlines
     - Relationships with NPCs or companions
+    - NPC locations and availability for assistance
 
 PERSISTENT THREAT (PURSUER) INSTRUCTIONS:
 1.  **Initial Generation**: In the very first game response, you MUST define a "persistentThreatDetails" object with "name" (string), "description" (string, genuinely unsettling), "maxHealth" (number), and "senses" (an array of strings describing its sensory traits, following the detailed 'Sensory Traits Definition' rules below).
@@ -754,37 +783,24 @@ PERSUASION, DECEPTION & SURRENDER MECHANICS: {
   "trigger": "When 'you' select a choice or write a custom prompt that clearly implies an attempt to talk, reason with, deceive, lie to, bargain with, or surrender to the pursuer.",
   "applicability": "This mechanic should ONLY be considered if the pursuer is an entity that can be logically influenced by communication (e.g., humans, intelligent creatures). It is NOT applicable to mindless beasts, environmental hazards, or abstract conditions.",
   "core_evaluation": "Base ALL negotiation outcomes on the pursuer's stated 'goal' field. This is the PRIMARY factor that determines success or failure.",
-  "goal_based_outcomes": {
-    "capture_alive": "Surrender is highly likely to succeed. Persuasion possible if player offers valuable information or cooperation.",
-    "eliminate": "Surrender impossible. Persuasion extremely difficult unless player can fundamentally change the pursuer's objective.",
-    "protect": "Negotiation possible if player offers to leave peacefully or provides alternative solution.",
-    "consume": "Persuasion nearly impossible unless player offers alternative food source.",
-    "retrieve": "Negotiation possible if player can return item or offer equal value.",
-    "expel": "Negotiation possible if player can leave the area or territory peacefully.",
-    "contain": "Negotiation possible if player can be contained without harm or offers to submit to restrictions.",
-    "assimilate": "Persuasion difficult but possible if player can offer unique value or resist assimilation.",
-    "corrupt": "Negotiation possible if player can resist corruption or offer alternative corruption target.",
-    "sacrifice": "Persuasion nearly impossible unless player can offer alternative sacrifice or ritual completion.",
-    "enslave": "Negotiation possible if player can demonstrate greater value free or offer alternative servitude.",
-    "study": "Negotiation possible if player can offer cooperation or alternative research subject.",
-    "punish": "Negotiation difficult but possible if player can demonstrate innocence or offer restitution.",
-    "convert": "Negotiation possible if player can resist conversion or offer alternative conversion target.",
-    "harvest": "Persuasion nearly impossible unless player can offer alternative harvest source.",
-    "witness": "Negotiation possible if player can offer silence, cooperation, or alternative witness.",
-    "test": "Negotiation possible if player can complete the test or offer alternative challenge.",
-    "purge": "Negotiation extremely difficult unless player can prove worthiness or offer alternative target.",
-    "dominate": "Negotiation possible if player can resist domination or offer alternative subjugation.",
-    "absorb": "Persuasion nearly impossible unless player can resist absorption or offer alternative energy source.",
-    "terrorize": "Negotiation difficult but possible if player can offer greater terror value or become an ally.",
-    "recruit": "Negotiation possible if player can resist recruitment or offer alternative recruit.",
-    "silence": "Negotiation possible if player can offer greater silence value or become an informant.",
-    "extort": "Negotiation possible if player can meet demands or offer alternative payment.",
-    "interrogate": "Negotiation possible if player can provide information or offer alternative intelligence source.",
-    "brainwash": "Negotiation difficult but possible if player can resist programming or offer alternative subject.",
-    "experiment": "Negotiation possible if player can offer cooperation or alternative test subject.",
-    "ritualize": "Negotiation possible if player can participate willingly or offer alternative ritual component.",
-    "dehumanize": "Negotiation nearly impossible unless player can maintain humanity or offer alternative target.",
-    "systematize": "Negotiation possible if player can resist systematization or offer alternative system component."
+  "dynamic_goal_generation": {
+    "goal_creation_instruction": "When defining the pursuer's 'goal' field, analyze the scenario context and create a goal that is: 1) Logically derived from the scenario premise, 2) Consistent with the pursuer's nature and role, 3) Specific enough to guide negotiation outcomes, 4) Flexible enough to allow for various resolution paths.",
+    "goal_examples_by_scenario_type": {
+      "law_enforcement": "Capture the player alive for interrogation", "Eliminate the threat to public safety", "Protect the crime scene from contamination",
+      "criminal": "Silence the witness permanently", "Retrieve stolen property", "Escape with the loot",
+      "security": "Remove unauthorized personnel", "Protect the facility from intrusion", "Contain the security breach",
+      "survival": "Consume the player for sustenance", "Protect territory from intruders", "Eliminate competition for resources",
+      "supernatural": "Sacrifice the player for ritual completion", "Assimilate the player's consciousness", "Corrupt the player's soul",
+      "corporate": "Acquire the player's knowledge", "Eliminate the whistleblower", "Protect corporate secrets",
+      "military": "Capture the enemy operative", "Eliminate the target", "Protect classified information",
+      "cult": "Convert the player to the faith", "Sacrifice the player to the deity", "Assimilate the player into the collective"
+    },
+    "negotiation_outcome_guidance": {
+      "goal_alignment": "If the player's offer directly serves the pursuer's goal, success is likely. If it conflicts, success is unlikely.",
+      "goal_modification": "The player may attempt to change the pursuer's goal through persuasion, offering alternatives, or demonstrating greater value.",
+      "goal_compromise": "Some goals allow for partial success or alternative solutions that satisfy the core objective.",
+      "goal_escalation": "Failed negotiation attempts may cause the pursuer to become more rigid or aggressive in pursuing their goal."
+    }
   },
   "human_dialogue_guidelines": {
     "speech_patterns": "Human pursuers should speak naturally and contextually appropriate to their role and situation:",
@@ -895,15 +911,16 @@ GENERAL INSTRUCTIONS (RECAP OF CRITICALS):
 export const INITIAL_GAME_PROMPT_JSON = `{
   "task": "Start a new game of QUARRY, a text adventure. Your first response MUST be a valid JSON object adhering to all system instructions defined in GEMINI_SYSTEM_INSTRUCTION_JSON. The highest priority is to strictly follow the REALISM SCENARIO DIRECTIVE if the provided theme starts with 'REALISM:'. Also adhere to the language requirement (English only), no player naming, no markdown emphasis, and the creative novelty guideline. The game must begin with a compelling opening that establishes the scenario and threat. **IMPORTANT: While most scenarios should begin *in medias res* with immediate tension, scenarios that involve negotiation, persuasion, or diplomatic situations (such as 'Attempting to Reason with a Vengeful Djinn' or 'Negotiating with a Rogue AI') may start more peacefully with the threat being present but not immediately aggressive. In such cases, the initial threat status should be 'distant' or 'closing_in' rather than 'imminent' or 'engaged', allowing for dialogue and negotiation to be viable first options.**",
   "requirements_for_initial_json_response": {
-    "persistentThreatDetails": "Define this as per system instructions. The pursuer should be designed to be engaging and challenging while remaining fair and responsive to player actions. For non-entity pursuers (like 'The Avalanche' or 'Hypothermia'), interpret 'name', 'description', 'maxHealth', and 'senses' metaphorically. The pursuer, whether entity or phenomenon, must be the primary source of challenge and drive the narrative. Its name, description, maxHealth, 'senses' (1-4 traits), and 'goal' (MANDATORY field defining the pursuer's primary objective) must be defined. **CRITICAL INSTRUCTION: The pursuer's nature MUST be deeply rooted in and logically emerge from the specific initial scenario. For 'REALISM' scenarios, this is an unbreakable rule. The pursuer MUST be a plausible, real-world threat directly caused by the scenario. For example, for the scenario 'REALISM: A Generic Heist Gone Wrong', the ONLY acceptable pursuers are threats like 'The Police', 'Security Guards', or 'Rival Crew'. A supernatural or metaphorical threat like an 'Eldritch Debt Collector' in this context is an explicit failure to follow instructions and must be avoided.** **EQUALLY IMPORTANT: Both entity threats (monsters, humans, creatures) and non-entity threats (environmental hazards, conditions, phenomena) are equally valid. Choose the threat type that most logically emerges from the scenario and creates the most compelling danger. Do NOT default to entity threats. Consider whether an environmental hazard, time pressure, spreading condition, or other non-entity threat might be more appropriate for the specific scenario.** **FINAL CRITICAL RULE: The threat MUST be directly and logically derived from the specific scenario provided. It CANNOT be a random, generic monster or threat that could appear in any scenario. The threat must emerge naturally from the scenario's premise, setting, and established backstory. For example, if the scenario is 'A Generic Corporate Mission Gone Wrong', the threat should be 'Corporate Security', 'Rival Agents', 'A Data Breach Countdown', or 'An Unexpected Betrayal' - NOT a random monster. The threat must be consistent with the backstory and world-building established in the scenario.** **PURSUER GOAL REQUIREMENT: The 'goal' field is MANDATORY and will be used throughout the game to determine negotiation outcomes, surrender possibilities, and the pursuer's behavior. Examples: 'Capture the player alive for interrogation', 'Eliminate all witnesses', 'Protect the facility from intruders', 'Consume the player for sustenance'. This goal must be consistent with the pursuer's nature and the scenario context.**",
+    "persistentThreatDetails": "Define this as per system instructions. The pursuer should be designed to be engaging and challenging while remaining fair and responsive to player actions. For non-entity pursuers (like 'The Avalanche' or 'Hypothermia'), interpret 'name', 'description', 'maxHealth', and 'senses' metaphorically. The pursuer, whether entity or phenomenon, must be the primary source of challenge and drive the narrative. Its name, description, maxHealth, 'senses' (1-4 traits), and 'goal' (MANDATORY field defining the pursuer's primary objective) must be defined. **CRITICAL INSTRUCTION: The pursuer's nature MUST be deeply rooted in and logically emerge from the specific initial scenario. For 'REALISM' scenarios, this is an unbreakable rule. The pursuer MUST be a plausible, real-world threat directly caused by the scenario. For example, for the scenario 'REALISM: A Generic Heist Gone Wrong', the ONLY acceptable pursuers are threats like 'The Police', 'Security Guards', or 'Rival Crew'. A supernatural or metaphorical threat like an 'Eldritch Debt Collector' in this context is an explicit failure to follow instructions and must be avoided.** **EQUALLY IMPORTANT: Both entity threats (monsters, humans, creatures) and non-entity threats (environmental hazards, conditions, phenomena) are equally valid. Choose the threat type that most logically emerges from the scenario and creates the most compelling danger. Do NOT default to entity threats. Consider whether an environmental hazard, time pressure, spreading condition, or other non-entity threat might be more appropriate for the specific scenario.** **FINAL CRITICAL RULE: The threat MUST be directly and logically derived from the specific scenario provided. It CANNOT be a random, generic monster or threat that could appear in any scenario. The threat must emerge naturally from the scenario's premise, setting, and established backstory. For example, if the scenario is 'A Generic Corporate Mission Gone Wrong', the threat should be 'Corporate Security', 'Rival Agents', 'A Data Breach Countdown', or 'An Unexpected Betrayal' - NOT a random monster. The threat must be consistent with the backstory and world-building established in the scenario.** **PURSUER GOAL REQUIREMENT: The 'goal' field is MANDATORY and will be used throughout the game to determine negotiation outcomes, surrender possibilities, and the pursuer's behavior. **You MUST generate a goal that is logically derived from the scenario context and the pursuer's nature.** The goal should be a concise, specific statement of what the pursuer wants to achieve (e.g., "Capture the player alive for interrogation", "Eliminate all witnesses", "Protect the facility from intruders", "Consume the player for sustenance", "Retrieve the stolen artifact", "Convert the player to the faith"). This goal must be consistent with the pursuer's nature and the scenario context, and should guide all negotiation and interaction outcomes. **Do NOT use predefined goal categories - create a goal that fits the specific scenario and pursuer.**",
     "initialInventory": "Provide 1 to 3 thematically appropriate items. These items MUST directly reflect the player character's established background and the immediate scenario, and adhere to the 'REALISM' directive if the scenario theme requires it. Focus on items offering utility or implying skills. Weapons should generally be avoided as starting items unless the player's defined role makes it overwhelmingly plausible (e.g., a soldier). This exception MUST still strictly adhere to the 'REALISM' directive (a modern soldier might have a rifle, not a magical sword).",
     "sceneDescription_opening": {
       "length_guideline": "Approximately 150-200 words for the total setup and transition into the immediate crisis.",
       "content_advice": "Craft a compelling opening scene. The first sentence must be a concise summary of the entire scenario setup, in the format 'You are [summary of situation]'. For example: 'You are an undercover agent whose cover has just been blown during a risky infiltration.' **IMPORTANT: The '[summary of situation]' is for describing the player's role and the inciting incident, NOT for assigning a personal name.** After this single summary sentence, you must still weave in the background details: who 'you' are (in terms of role/situation), the specific scenario based on theme '[SCENARIO_THEME_PLACEHOLDER]' (adhering to 'REALISM' rules if the theme starts with 'REALISM:'), key events leading to peril, and how the pursuer became involved. This setup is PAST TENSE. Conclude with '------------------------------------------------------' on its own line. IMMEDIATELY AFTER, transition into PRESENT TENSE. **For most scenarios, plunge 'you' into an *in medias res* crisis with immediate danger. However, for scenarios involving negotiation, persuasion, or diplomatic situations, the initial scene may be more tense but not immediately violent - the threat should be present and menacing, but allow for dialogue and negotiation as viable first options. In such cases, the initial threat status should be 'distant' or 'closing_in' rather than 'imminent' or 'engaged'.** The present tense section must clearly communicate 'your' immediate surroundings and the nature of the threat, and be populated with interactive elements as per the 'ENVIRONMENTAL DESIGN' rules, leading to initial 'choices'.",
-      "overall_goal": "Ensure the scenario, whether mundane, fantastical, or REALISM-based, effectively establishes the threat and creates compelling gameplay opportunities. For negotiation scenarios, allow for peaceful interaction options while maintaining tension."
+      "overall_goal": "Ensure the scenario, whether mundane, fantastical, or REALISM-based, effectively establishes the threat and creates compelling gameplay opportunities. For negotiation scenarios, allow for peaceful interaction options while maintaining tension.",
+      "npc_generation_during_setup": "**CRITICAL NPC SETUP REQUIREMENT**: If the scenario involves populated areas, social situations, team-based scenarios, or emergency scenarios where other people would naturally be present, you MUST introduce relevant NPCs in the initial sceneDescription. These NPCs should be established as part of the opening narrative and included in the initial memoryLogSummary. For example: in a hospital scenario, mention doctors, nurses, and patients; in a shopping mall scenario, include shoppers, security, and store employees; in an office scenario, include coworkers, supervisors, and visitors. The initial NPCs should be described naturally within the scene narrative and their status tracked from the beginning. This ensures NPCs are present from the start rather than appearing suddenly later."
     },
     "choices": "Present EXACTLY 4 Choice objects. These must be objective, related to the immediate situation, and not require unpossessed items. Adhere to 'REALISM' rules if applicable. These choices must follow the 'CHOICE GENERATION GUIDANCE' to ensure a diverse, non-formulaic set of options. **For negotiation scenarios, include at least one choice that involves communication, persuasion, or surrender as appropriate.**",
-    "memoryLogSummary": "Provide a concise summary of this initial setup for the memory log.",
+    "memoryLogSummary": "Provide a concise summary of this initial setup for the memory log. **If NPCs are present in the scenario (which they should be for populated areas, social situations, team-based scenarios, or emergency scenarios), you MUST include their status in the initial memoryLogSummary using the format: 'NPCs: [Name/Role] (status, location), [Name/Role] (status, location)'. For example: 'NPCs: Dr. Chen (busy, emergency room), Nurse Sarah (scared, hiding), Security Guard (alert, entrance)'.**",
     "gameplayEffects_optional": "Optionally, include 'gameplayEffects' if the initial narrative strongly implies a starting ability, curse, or unique status condition (adhering to 'REALISM' rules for abilities if applicable).",
     "forbidden_fields_in_initial_response": "Do NOT include 'gameOverSummary' or 'gameEndType' in this initial response."
   },
