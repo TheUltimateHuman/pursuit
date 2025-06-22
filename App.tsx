@@ -693,18 +693,57 @@ const App: React.FC = () => {
                     <div className="bg-blue-800 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl">
                         <h3 className="text-lg font-semibold text-blue-200 mb-3 border-b border-blue-300 pb-1">Memory Log:</h3>
                         <div className="max-h-48 overflow-y-auto custom-scroll pr-2 space-y-2">
-                            {/* Show recent memory log entries */}
-                            {memoryLog.slice(-6).map((entry, index) => (
-                                <div key={`memory-${index}`} className="text-sm text-gray-200 py-1 border-l-2 border-blue-400 pl-3">
-                                    <span className="text-blue-300 font-medium">Event:</span> {entry}
-                                </div>
-                            ))}
-                            {/* Show recent player choices */}
-                            {playerChoices.slice(-4).map((choice, index) => (
-                                <div key={`choice-${index}`} className="text-sm text-gray-200 py-1 border-l-2 border-green-400 pl-3">
-                                    <span className="text-green-300 font-medium">Choice:</span> {choice}
-                                </div>
-                            ))}
+                            {(() => {
+                                // Create combined timeline of events and choices
+                                const timeline = [];
+                                
+                                // Add events with type marker
+                                memoryLog.slice(-6).forEach((entry, index) => {
+                                    // Filter out threat status information and NPC status
+                                    if (!entry.toLowerCase().includes('status') && 
+                                        !entry.toLowerCase().includes('threat') &&
+                                        !entry.toLowerCase().includes('pursuer') &&
+                                        !entry.toLowerCase().startsWith('npcs:')) {
+                                        timeline.push({
+                                            type: 'event',
+                                            content: entry,
+                                            originalIndex: index
+                                        });
+                                    }
+                                });
+                                
+                                // Add choices with type marker
+                                playerChoices.slice(-4).forEach((choice, index) => {
+                                    timeline.push({
+                                        type: 'choice',
+                                        content: choice,
+                                        originalIndex: index
+                                    });
+                                });
+                                
+                                // Sort by original index to maintain chronological order
+                                timeline.sort((a, b) => a.originalIndex - b.originalIndex);
+                                
+                                // Display interleaved timeline
+                                return timeline.map((item, index) => (
+                                    <div 
+                                        key={`timeline-${index}`} 
+                                        className={`text-sm text-gray-200 py-1 border-l-2 pl-3 ${
+                                            item.type === 'event' 
+                                                ? 'border-blue-400' 
+                                                : 'border-green-400'
+                                        }`}
+                                    >
+                                        <span className={`font-medium ${
+                                            item.type === 'event' 
+                                                ? 'text-blue-300' 
+                                                : 'text-green-300'
+                                        }`}>
+                                            {item.type === 'event' ? 'Event:' : 'Choice:'}
+                                        </span> {item.content}
+                                    </div>
+                                ));
+                            })()}
                         </div>
                     </div>
                 </div>
