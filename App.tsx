@@ -55,6 +55,11 @@ const App: React.FC = () => {
   const [isCustomScenarioModalVisible, setIsCustomScenarioModalVisible] = useState<boolean>(false); 
   // --- NEW STATE FOR TRACKING LAST USED CUSTOM SCENARIO ---
   const [lastUsedCustomScenario, setLastUsedCustomScenario] = useState<string | null>(null);
+  // --- NEW STATE FOR TRACKING CURRENT SCENARIO THEME ---
+  const [currentScenarioTheme, setCurrentScenarioTheme] = useState<string | null>(null);
+  // --- NEW STATE FOR CUSTOM SCENARIO INPUT ---
+  const [isCustomScenarioInputVisible, setIsCustomScenarioInputVisible] = useState<boolean>(false);
+  const [customScenarioText, setCustomScenarioText] = useState<string>("");
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
@@ -343,6 +348,9 @@ const App: React.FC = () => {
     setIsCustomChoiceInputVisible(false); 
     setLastUsedThemeType(null); 
     setLastUsedCustomScenario(null); // Reset custom scenario state
+    setCurrentScenarioTheme(null); // Reset current scenario theme
+    setIsCustomScenarioInputVisible(false); // Reset custom scenario input
+    setCustomScenarioText(""); // Reset custom scenario text
     setCurrentStory({ 
         sceneDescription: "Welcome to QUARRY.", 
         choices: ["Begin"], 
@@ -357,10 +365,10 @@ const App: React.FC = () => {
     switch (themeType) { 
         case "random": return [...SCENARIO_THEMES_LIST]; 
         case "realism": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("REALISM:")); 
-        case "historical": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Historical:") || t.startsWith("Mythological & Folkloric:")); 
-        case "modern": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Mystery/Thriller:") || t.startsWith("Occupational & Mundane Catastrophe:") || t.startsWith("Contemporary & Mundane:")); 
-        case "sci_fi": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Science Fiction:") || t.startsWith("Cosmic & Eldritch Horror:") || t.startsWith("Unique & Surreal Environments:")); 
-        case "fantasy": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Fantasy:") || t.startsWith("Psychological & Existential Horror:")); 
+        case "historical": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Historical:") || t.startsWith("Mythological:")); 
+        case "modern": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Mystery:") || t.startsWith("Mundane:") || t.startsWith("Contemporary:")); 
+        case "sci_fi": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Science Fiction:") || t.startsWith("Cosmic Horror:") || t.startsWith("Surreal:")); 
+        case "fantasy": return SCENARIO_THEMES_LIST.filter(t => t.startsWith("Fantasy:") || t.startsWith("Existential Horror:")); 
         default: 
             console.warn(`Unknown themeType '${themeType}'.`); 
             return [...SCENARIO_THEMES_LIST]; 
@@ -372,7 +380,7 @@ const App: React.FC = () => {
       return themes[Math.floor(Math.random() * themes.length)]; 
     } 
     console.warn(`Theme list was empty.`); 
-    return SCENARIO_THEMES_LIST[Math.floor(Math.random() * SCENARIO_THEMES_LIST.length)] || "Unique & Surreal Environments: Abstract Conceptual Realm Made Manifest"; 
+    return SCENARIO_THEMES_LIST[Math.floor(Math.random() * SCENARIO_THEMES_LIST.length)] || "Surreal: Abstract Conceptual Realm Made Manifest"; 
   }; 
 
   const handleStartGameWithTheme = useCallback((themeType: ThemeType) => { 
@@ -388,6 +396,7 @@ const App: React.FC = () => {
         setError("Failed to select a scenario theme."); 
         return; 
     } 
+    setCurrentScenarioTheme(selectedTheme);
     processApiResponse(fetchInitialStory(selectedTheme), true); 
   }, [startGame, processApiResponse, setLastUsedThemeType, setError]); 
 
@@ -401,8 +410,31 @@ const App: React.FC = () => {
     startGame(); 
     setLastUsedThemeType(null); 
     setLastUsedCustomScenario(scenario); // Store the selected custom scenario
+    setCurrentScenarioTheme(scenario);
     processApiResponse(fetchInitialStory(scenario), true); 
   }, [startGame, processApiResponse, setError]); 
+
+  // --- NEW HANDLER FOR CUSTOM SCENARIO INPUT ---
+  const handleCustomScenarioSubmit = useCallback(() => {
+    if (!customScenarioText.trim() || !API_KEY_AVAILABLE) {
+      setError("Please enter a valid scenario description.");
+      return;
+    }
+    
+    const scenarioText = customScenarioText.trim();
+    if (scenarioText.length > 200) {
+      setError("Scenario description is too long. Please keep it under 200 characters.");
+      return;
+    }
+    
+    setIsCustomScenarioInputVisible(false);
+    startGame();
+    setLastUsedThemeType(null);
+    setLastUsedCustomScenario(scenarioText);
+    setCurrentScenarioTheme(scenarioText);
+    setCustomScenarioText("");
+    processApiResponse(fetchInitialStory(scenarioText), true);
+  }, [customScenarioText, startGame, processApiResponse, setError]);
 
   const handleChoiceSelected = useCallback((choice: string | ChoiceType) => { 
     if (isGameOver) return; 
@@ -415,12 +447,13 @@ const App: React.FC = () => {
     if (!isInitialLoad) { 
       processApiResponse(fetchNextStorySegment( 
         currentStory.sceneDescription, choiceText, inventory, playerHealth, 
-        persistentThreat, isInCombat, isTriggeringCombat, memoryLog, storyFlags, playerAbilities 
+        persistentThreat, isInCombat, isTriggeringCombat, memoryLog, storyFlags, playerAbilities, 
+        currentScenarioTheme || "Unknown Scenario"
       )); 
     } 
   }, [ 
       isInitialLoad, currentStory.sceneDescription, inventory, playerHealth, persistentThreat, 
-      isInCombat, isGameOver, processApiResponse, memoryLog, storyFlags, playerAbilities 
+      isInCombat, isGameOver, processApiResponse, memoryLog, storyFlags, playerAbilities, currentScenarioTheme
   ]); 
 
   const handleCustomChoiceSubmit = useCallback(() => { 
@@ -432,12 +465,13 @@ const App: React.FC = () => {
     setIsCustomChoiceInputVisible(false); 
     processApiResponse(fetchNextStorySegment( 
       currentStory.sceneDescription, customChoiceText.trim(), inventory, playerHealth, 
-      persistentThreat, isInCombat, false, memoryLog, storyFlags, playerAbilities 
+      persistentThreat, isInCombat, false, memoryLog, storyFlags, playerAbilities, 
+      currentScenarioTheme || "Unknown Scenario"
     )); 
     setCustomChoiceText(""); 
   }, [ 
     customChoiceText, isInitialLoad, currentStory.sceneDescription, inventory, playerHealth, 
-    persistentThreat, isInCombat, processApiResponse, setIsCustomChoiceInputVisible, memoryLog, storyFlags, playerAbilities 
+    persistentThreat, isInCombat, processApiResponse, setIsCustomChoiceInputVisible, memoryLog, storyFlags, playerAbilities, currentScenarioTheme
   ]); 
 
   const handleRegenerateInitialScene = useCallback(() => { 
@@ -445,6 +479,7 @@ const App: React.FC = () => {
     
     // If we have a stored custom scenario, use that instead of theme type
     if (lastUsedCustomScenario) {
+      setCurrentScenarioTheme(lastUsedCustomScenario);
       processApiResponse(fetchInitialStory(lastUsedCustomScenario), true);
       return;
     }
@@ -457,6 +492,7 @@ const App: React.FC = () => {
         setError("Failed to select a scenario theme for regeneration."); 
         return; 
     } 
+    setCurrentScenarioTheme(selectedTheme);
     processApiResponse(fetchInitialStory(selectedTheme), true); 
   }, [processApiResponse, isLoading, lastUsedThemeType, lastUsedCustomScenario, setError]); 
 
@@ -472,7 +508,7 @@ const App: React.FC = () => {
   const randomThemeButtonClass = `${themeButtonBaseClass} bg-yellow-500 text-black font-bold hover:bg-yellow-400 focus:ring-yellow-300`; 
   const realismThemeButtonClass = `${themeButtonBaseClass} text-white bg-red-800 hover:bg-red-700 focus:ring-red-600 disabled:bg-red-900 disabled:text-gray-300`; 
   const specificThemeButtonClass = `${themeButtonBaseClass} text-white bg-gray-600 hover:bg-gray-500 focus:ring-gray-400 disabled:bg-gray-400`; 
-  const customThemeButtonClass = `${themeButtonBaseClass} text-yellow-300 bg-gray-700 hover:bg-gray-600 focus:ring-gray-500 disabled:bg-gray-800 md:col-span-3`; 
+  const customThemeButtonClass = `${themeButtonBaseClass} text-yellow-300 bg-gray-700 hover:bg-gray-600 focus:ring-gray-500 disabled:bg-gray-800`;
 
 
   return ( 
@@ -604,7 +640,7 @@ const App: React.FC = () => {
         <div className="w-full max-w-xl flex flex-col items-center mt-4 md:mt-6"> 
 
             {isDisplayingInitialStartOptions && ( 
-                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"> 
+                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"> 
                     <button 
                         key="random" 
                         onClick={() => handleStartGameWithTheme("random")} 
@@ -619,15 +655,67 @@ const App: React.FC = () => {
                     <button key="scifi" onClick={() => handleStartGameWithTheme("sci_fi")} className={specificThemeButtonClass} disabled={isLoading}>Sci-Fi</button> 
                     <button key="fantasy" onClick={() => handleStartGameWithTheme("fantasy")} className={specificThemeButtonClass} disabled={isLoading}>Fantasy</button> 
                     <button 
-                      key="custom" 
+                      key="select" 
                       onClick={() => setIsCustomScenarioModalVisible(true)} 
                       className={customThemeButtonClass} 
                       disabled={isLoading} 
                     > 
-                      CUSTOM 
+                      Select... 
+                    </button> 
+                    <button 
+                      key="custom" 
+                      onClick={() => setIsCustomScenarioInputVisible(true)} 
+                      className={customThemeButtonClass} 
+                      disabled={isLoading} 
+                    > 
+                      Custom... 
                     </button> 
                 </div> 
             )} 
+
+            {/* Custom Scenario Input Modal */}
+            {isDisplayingInitialStartOptions && isCustomScenarioInputVisible && !isLoading && (
+                <div className="w-full flex flex-col items-center space-y-3 mt-4">
+                    <div className="w-full max-w-md">
+                        <label htmlFor="customScenario" className="block text-sm font-medium text-gray-300 mb-2">
+                            Enter your custom scenario (max 200 characters):
+                        </label>
+                        <textarea 
+                            id="customScenario"
+                            value={customScenarioText} 
+                            onChange={(e) => setCustomScenarioText(e.target.value)} 
+                            placeholder="e.g., A cyberpunk detective hunting a rogue AI through neon-lit streets..." 
+                            rows={3} 
+                            maxLength={200}
+                            className="w-full p-3 bg-gray-800 text-white border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
+                            disabled={isLoading} 
+                            aria-label="Custom scenario input" 
+                        />
+                        <div className="text-xs text-gray-400 mt-1 text-right">
+                            {customScenarioText.length}/200 characters
+                        </div>
+                    </div>
+                    <div className="flex space-x-3 w-full sm:w-auto">
+                        <button 
+                            onClick={handleCustomScenarioSubmit} 
+                            disabled={isLoading || !customScenarioText.trim()} 
+                            className="flex-1 sm:flex-none bg-red-600 text-white font-semibold py-3 px-5 rounded-lg shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:bg-red-400 disabled:cursor-not-allowed" 
+                        > 
+                            Start Game 
+                        </button> 
+                        <button 
+                            onClick={() => {
+                                setIsCustomScenarioInputVisible(false);
+                                setCustomScenarioText("");
+                            }} 
+                            disabled={isLoading} 
+                            className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed" 
+                        > 
+                            Cancel 
+                        </button> 
+                    </div> 
+                </div> 
+            )}
 
             {!isDisplayingInitialStartOptions && isCustomChoiceInputVisible && !isGameOver && !isLoading && ( 
                 <div className="w-full flex flex-col items-center space-y-3"> 

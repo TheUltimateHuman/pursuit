@@ -1,5 +1,3 @@
-
-
 // services/geminiService.ts
 
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
@@ -258,7 +256,8 @@ export const fetchNextStorySegment = async (
   isInitiatingCombatByChoice: boolean,
   memoryLog: string[],
   currentStoryFlags: Record<string, any>,
-  currentPlayerAbilities: { name: string; description: string; uses?: number }[]
+  currentPlayerAbilities: { name: string; description: string; uses?: number }[],
+  scenarioTheme: string
 ): Promise<GeminiApiResponse> => {
   if (!ai) throw new Error("Gemini API client not initialized. API_KEY might be missing, invalid, or client instantiation failed.");
 
@@ -286,6 +285,7 @@ export const fetchNextStorySegment = async (
 
   const prompt = `
 Context:
+Scenario Theme: ${scenarioTheme}
 Player Health: ${playerHealth}
 Is In Combat: ${isInCombat}
 Player is initiating combat this turn via choice: ${isInitiatingCombatByChoice}
