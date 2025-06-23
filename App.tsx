@@ -684,7 +684,7 @@ const App: React.FC = () => {
                             id="customScenario"
                             value={customScenarioText} 
                             onChange={(e) => setCustomScenarioText(e.target.value)} 
-                            placeholder="e.g., A cyberpunk detective hunting a rogue AI through neon-lit streets..." 
+                            placeholder="e.g., Derelict Spaceship, Ancient Ruin Exploration, Corporate Espionage... (Add 'REALISM:' prefix for realistic scenarios)" 
                             rows={3} 
                             maxLength={200}
                             className="w-full p-3 bg-gray-800 text-white border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
@@ -778,8 +778,8 @@ const App: React.FC = () => {
             {/* Enhanced Memory Log - Shows below choices */}
             {!isDisplayingInitialStartOptions && !isGameOver && !isLoading && (memoryLog.length > 0 || playerChoices.length > 0) && (
                 <div className="w-full max-w-3xl mt-6">
-                    <div className="bg-blue-800 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl">
-                        <h3 className="text-lg font-semibold text-blue-200 mb-3 border-b border-blue-300 pb-1">Memory Log:</h3>
+                    <div className="bg-purple-800 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl">
+                        <h3 className="text-lg font-semibold text-purple-200 mb-3 border-b border-purple-300 pb-1">Memory Log:</h3>
                         <div className="max-h-48 overflow-y-auto custom-scroll pr-2 space-y-2">
                             {(() => {
                                 // Create combined timeline of events and choices
@@ -812,13 +812,13 @@ const App: React.FC = () => {
                                         key={`timeline-${index}`} 
                                         className={`text-sm text-gray-200 py-1 border-l-2 pl-3 ${
                                             item.type === 'event' 
-                                                ? 'border-blue-400' 
+                                                ? 'border-purple-400' 
                                                 : 'border-green-400'
                                         }`}
                                     >
                                         <span className={`font-medium ${
                                             item.type === 'event' 
-                                                ? 'text-blue-300' 
+                                                ? 'text-purple-300' 
                                                 : 'text-green-300'
                                         }`}>
                                             {item.type === 'event' ? 'Event:' : 'Choice:'}

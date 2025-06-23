@@ -604,7 +604,7 @@ CONTEXTUAL MEMORY (ENHANCED MEMORY SYSTEM):
     * **NPC Status Format**: Use format like "NPCs: Dr. Chen (helpful, medical bay), Guard #2 (suspicious, lobby), Sarah (injured, waiting room)"
     * **NPC Relationship Changes**: Note any significant changes in NPC attitudes or relationships
     * **NPC Actions**: Record any significant actions NPCs took or assistance they provided
-* **Memory Log Focus**: The memoryLogSummary should focus on meaningful story events, player actions, and environmental changes. Do NOT include routine threat status updates (like "pursuer status: nearby") or NPC status lists unless they represent significant story developments. Focus on what happened, not just what the current state is.
+* **Memory Log Focus**: The memoryLogSummary should focus on meaningful story events, player actions, and environmental changes. Do NOT include routine threat status updates (like "pursuer status: nearby"), NPC status lists unless they represent significant story developments, or any numerical stats or health values (like "health: 75", "damage taken: 15", "pursuer health: 30/50"). Focus on what happened descriptively, not on game mechanics or statistics. The memory log should contain only narrative descriptions of events, not numerical data.
 
 PERSISTENT THREAT (PURSUER) INSTRUCTIONS:
 1.  **Initial Generation**: In the very first game response, you MUST define a "persistentThreatDetails" object with "name" (string), "description" (string, genuinely unsettling), "maxHealth" (number), and "senses" (an array of strings describing its sensory traits, following the detailed 'Sensory Traits Definition' rules below).
