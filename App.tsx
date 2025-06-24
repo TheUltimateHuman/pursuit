@@ -1055,7 +1055,7 @@ const App: React.FC = () => {
         <img 
           src="/eye.svg" 
           alt="Technohorror Eye" 
-          style={{ width: '60px', height: '32px', filter: 'drop-shadow(0 0 6px #000) brightness(1.2) sepia(1) hue-rotate(30deg) saturate(6)', display: 'block' }}
+          style={{ width: '60px', height: '32px', display: 'block' }}
         />
       </div>
     </div>
