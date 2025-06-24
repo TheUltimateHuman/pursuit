@@ -999,6 +999,12 @@ const App: React.FC = () => {
             )}
         </div>
       </main>
+      <ScenarioSelectorModal
+        isOpen={isCustomScenarioModalVisible}
+        onClose={() => setIsCustomScenarioModalVisible(false)}
+        onScenarioSelected={handleCustomScenarioSelected}
+        scenarios={SCENARIO_THEMES_LIST}
+      />
     </div>
   );
 };
