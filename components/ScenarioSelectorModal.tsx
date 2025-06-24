@@ -95,7 +95,7 @@ const ScenarioSelectorModal: React.FC<ScenarioSelectorModalProps> = ({
         <div className="p-6 flex-1 overflow-y-auto">
           <input
             type="text"
-            placeholder="Search scenarios or genres..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full p-3 bg-gray-900 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4" 

@@ -18,7 +18,81 @@ const API_KEY_AVAILABLE = typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FRO
 // --- End Configuration --- 
 
 const MAX_MEMORY_LOG_ENTRIES = 15; 
-type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fantasy"; 
+type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fantasy" | "mythological"; 
+
+// --- GLYPH FIELD OVERLAY COMPONENT (restored) ---
+const GLYPH_SET = [
+  '∆', 'λ', 'µ', 'π', '†', '‡', '§', '¤', '☠', '☢', '☣', '⚠', '⛧', '⟁',
+  '⩫', '⩪', '⩤', '⩥', '⧫', '⧖', '⧗', '⧛', '⧜', '⩶', '⩷', '⩸', '⩹', '⩺', '⩻', '⩼', '⩽', '⩾', '⩿',
+  '⪀', '⪁', '⪂', '⪃', '⪄', '⪅', '⪆', '⪇', '⪈', '⪉', '⪊', '⪋', '⪌', '⪍', '⪎', '⪏', '⪐', '⪑',
+  '⪒', '⪓', '⪔', '⪕', '⪖', '⪗', '⪘', '⪙', '⪚', '⪛', '⪜', '⪝', '⪞', '⪟', '⪠', '⪡', '⪢', '⪣',
+  '⪤', '⪥', '⪦', '⪧', '⪨', '⪩', '⪪', '⪫', '⪬', '⪭', '⪮', '⪯', '⪰', '⪱', '⪲', '⪳', '⪴', '⪵',
+  '⪶', '⪷', '⪸', '⪹', '⪺', '⪻', '⪼', '⪽', '⪾', '⪿', '⫀', '⫁', '⫂', '⫃', '⫄', '⫅', '⫆',
+  '⫇', '⫈', '⫉', '⫊', '⫋', '⫌', '⫍', '⫎', '⫏', '⫐', '⫑', '⫒', '⫓', '⫔', '⫕', '⫖', '⫗',
+  '⫘', '⫙', '⫚', '⫛', '⫝̸', '⫝', '⫞', '⫟', '⫠', '⫡', '⫢', '⫣', '⫤', '⫥', '⫦', '⫧', '⫨',
+  '⫩', '⫪', '⫫', '⫬', '⫭', '⫮', '⫯', '⫰', '⫱', '⫲', '⫳', '⫴', '⫵', '⫶', '⫷', '⫸', '⫹',
+  '⫺', '⫻', '⫼', '⫽', '⫾', '⫿'
+];
+
+function getRandomGlyph() {
+  return GLYPH_SET[Math.floor(Math.random() * GLYPH_SET.length)];
+}
+
+const GlyphFieldOverlay: React.FC = () => {
+  // Calculate grid size based on viewport
+  const [dimensions, setDimensions] = React.useState({ cols: 32, rows: 18 });
+
+  React.useEffect(() => {
+    function updateDimensions() {
+      const glyphSize = 32; // px
+      const cols = Math.ceil(window.innerWidth / glyphSize);
+      const rows = Math.ceil(window.innerHeight / glyphSize);
+      setDimensions({ cols, rows });
+    }
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  const glyphs = useMemo(() => {
+    return Array.from({ length: dimensions.rows * dimensions.cols }, getRandomGlyph);
+  }, [dimensions]);
+
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: 'none',
+        opacity: 0.08,
+        color: '#ffe066',
+        fontFamily: 'JetBrains Mono, monospace',
+        fontWeight: 700,
+        fontSize: '2rem',
+        lineHeight: 1,
+        userSelect: 'none',
+        mixBlendMode: 'screen',
+        transition: 'opacity 0.5s',
+      }}
+    >
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${dimensions.cols}, 1fr)`,
+          gridTemplateRows: `repeat(${dimensions.rows}, 1fr)`,
+          width: '100vw',
+          height: '100vh',
+        }}
+      >
+        {glyphs.map((glyph, i) => (
+          <span key={i} style={{ opacity: Math.random() * 0.7 + 0.3 }}>{glyph}</span>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const App: React.FC = () => { 
   const [currentStory, setCurrentStory] = useState<StoryState>({ 
@@ -381,7 +455,7 @@ const App: React.FC = () => {
       return themes[Math.floor(Math.random() * themes.length)]; 
     } 
     console.warn(`Theme list was empty.`); 
-    return SCENARIO_THEMES_LIST[Math.floor(Math.random() * SCENARIO_THEMES_LIST.length)] || "Surreal: Abstract Conceptual Realm Made Manifest"; 
+    return SCENARIO_THEMES_LIST[Math.floor(Math.random() * SCENARIO_THEMES_LIST.length)] || "";
   }; 
 
   const handleStartGameWithTheme = useCallback((themeType: ThemeType) => { 
@@ -517,7 +591,8 @@ const App: React.FC = () => {
 
 
   return ( 
-    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 px-4 selection:bg-red-700 selection:text-white font-['Inter']"> 
+    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 px-4 selection:bg-red-700 selection:text-white font-['Inter']" style={{ position: 'relative', zIndex: 1 }}>
+      <GlyphFieldOverlay />
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
@@ -531,7 +606,7 @@ const App: React.FC = () => {
         </h1> 
         {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
           <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
-            "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|SCIENCE FICTION:|CONTEMPORARY:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
+            "{(currentScenarioTheme ?? '').replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|SCIENCE FICTION:|CONTEMPORARY:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
           </p>
         )}
       </header> 
@@ -668,7 +743,49 @@ const App: React.FC = () => {
                     > 
                         Random 
                     </button> 
-                    <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>Realism</button> 
+                    <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>REALISM</button>
+                    {/* New category buttons */}
+                    <button
+                        key="contemporary"
+                        onClick={() => handleStartGameWithTheme("modern")}
+                        className="w-full font-semibold py-3 px-5 shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg border bg-yellow-400 text-white hover:bg-yellow-300 focus:ring-yellow-300"
+                        disabled={isLoading}
+                    >
+                        Contemporary
+                    </button>
+                    <button
+                        key="fantasy"
+                        onClick={() => handleStartGameWithTheme("fantasy")}
+                        className="w-full font-semibold py-3 px-5 shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg border bg-yellow-400 text-white hover:bg-yellow-300 focus:ring-yellow-300"
+                        disabled={isLoading}
+                    >
+                        Fantasy
+                    </button>
+                    <button
+                        key="historical"
+                        onClick={() => handleStartGameWithTheme("historical")}
+                        className="w-full font-semibold py-3 px-5 shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg border bg-yellow-400 text-white hover:bg-yellow-300 focus:ring-yellow-300"
+                        disabled={isLoading}
+                    >
+                        Historical
+                    </button>
+                    <button
+                        key="mythological"
+                        onClick={() => handleStartGameWithTheme("mythological")}
+                        className="w-full font-semibold py-3 px-5 shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg border bg-yellow-400 text-white hover:bg-yellow-300 focus:ring-yellow-300"
+                        disabled={isLoading}
+                    >
+                        Mythological
+                    </button>
+                    <button
+                        key="science_fiction"
+                        onClick={() => handleStartGameWithTheme("sci_fi")}
+                        className="w-full font-semibold py-3 px-5 shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg border bg-yellow-400 text-white hover:bg-yellow-300 focus:ring-yellow-300"
+                        disabled={isLoading}
+                    >
+                        Science Fiction
+                    </button>
+                    {/* Existing Select and Custom buttons */}
                     <button 
                       key="select" 
                       onClick={() => setIsCustomScenarioModalVisible(true)} 
@@ -693,13 +810,13 @@ const App: React.FC = () => {
                 <div className="w-full flex flex-col items-center space-y-3 mt-4">
                     <div className="w-full max-w-md">
                         <label htmlFor="customScenario" className="block text-sm font-medium text-gray-300 mb-2">
-                            Enter your custom scenario (max 200 characters):
+                            Enter your custom scenario:
                         </label>
                         <textarea 
                             id="customScenario"
                             value={customScenarioText} 
                             onChange={(e) => setCustomScenarioText(e.target.value)} 
-                            placeholder="e.g., Derelict Spaceship, Ancient Ruin Exploration, Corporate Espionage... (Add 'REALISM:' prefix for realistic scenarios)" 
+                            placeholder='(Add "REALISM:" for Realism Mode)'
                             rows={3} 
                             maxLength={200}
                             className="w-full p-3 bg-gray-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
@@ -803,10 +920,8 @@ const App: React.FC = () => {
                         <h3 className="text-lg font-semibold text-yellow-300 mb-3 border-b border-yellow-400 pb-1">Memory Log:</h3>
                         <div className="max-h-48 overflow-y-auto custom-scroll pr-2 space-y-2">
                             {(() => {
-                                // Create combined timeline of events and choices
-                                const timeline = [];
-                                
-                                // Add events with type marker
+                                type TimelineItem = { type: 'event' | 'choice'; content: string; originalIndex: number };
+                                const timeline: TimelineItem[] = [];
                                 memoryLog.slice(-6).forEach((entry, index) => {
                                     timeline.push({
                                         type: 'event',
@@ -814,8 +929,6 @@ const App: React.FC = () => {
                                         originalIndex: index
                                     });
                                 });
-                                
-                                // Add choices with type marker
                                 playerChoices.slice(-4).forEach((choice, index) => {
                                     timeline.push({
                                         type: 'choice',
@@ -823,23 +936,19 @@ const App: React.FC = () => {
                                         originalIndex: index
                                     });
                                 });
-                                
-                                // Sort by original index to maintain chronological order
                                 timeline.sort((a, b) => a.originalIndex - b.originalIndex);
-                                
-                                // Display interleaved timeline
                                 return timeline.map((item, index) => (
-                                    <div 
-                                        key={`timeline-${index}`} 
+                                    <div
+                                        key={`timeline-${index}`}
                                         className={`text-sm text-gray-200 py-1 border-l-2 pl-3 ${
-                                            item.type === 'event' 
-                                                ? 'border-yellow-400' 
+                                            item.type === 'event'
+                                                ? 'border-yellow-400'
                                                 : 'border-red-700'
                                         }`}
                                     >
                                         <span className={`font-medium ${
-                                            item.type === 'event' 
-                                                ? 'text-yellow-300' 
+                                            item.type === 'event'
+                                                ? 'text-yellow-300'
                                                 : 'text-red-300'
                                         }`}>
                                             {item.type === 'event' ? 'Event:' : 'Choice:'}
@@ -851,62 +960,9 @@ const App: React.FC = () => {
                     </div>
                 </div>
             )}
-            
-            {!isDisplayingInitialStartOptions && !isLoading && !error && !isGameOver && currentDisplayedChoices.length === 0 && !isCustomChoiceInputVisible && (
-                 <div className="text-center p-4 bg-gray-800 border border-gray-700 w-full" style={{ borderRadius: '4px' }}>
-                     <p className="text-xl text-gray-400">No clear path...</p>
-                     <button 
-                         onClick={() => setIsCustomChoiceInputVisible(true)} 
-                         className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 shadow transition duration-150 border border-gray-500" 
-                         style={{ borderRadius: '4px' }}
-                     > 
-                         Describe Your Action 
-                     </button> 
-                 </div>
-             )}
-        </div> 
-      </main> 
-      
-      <ScenarioSelectorModal 
-        isOpen={isCustomScenarioModalVisible} 
-        onClose={() => setIsCustomScenarioModalVisible(false)} 
-        onScenarioSelected={handleCustomScenarioSelected} 
-        scenarios={SCENARIO_THEMES_LIST} 
-      /> 
+        </div>
+    </div>
+  );
+};
 
-      {/* Return to Menu Modal */}
-      {isReturnToMenuModalVisible && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-gray-800 shadow-2xl w-full max-w-md flex flex-col border border-gray-600" style={{ borderRadius: '4px' }}>
-                    <div className="p-6 text-center">
-                        <h2 className="text-2xl font-bold text-yellow-400 font-['Chakra_Petch']">Return to Menu?</h2>
-                        <p className="text-gray-400 mt-3 mb-6">This will end your current game. Are you sure?</p>
-                        <div className="flex space-x-3">
-                            <button 
-                                onClick={() => {
-                                    setIsReturnToMenuModalVisible(false);
-                                    startGame();
-                                }} 
-                                className="flex-1 bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 border border-red-500" 
-                                style={{ borderRadius: '4px' }}
-                            > 
-                                Return to Menu 
-                            </button> 
-                            <button 
-                                onClick={() => setIsReturnToMenuModalVisible(false)} 
-                                className="flex-1 bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-600" 
-                                style={{ borderRadius: '4px' }}
-                            > 
-                                Cancel 
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )}
-
-    </div> 
-  ); 
- }; 
-
- export default App;
+export default App;
