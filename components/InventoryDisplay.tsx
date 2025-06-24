@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface InventoryDisplayProps {
@@ -18,7 +17,7 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({ items }) => {
               title={item}
               aria-label={`Inventory item: ${item}`}
             >
-              <span className="text-purple-400 mr-1.5">&#✧</span> {item}
+              <span className="text-purple-400 mr-1.5">◆</span> {item}
             </li>
           ))}
         </ul>

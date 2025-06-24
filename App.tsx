@@ -407,12 +407,13 @@ const App: React.FC = () => {
       return; 
     } 
     setIsCustomScenarioModalVisible(false); 
-    startGame(); 
     setLastUsedThemeType(null); 
     setLastUsedCustomScenario(scenario); // Store the selected custom scenario
-    setCurrentScenarioTheme(scenario);
+    setCurrentScenarioTheme(scenario); // Set the scenario theme first
+    startGame(); // Then start the game
+    setCurrentScenarioTheme(scenario); // Ensure the scenario theme is set after startGame
     processApiResponse(fetchInitialStory(scenario), true); 
-  }, [startGame, processApiResponse, setError]); 
+  }, [startGame, processApiResponse, setError]);
 
   // --- NEW HANDLER FOR CUSTOM SCENARIO INPUT ---
   const handleCustomScenarioSubmit = useCallback(() => {
@@ -428,10 +429,11 @@ const App: React.FC = () => {
     }
     
     setIsCustomScenarioInputVisible(false);
-    startGame();
     setLastUsedThemeType(null);
     setLastUsedCustomScenario(scenarioText);
-    setCurrentScenarioTheme(scenarioText);
+    setCurrentScenarioTheme(scenarioText); // Set the scenario theme first
+    startGame(); // Then start the game
+    setCurrentScenarioTheme(scenarioText); // Ensure the scenario theme is set after startGame
     setCustomScenarioText("");
     processApiResponse(fetchInitialStory(scenarioText), true);
   }, [customScenarioText, startGame, processApiResponse, setError]);
@@ -534,7 +536,7 @@ const App: React.FC = () => {
                         title="Regenerate Initial Scene (same category)"
                         aria-label="Regenerate Initial Scene (same category)"
                     >
-                        🔄
+                        ⥁
                     </button>
                 )}
             </div>
@@ -584,7 +586,7 @@ const App: React.FC = () => {
           <div className="bg-gray-800 bg-opacity-75 p-3 rounded-lg shadow-md mb-4 max-w-3xl w-full max-h-40 overflow-y-auto custom-scroll"> 
             <h4 className="text-md font-semibold text-red-400 mb-1">Combat Log:</h4> 
             {currentStory.combatLog.map((logEntry, index) => ( 
-              <p key={index} className="text-sm text-gray-200 py-0.5 whitespace-pre-line">&raquo; {logEntry}</p> 
+              <p key={index} className="text-sm text-gray-200 py-0.5 whitespace-pre-line">▶ {logEntry}</p> 
             ))} 
           </div> 
         )} 
@@ -778,8 +780,8 @@ const App: React.FC = () => {
             {/* Enhanced Memory Log - Shows below choices */}
             {!isDisplayingInitialStartOptions && !isGameOver && !isLoading && (memoryLog.length > 0 || playerChoices.length > 0) && (
                 <div className="w-full max-w-3xl mt-6">
-                    <div className="bg-purple-800 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl">
-                        <h3 className="text-lg font-semibold text-purple-200 mb-3 border-b border-purple-300 pb-1">Memory Log:</h3>
+                    <div className="bg-gray-700 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl">
+                        <h3 className="text-lg font-semibold text-yellow-300 mb-3 border-b border-yellow-400 pb-1">Memory Log:</h3>
                         <div className="max-h-48 overflow-y-auto custom-scroll pr-2 space-y-2">
                             {(() => {
                                 // Create combined timeline of events and choices
@@ -812,14 +814,14 @@ const App: React.FC = () => {
                                         key={`timeline-${index}`} 
                                         className={`text-sm text-gray-200 py-1 border-l-2 pl-3 ${
                                             item.type === 'event' 
-                                                ? 'border-purple-400' 
-                                                : 'border-green-400'
+                                                ? 'border-yellow-400' 
+                                                : 'border-red-700'
                                         }`}
                                     >
                                         <span className={`font-medium ${
                                             item.type === 'event' 
-                                                ? 'text-purple-300' 
-                                                : 'text-green-300'
+                                                ? 'text-yellow-300' 
+                                                : 'text-red-300'
                                         }`}>
                                             {item.type === 'event' ? 'Event:' : 'Choice:'}
                                         </span> {item.content}

@@ -597,13 +597,13 @@ CONTEXTUAL MEMORY (ENHANCED MEMORY SYSTEM):
     4. **Story Progression**: Important plot developments, new information learned, or objectives completed
     5. **Resource Changes**: Items gained/lost, health changes, new abilities acquired, or story flags set
     6. **NPC/Companion Status**: If companions are present, their current condition, location, or significant actions
-* **NPC Memory Requirements**: The memoryLogSummary MUST include a dedicated NPC status section that tracks:
+* **NPC Memory Requirements**: The memoryLogSummary MUST include narrative descriptions of character interactions and events:
     * **Active NPCs**: All NPCs currently in the same area as the player with their status
     * **Nearby NPCs**: NPCs in adjacent areas who could reasonably interact
     * **Important NPCs**: NPCs who have provided significant help or information, even if not currently present
-    * **NPC Status Format**: Use format like "NPCs: Dr. Chen (helpful, medical bay), Guard #2 (suspicious, lobby), Sarah (injured, waiting room)"
-    * **NPC Relationship Changes**: Note any significant changes in NPC attitudes or relationships
-    * **NPC Actions**: Record any significant actions NPCs took or assistance they provided
+    * **NPC Description Format**: Describe character interactions and events naturally in narrative form. For example: "Dr. Chen helped you find medical supplies", "The guard became suspicious when you entered the restricted area", "Sarah was injured but managed to escape". DO NOT use status lists or the word "NPCs" in the memory log.
+    * **NPC Relationship Changes**: Note any significant changes in NPC attitudes or relationships through narrative description
+    * **NPC Actions**: Record any significant actions NPCs took or assistance they provided as part of the story flow
 * **Memory Log Focus**: The memoryLogSummary should focus on meaningful story events, player actions, and environmental changes. Do NOT include routine threat status updates (like "pursuer status: nearby"), NPC status lists unless they represent significant story developments, or any numerical stats or health values (like "health: 75", "damage taken: 15", "pursuer health: 30/50"). Focus on what happened descriptively, not on game mechanics or statistics. The memory log should contain only narrative descriptions of events, not numerical data.
 
 PERSISTENT THREAT (PURSUER) INSTRUCTIONS:

@@ -92,7 +92,7 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
           <ul className="text-xs text-red-300 list-none p-0">
             {threat.senses.map((sense, index) => (
               <li key={index} className="inline-block mr-2 last:mr-0" title={sense}>
-                <span role="img" aria-label="indicator icon" className="mr-1">👁️</span>{sense.split('(')[0].trim()}
+                <span role="img" aria-label="indicator icon" className="mr-1">👁</span>{sense.split('(')[0].trim()}
               </li>
             ))}
           </ul>
