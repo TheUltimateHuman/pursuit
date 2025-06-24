@@ -62,13 +62,19 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
-  // ASCII art for QUARRY title
+  // ASCII art for QUARRY title (blocky, legible)
   const asciiTitle = [
-    "  ██████  ██    ██  █    █  ██████  ██████  ██   ██",
-    " ██      ██    ██  ██  ██  ██      ██      ██   ██",
-    " ██  ██  ██    ██  ██  ██  █████   █████   ███████",
-    " ██   █  ██    ██  ██  ██  ██      ██      ██   ██",
-    "  █████   ██████    ████   ██████  ██████  ██   ██",
+    "  ██████  ██    ██ ██    ██ ██████  ██████  ██   ██",
+    " ██      ██    ██ ██    ██ ██      ██      ██   ██",
+    " ██  ██  ██    ██ ██    ██ █████   █████   ███████",
+    " ██   █  ██    ██ ██    ██ ██      ██      ██   ██",
+    "  █████   ██████   ██████  ██████  ██████  ██   ██",
+    "",
+    "   ██████  ██    ██  █████  ██████  ██    ██",
+    "  ██    ██ ██    ██ ██   ██ ██   ██  ██  ██ ",
+    "  ██    ██ ██    ██ ███████ ██████    ████  ",
+    "  ██    ██  ██  ██  ██   ██ ██   ██    ██   ",
+    "   ██████    ████   ██   ██ ██   ██    ██   "
   ];
   // Starfield with a window for the ASCII title
   const starGlyphs = ['.', '·', '•', '░', '▒', '╳', '¤', '†', '§', 'Ω'];
@@ -90,7 +96,7 @@ const App: React.FC = () => {
     // Add top and bottom starfield padding
     const width = asciiTitle[0].length + pad * 2;
     const starLine = () => Array.from({length: width}, () => Math.random() < 0.8 ? ' ' : starGlyphs[Math.floor(Math.random() * starGlyphs.length)]).join('');
-    return [starLine(), ...lines, starLine()].join('\n');
+    return [starLine(), starLine(), ...lines, starLine(), starLine()].join('\n');
   }, []);
 
   useEffect(() => { 
