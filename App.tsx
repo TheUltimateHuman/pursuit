@@ -96,7 +96,7 @@ const GlyphFieldOverlay: React.FC = () => {
         zIndex: 0,
         pointerEvents: 'none',
         opacity: 0.08,
-        color: '#ffe066',
+        color: '#000',
         fontFamily: 'JetBrains Mono, monospace',
         fontWeight: 700,
         fontSize: '0.7rem',
@@ -180,19 +180,23 @@ const App: React.FC = () => {
     const fullTitle = 'QUARRY';
     let i = 0;
     setTypedTitle('');
-    const interval = setInterval(() => {
-      setTypedTitle((prev) => {
-        if (i < fullTitle.length) {
-          const next = prev + fullTitle[i];
-          i++;
-          return next;
-        } else {
-          clearInterval(interval);
-          return prev;
-        }
-      });
-    }, 120);
-    return () => clearInterval(interval);
+    const timeout = setTimeout(() => {
+      const interval = setInterval(() => {
+        setTypedTitle((prev) => {
+          if (i < fullTitle.length) {
+            const next = prev + fullTitle[i];
+            i++;
+            return next;
+          } else {
+            clearInterval(interval);
+            return prev;
+          }
+        });
+      }, 120);
+    }, 0);
+    return () => {
+      clearTimeout(timeout);
+    };
   }, []);
 
   useEffect(() => { 
