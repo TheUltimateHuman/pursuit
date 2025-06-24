@@ -139,7 +139,7 @@ const GlyphFieldOverlay: React.FC<{ currentScenario?: string | null }> = ({ curr
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 0,
+        zIndex: -1,
         pointerEvents: 'none',
         opacity: 0.22,
         color: '#000',
