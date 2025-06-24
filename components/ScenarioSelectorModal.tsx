@@ -110,7 +110,7 @@ const ScenarioSelectorModal: React.FC<ScenarioSelectorModalProps> = ({
                   className="w-full p-4 text-left bg-gray-700 hover:bg-gray-600 transition-colors duration-150 flex justify-between items-center"
                   style={{ borderRadius: '4px' }}
                 >
-                  <span className="text-lg font-semibold text-yellow-400">{group.name}</span>
+                  <span className="text-lg font-semibold text-yellow-400">{group.name === 'REALISM' ? 'Realism' : group.name}</span>
                   <span className="text-gray-400 text-xl">
                     {expandedGenres.has(group.name) ? '−' : '+'}
                   </span>

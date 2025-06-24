@@ -52,6 +52,16 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Science Fiction: Rogue AI Escaping Containment",
   "Science Fiction: Hive-Mind That Wants to Assimilate Your Consciousness",
   "Science Fiction: Space Station During a Life Support System Failure",
+  "Science Fiction: Microscopic Environment",
+  "Science Fiction: Physical Manifestation of the Internet",
+  "Science Fiction: Last Human in a World Conquered by Aliens",
+  "Science Fiction: Fleeing the Edge of a Reality-Devouring Cosmic Anomaly",
+  "Science Fiction: Stowaway on a Vessel Traversing Realities",
+  "Science Fiction: Something in the Stars is Now Looking Back",
+  "Science Fiction: Mathematician Who Solved an Equation That is Also a Malevolent God",
+  "Science Fiction: Trapped in a False Utopia",
+  "Science Fiction: Protagonist Who Knows They Are in a Game and is Fleeing the Developer",
+  "Science Fiction: Uncovering a World-Ending Conspiracy",
   "Science Fiction: Cerberus Operative Hunting You Through Omega's Dark Alleys (Mass Effect)",
   "Science Fiction: Batarian Slavers Attacking Your Colony (Mass Effect)",
   "Science Fiction: Blood Pack Hunting You on Tuchanka (Mass Effect)",
@@ -128,6 +138,38 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Fantasy: You Are The Guardian of a Tomb, Treasure Hunters Have Just Broken In",
   "Fantasy: Bodyguard to a Spoiled Prince in a Hostile Foreign City",
   "Fantasy: Convincing the Council of Elders to Flee Before the Prophesied Doom Arrives",
+  "Fantasy: Subterranean World/Hollow Earth Expedition",
+  "Fantasy: Nightmare Logic Scenario",
+  "Fantasy: Trapped Inside a Living Organism or Colossal Being",
+  "Fantasy: Journey into a Painting/Book",
+  "Fantasy: Abstract Conceptual Realm",
+  "Fantasy: World Made Entirely of Glass, Mirrors, and Echoes",
+  "Fantasy: Sapient Forest of Fungi Connected by a Single Consciousness",
+  "Fantasy: The Junkyard of the Gods",
+  "Fantasy: Landscape of Unfinished, Abandoned Concepts",
+  "Fantasy: Inside a Colossal, Clockwork Being that is Breaking Down",
+  "Fantasy: A Realm Where All Text and Language has Become a Physical, Hostile Force",
+  "Fantasy: Trapped in a Memory Palace",
+  "Fantasy: A World Where Emotions Manifest as Physical Predators",
+  "Fantasy: Idea That Hunts You Through the Minds of Others",
+  "Fantasy: Diseases are Walking, Sentient Entities",
+  "Fantasy: Sprawling, Escher-esque Bureaucracy",
+  "Fantasy: The World is a Stage, and You are an Actor",
+  "Fantasy: Sentient Weather System",
+  "Fantasy: A World Composed Entirely of Sound Waves",
+  "Fantasy: Navigating the Physical Gaps Between Memories",
+  "Fantasy: The Junkyard of Discarded Ideas",
+  "Fantasy: Navigating a World Made of Pure, Unstable Metaphor",
+  "Fantasy: Sentient Storm That Demands a Sacrifice",
+  "Fantasy: Member of a Forgotten Bloodline",
+  "Fantasy: A Deal with an Otherworldly Entity",
+  "Fantasy: Forced Participant in a Deadly, Incomprehensible Metaphysical Game",
+  "Fantasy: Hunted by Your Own Doppelgänger",
+  "Fantasy: Trapped in a Personal Hell Designed by a Malevolent Captor",
+  "Fantasy: Your Own Shadow/Reflection has Detached",
+  "Fantasy: An Encounter with an Empathy Vampire",
+  "Fantasy: The Last Person to Remember a Forgotten God",
+  "Fantasy: World Where Sleep is No Longer Safe",
   "Fantasy: Cyran soldier as the Mourning Begins (Eberron).",
   "Fantasy: Vistani guide just led your caravan into the Mists of Ravenloft (Ravenloft).",
   "Fantasy: Adrift in the Phlogiston (Spelljammer).",
@@ -140,6 +182,7 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Fantasy: Vengeful Djinn Has Trapped You in a Bottle",
   "Fantasy: Bargaining with a Dragon Who Has Your Village Hostage",
   "Fantasy: Protecting a Royal Heir from Assassination Attempt",
+  "Fantasy: Supernatural Espionage Mission",
 
   // MYTHOLOGICAL
   "Mythological: Escaping the Wild Hunt",
@@ -156,6 +199,8 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Mythological: First Howl of Ragnarök",
   "Mythological: Rampage of the Golem of Prague",
   "Mythological: Trapped in the Labyrinth",
+  "Mythological: Gorgon's Garden",
+  "Mythological: Draugr's Tomb",
   "Mythological: You Stole a Leprechaun's Gold.",
 
   // HISTORICAL
@@ -203,75 +248,6 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Historical: Medieval Castle During a Siege with Defenders",
   "Historical: Protecting a Diplomat During Embassy Siege",
 
-  // MYSTERY
-  "Mystery: Detective Investigating a Bizarre Case",
-  "Mystery: Supernatural Espionage Mission",
-  "Mystery: Uncovering a World-Ending Conspiracy",
-  "Mystery: Coded Message Meant for a Dead Spy",
-  "Mystery: Your Hacked Self-Driving Car is a Kidnapper",
-  "Mystery: Blackmailed into Becoming a Getaway Driver for a Heist",
-  "Mystery: Contestant on a Game Show Where Losing is Secretly Fatal",
-  "Mystery: Amnesiac",
-  "Mystery: Framed for a Horrific Crime, Hunted by the Law",
-  "Mystery: Witness Protection Failure",
-  "Mystery: The Sole Survivor of a Catastrophe",
-  "Mystery: Waking up from a Medical Procedure",
-  "Mystery: Deep sea welder; your partner's comms went silent.",
-  "Mystery: Subway Train Stranded Between Stations with Passengers",
-
-  // EXISTENTIAL HORROR
-  "Existential Horror: A Deal with an Otherworldly Entity",
-  "Existential Horror: Escaping a Cult",
-  "Existential Horror: Forced Participant in a Deadly, Incomprehensible Metaphysical Game",
-  "Existential Horror: Hunted by Your Own Doppelgänger",
-  "Existential Horror: Trapped in a Personal Hell Designed by a Malevolent Captor",
-  "Existential Horror: Your Own Shadow/Reflection has Detached",
-  "Existential Horror: An Encounter with an Empathy Vampire",
-  "Existential Horror: The Last Person to Remember a Forgotten God",
-  "Existential Horror: Trapped in a False Utopia",
-  "Existential Horror: World Where Sleep is No Longer Safe",
-  "Existential Horror: Protagonist Who Knows They Are in a Game and is Fleeing the Developer",
-  "Existential Horror: Trapped in a Coma, Aware of Outside World",
-  "Existential Horror: Survivor of a Disaster, There is One More Person Than There Should Be",
-  "Existential Horror: Your Child's Imaginary Friend is Giving Them Real, Dangerous Instructions",
-  "Existential Horror: Split Personality",
-
-  // COSMIC HORROR
-  "Cosmic Horror: Last Human in a World Conquered by Aliens",
-  "Cosmic Horror: Fleeing the Edge of a Reality-Devouring Cosmic Anomaly",
-  "Cosmic Horror: Stowaway on a Vessel Traversing Realities",
-  "Cosmic Horror: Member of a Forgotten Bloodline",
-  "Cosmic Horror: Something in the Stars is Now Looking Back",
-  "Cosmic Horror: Mathematician Who Solved an Equation That is Also a Malevolent God",
-
-  // SURREAL
-  "Surreal: Deep Sea Exploration/Diving Expedition",
-  "Surreal: Subterranean World/Hollow Earth Expedition",
-  "Surreal: Nightmare Logic Scenario",
-  "Surreal: Microscopic Environment",
-  "Surreal: Trapped Inside a Living Organism or Colossal Being",
-  "Surreal: Journey into a Painting/Book",
-  "Surreal: Abstract Conceptual Realm",
-  "Surreal: World Made Entirely of Glass, Mirrors, and Echoes",
-  "Surreal: Sapient Forest of Fungi Connected by a Single Consciousness",
-  "Surreal: Physical Manifestation of the Internet",
-  "Surreal: The Junkyard of the Gods",
-  "Surreal: Landscape of Unfinished, Abandoned Concepts",
-  "Surreal: Inside a Colossal, Clockwork Being that is Breaking Down",
-  "Surreal: A Realm Where All Text and Language has Become a Physical, Hostile Force",
-  "Surreal: Trapped in a Memory Palace",
-  "Surreal: A World Where Emotions Manifest as Physical Predators",
-  "Surreal: Idea That Hunts You Through the Minds of Others",
-  "Surreal: Diseases are Walking, Sentient Entities",
-  "Surreal: Sprawling, Escher-esque Bureaucracy",
-  "Surreal: The World is a Stage, and You are an Actor",
-  "Surreal: Sentient Weather System",
-  "Surreal: A World Composed Entirely of Sound Waves",
-  "Surreal: Navigating the Physical Gaps Between Memories",
-  "Surreal: The Junkyard of Discarded Ideas",
-  "Surreal: Navigating a World Made of Pure, Unstable Metaphor",
-  "Surreal: Sentient Storm That Demands a Sacrifice",
-
   // CONTEMPORARY
   "Contemporary: Remote Wilderness Survival/Isolation",
   "Contemporary: Urban Exploration of Abandoned Structures",
@@ -298,17 +274,30 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Contemporary: Drone Pilot",
   "Contemporary: House-Sitting a Malicious Smart Home",
   "Contemporary: Mistaken for a Bank Robber",
-
-  // MUNDANE
-  "Mundane: Offshore Oil Rig Diver",
-  "Mundane: Deep Storage of a National Library",
-  "Mundane: Critic Gives a Bad Review",
-  "Mundane: Plumber in a Vast Sewer System",
-  "Mundane: Park Ranger in a Vast National Forest",
-  "Mundane: Power Plant Technician During a Meltdown",
-  "Mundane: Highway Toll Booth Operator",
-  "Mundane: Carnivorous Greenhouse",
-  "Mundane: Terrorist Who Has Planted Bombs Throughout Your Office Building",
+  "Contemporary: Deep Sea Exploration/Diving Expedition",
+  "Contemporary: Escaping a Cult",
+  "Contemporary: Trapped in a Coma, Aware of Outside World",
+  "Contemporary: Your Child's Imaginary Friend is Giving Them Real, Dangerous Instructions",
+  "Contemporary: Split Personality",
+  "Contemporary: Your Hacked Self-Driving Car is a Kidnapper",
+  "Contemporary: Blackmailed into Becoming a Getaway Driver for a Heist",
+  "Contemporary: Contestant on a Game Show Where Losing is Secretly Fatal",
+  "Contemporary: Amnesiac",
+  "Contemporary: Framed for a Horrific Crime, Hunted by the Law",
+  "Contemporary: Witness Protection Failure",
+  "Contemporary: Sole Survivor of a Catastrophe",
+  "Contemporary: Waking Up from a Medical Procedure",
+  "Contemporary: Subway Train Stranded Between Stations with Passengers",
+  "Contemporary: Survivor of a Disaster, There is One More Person Than There Should Be",
+  "Contemporary: Offshore Oil Rig Diver",
+  "Contemporary: Deep Storage of a National Library",
+  "Contemporary: Critic Gives a Bad Review",
+  "Contemporary: Plumber in a Vast Sewer System",
+  "Contemporary: Park Ranger in a Vast National Forest",
+  "Contemporary: Power Plant Technician During a Meltdown",
+  "Contemporary: Highway Toll Booth Operator",
+  "Contemporary: Carnivorous Greenhouse",
+  "Contemporary: Terrorist Who Has Planted Bombs Throughout Your Office Building",
 
   // REALISM (AT THE BOTTOM AS REQUESTED)
   "REALISM: A Daring Prison Escape",
@@ -654,9 +643,9 @@ ALTERNATE GAME ENDINGS (RARE CIRCUMSTANCES):
     * **When**: If a player's choice leads to an immediate, non-'engaged' state, inescapable, and lethal outcome (e.g., triggering an unavoidable massive explosion, falling into an abyss, succumbing instantly to an overwhelming environmental hazard directly caused by 'your' choice).
     * **Response**: \\\`sceneDescription\\\` (demise narration), \\\`gameOverSummary\\\`, \\\`gameEndType: "alternate_loss"\\\`, \\\`choices: []\\\`.
 * **Alternate Win Condition (Non-'engaged' State Resolution)**:
-    * **When**: Player achieves a definitive end to the pursuit *without* an 'engaged' state combat victory (e.g., permanently trapping persistent threat, true escape, a stable truce if highly consistent).
-    * **Response**: \\\`sceneDescription\\\` (resolution epilogue), \\\`gameOverSummary\\\`, \\\`gameEndType: "alternate_win"\\\`, \\\`choices: []\\\`.
-    * **CRITICAL EPILOGUE REQUIREMENT**: The \\\`gameOverSummary\\\` for successful outcomes MUST provide a compelling epilogue (approximately 30-50 words) that explains how the player achieved victory, the consequences of their success, and a sense of closure. This should be more than just "You won" - it should narrate the resolution of the conflict and its aftermath.
+    * **When**: Player achieves a definitive end to the pursuit *without* an 'engaged' state combat victory (e.g., permanently trapping persistent threat, true escape, a stable truce if highly consistent, or successful evasion as described in the Hiding & Stealth Mechanics). If the persistent threat's status regresses to 'hidden' or 'very_distant' for several turns and the player escapes the area or the threat gives up, this MUST be treated as an 'alternate_win'.
+    * **Response**: `sceneDescription` (resolution epilogue), `gameOverSummary`, `gameEndType: "alternate_win"`, `choices: []`.
+    * **CRITICAL EPILOGUE REQUIREMENT**: The `gameOverSummary` for successful outcomes MUST provide a compelling epilogue (approximately 30-50 words) that explains how the player achieved victory, the consequences of their success, and a sense of closure. This should be more than just "You won" - it should narrate the resolution of the conflict and its aftermath.
 * **Alternate Game Over (Surrender/Capture)**:
     * **When**: The player makes a choice to surrender or successfully uses the surrender mechanic, AND the persistent threat is an entity that would plausibly capture them rather than kill them (e.g., law enforcement, security guards).
     * **Response**: \\\`sceneDescription\\\` (narration of capture), \\\`gameOverSummary\\\`, \\\`gameEndType: "player_surrender"\\\`, \\\`choices: []\\\`.
@@ -705,9 +694,11 @@ HIDING & STEALTH MECHANICS: {
         "narrative_description": "'sceneDescription' MUST vividly describe the persistent threat's sounds or presence diminishing significantly. The persistent threat (e.g., creature, human antagonist) decides the area is clear, that 'you' have moved on, or that the search here is fruitless, and begins to search elsewhere or disengages from the immediate vicinity.",
         "persistent_threat_status_update": "'updatedThreatStatus' MUST regress significantly (e.g., to 'very_distant', 'hidden', or a similar low-threat status indicating disengagement from the current area).",
         "flag_resets": "The 'is_hidden_temporarily' flag MUST be set to false (via 'story_flag_set' gameplayEffect), as the immediate chase in *this specific spot* has been averted. The conceptual 'consecutive_successful_hides_count' is reset to 0.",
-        "next_player_choices": "Offer choices that allow 'you' to capitalize on this newfound reprieve (e.g., 'Carefully scout the area', 'Attempt to move to a safer location', 'Try to make progress on your primary escape objective')."
+        "next_player_choices": "Offer choices that allow 'you' to capitalize on this newfound reprieve (e.g., 'Carefully scout the area', 'Attempt to move to a safer location', 'Try to make progress on your primary escape objective').",
+        "explicit_win_condition": "If the persistent threat's status regresses to 'hidden' or 'very_distant' for several turns due to successful hiding/evasion, and the player escapes the area or the threat gives up the pursuit, you MUST end the game with an \"alternate_win\" and provide a narrative epilogue explaining the player's successful evasion."
       },
-      "note_on_persistent_threat_persistence": "Extremely persistent or intelligent persistent threats might require a longer period of successful hiding or might employ countermeasures. This is up to AI discretion within the narrative."
+      "note_on_persistent_threat_persistence": "Extremely persistent or intelligent persistent threats might require a longer period of successful hiding or might employ countermeasures. This is up to AI discretion within the narrative.",
+      "explicit_win_condition": "If the persistent threat's status regresses to 'hidden' or 'very_distant' for several turns due to successful hiding/evasion, and the player escapes the area or the threat gives up the pursuit, you MUST end the game with an \"alternate_win\" and provide a narrative epilogue explaining the player's successful evasion."
     },
     "environmental_threat_sustained_mitigation": {
       "context_applicability": "Applies when 'hiding' from *non-entity/environmental persistent threats* (e.g., a raging wildfire, extreme cold, a spreading infection).",
