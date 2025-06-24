@@ -520,12 +520,12 @@ const App: React.FC = () => {
 
 
   return ( 
-    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-center p-4 selection:bg-red-700 selection:text-white font-['Inter']"> 
+    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-2 pb-4 px-4 selection:bg-red-700 selection:text-white font-['Inter']"> 
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
         <h1 
-          className={`text-7xl md:text-8xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+          className={`text-9xl md:text-9xl lg:text-10xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
           onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         > 
@@ -775,12 +775,13 @@ const App: React.FC = () => {
                             setCustomChoiceText(""); 
                         }} 
                         disabled={isLoading} 
-                        className="w-full bg-gray-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md 
+                        className="w-full bg-gray-700 text-white font-semibold py-3 px-5 shadow-md 
                                      transition-all duration-150 ease-in-out 
                                      hover:bg-gray-600 hover:shadow-lg transform hover:scale-105 
                                      focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 
                                      disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none 
-                                     border border-gray-600 mb-4" // Added mb-4 for spacing 
+                                     border border-gray-600 mb-4" 
+                        style={{ borderRadius: '4px' }}
                     > 
                         Write your own... 
                     </button> 
