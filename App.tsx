@@ -62,20 +62,39 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
-  // Generate a random glyph starfield overlay ONCE per page load
+  // Responsive glyph starfield overlay
   const glyphs = ['.', '·', '•', '░', '▒', '▓', '█', '╳', '╬', '¤', '†', '§', 'Ω', 'Ψ', 'Ξ', 'Ж'];
-  const glyphStarfield = useMemo(() => {
-    const lines = [];
-    for (let i = 0; i < 18; i++) { // 18 lines for full screen height
-      let line = '';
-      for (let j = 0; j < 80; j++) { // 80 glyphs per line for wide screens
-        const pool = Math.random() < 0.7 ? ['.', '·', '•'] : glyphs;
-        line += pool[Math.floor(Math.random() * pool.length)];
-      }
-      lines.push(line);
+  const [starfieldDims, setStarfieldDims] = useState({ rows: 20, cols: 60 });
+  const [starfieldGlyphs, setStarfieldGlyphs] = useState<string[][]>([]);
+
+  useEffect(() => {
+    function updateDims() {
+      const glyphWidth = 12; // px, approx for monospace font
+      const glyphHeight = 18; // px, approx for monospace font
+      const cols = Math.ceil(window.innerWidth / glyphWidth);
+      const rows = Math.ceil(window.innerHeight / glyphHeight);
+      setStarfieldDims({ rows, cols });
     }
-    return lines.join('\n');
+    updateDims();
+    window.addEventListener('resize', updateDims);
+    return () => window.removeEventListener('resize', updateDims);
   }, []);
+
+  useEffect(() => {
+    // Generate glyphs for the current grid size
+    const newGlyphs: string[][] = [];
+    for (let i = 0; i < starfieldDims.rows; i++) {
+      const row: string[] = [];
+      for (let j = 0; j < starfieldDims.cols; j++) {
+        const pool = Math.random() < 0.7 ? ['.', '·', '•'] : glyphs;
+        row.push(pool[Math.floor(Math.random() * pool.length)]);
+      }
+      newGlyphs.push(row);
+    }
+    setStarfieldGlyphs(newGlyphs);
+    // Only regenerate on mount or resize
+    // eslint-disable-next-line
+  }, [starfieldDims.rows, starfieldDims.cols]);
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
@@ -533,18 +552,27 @@ const App: React.FC = () => {
 
   return ( 
     <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 px-4 selection:bg-red-700 selection:text-white font-['Inter'] relative overflow-x-hidden">
-      {/* Glyph starfield overlay, very transparent, yellow, beneath all content */}
-      <pre
-        className="fixed inset-0 w-full h-full pointer-events-none select-none z-0 text-yellow-400 font-mono opacity-10 text-xs md:text-base"
+      {/* Responsive glyph starfield overlay, very transparent, yellow, beneath all content */}
+      <div
+        className="fixed inset-0 w-full h-full pointer-events-none select-none z-0 text-yellow-400 font-mono opacity-10"
         style={{
+          display: 'grid',
+          gridTemplateRows: `repeat(${starfieldDims.rows}, 1fr)`,
+          gridTemplateColumns: `repeat(${starfieldDims.cols}, 1fr)`,
+          fontSize: '14px',
           lineHeight: '1.1',
           userSelect: 'none',
           color: '#facc15', // Tailwind yellow-400
           background: 'none',
-          whiteSpace: 'pre',
         }}
         aria-hidden="true"
-      >{glyphStarfield}</pre>
+      >
+        {starfieldGlyphs.map((row, i) =>
+          row.map((glyph, j) => (
+            <span key={`${i}-${j}`}>{glyph}</span>
+          ))
+        )}
+      </div>
       
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
