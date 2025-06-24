@@ -17,6 +17,7 @@ export interface PersistentThreat {
   currentHealth: number;
   senses?: string[]; // Primary senses for detection (e.g., "Acute Hearing", "Thermal Vision")
   lastKnownAction?: string;
+  redacted?: boolean;
 }
 
 export interface CombatOutcome {
@@ -76,9 +77,9 @@ export type GameplayEffect =
 export interface GeminiApiResponse {
   sceneDescription: string;
   choices: (string | Choice)[]; // Can be simple strings or Choice objects
-  addItem?: string | InventoryItem; // Can be string (legacy) or structured InventoryItem
-  removeItem?: string | InventoryItem; // Can be string (legacy) or structured InventoryItem
-  initialInventory?: (string | InventoryItem)[]; // For player's starting items (1-3)
+  addItem?: string;
+  removeItem?: string;
+  initialInventory?: string[]; // For player's starting items (1-3)
   memoryLogSummary?: string; // Concise summary of the current turn for the memory log
   gameplayEffects?: GameplayEffect[]; // New field for emergent effects
   gameOverSummary?: string; // New: Concise summary of game end (e.g., "You perished.")
@@ -158,38 +159,38 @@ export const formatInventoryItem = (item: InventoryItem): string => {
 };
 
 export const addToInventory = (inventory: InventoryItem[], item: string | InventoryItem): InventoryItem[] => {
-  const parsedItem = parseInventoryItem(item);
-  const existingIndex = inventory.findIndex(invItem => invItem.name === parsedItem.name);
+  const newItem = parseInventoryItem(item);
+  const existingItemIndex = inventory.findIndex(invItem => invItem.name === newItem.name);
   
-  if (existingIndex >= 0) {
-    // Item exists, add to quantity
+  if (existingItemIndex >= 0) {
+    // Update existing item quantity
     const updatedInventory = [...inventory];
-    updatedInventory[existingIndex] = {
-      ...updatedInventory[existingIndex],
-      quantity: updatedInventory[existingIndex].quantity + parsedItem.quantity
+    updatedInventory[existingItemIndex] = {
+      ...updatedInventory[existingItemIndex],
+      quantity: updatedInventory[existingItemIndex].quantity + newItem.quantity
     };
     return updatedInventory;
   } else {
-    // New item
-    return [...inventory, parsedItem];
+    // Add new item
+    return [...inventory, newItem];
   }
 };
 
 export const removeFromInventory = (inventory: InventoryItem[], item: string | InventoryItem): InventoryItem[] => {
-  const parsedItem = parseInventoryItem(item);
-  const existingIndex = inventory.findIndex(invItem => invItem.name === parsedItem.name);
+  const itemToRemove = parseInventoryItem(item);
+  const existingItemIndex = inventory.findIndex(invItem => invItem.name === itemToRemove.name);
   
-  if (existingIndex >= 0) {
-    const existingItem = inventory[existingIndex];
-    const newQuantity = existingItem.quantity - parsedItem.quantity;
+  if (existingItemIndex >= 0) {
+    const existingItem = inventory[existingItemIndex];
+    const newQuantity = existingItem.quantity - itemToRemove.quantity;
     
     if (newQuantity <= 0) {
       // Remove item completely
-      return inventory.filter((_, index) => index !== existingIndex);
+      return inventory.filter((_, index) => index !== existingItemIndex);
     } else {
-      // Reduce quantity
+      // Update quantity
       const updatedInventory = [...inventory];
-      updatedInventory[existingIndex] = {
+      updatedInventory[existingItemIndex] = {
         ...existingItem,
         quantity: newQuantity
       };
@@ -197,46 +198,15 @@ export const removeFromInventory = (inventory: InventoryItem[], item: string | I
     }
   }
   
-  // Item not found, return unchanged inventory
-  return inventory;
+  return inventory; // Item not found, return unchanged inventory
 };
 
-export const hasItem = (inventory: InventoryItem[], itemName: string, requiredQuantity: number = 1): boolean => {
+export const hasItem = (inventory: InventoryItem[], itemName: string, quantity: number = 1): boolean => {
   const item = inventory.find(invItem => invItem.name === itemName);
-  return item ? item.quantity >= requiredQuantity : false;
+  return item ? item.quantity >= quantity : false;
 };
 
 export const getItemQuantity = (inventory: InventoryItem[], itemName: string): number => {
   const item = inventory.find(invItem => invItem.name === itemName);
   return item ? item.quantity : 0;
-};
-
-// Test function to verify inventory system
-export const testInventorySystem = () => {
-  console.log("Testing inventory system...");
-  
-  let inventory: InventoryItem[] = [];
-  
-  // Test adding items
-  inventory = addToInventory(inventory, "5 Rifle Rounds");
-  console.log("After adding 5 Rifle Rounds:", inventory);
-  
-  inventory = addToInventory(inventory, "3 Bandages");
-  console.log("After adding 3 Bandages:", inventory);
-  
-  inventory = addToInventory(inventory, "2 Rifle Rounds");
-  console.log("After adding 2 more Rifle Rounds:", inventory);
-  
-  // Test removing items
-  inventory = removeFromInventory(inventory, "1 Rifle Round");
-  console.log("After removing 1 Rifle Round:", inventory);
-  
-  inventory = removeFromInventory(inventory, "2 Bandages");
-  console.log("After removing 2 Bandages:", inventory);
-  
-  // Test removing all of an item
-  inventory = removeFromInventory(inventory, "6 Rifle Rounds");
-  console.log("After removing all Rifle Rounds:", inventory);
-  
-  console.log("Inventory system test completed.");
 };

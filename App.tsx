@@ -259,7 +259,7 @@ const App: React.FC = () => {
           setShowBlinkCursor(true);
           blinkInterval = setInterval(() => {
             setIsUnderscoreVisible((v) => !v);
-          }, 1500);
+          }, 500);
           return prev;
         }
       });
@@ -435,6 +435,7 @@ const App: React.FC = () => {
             senses: persistentThreatDetails.senses || [],
             status: updatedThreatStatus || 'distant',
             lastKnownAction: threatEncounterMessage || "Lurking...",
+            redacted: (persistentThreatDetails as any).redacted || false,
           };
           tempPersistentThreat = newThreat;
           setPersistentThreat(newThreat);
@@ -833,17 +834,16 @@ const App: React.FC = () => {
         
         {!isGameOver && !isInitialLoad && ( 
           <div className="w-full max-w-lg text-center my-4"> 
-            <div className="relative w-full bg-gray-700 h-6 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
-              <div className="absolute top-0 left-2 z-10 text-yellow-400 text-base" style={{ transform: 'translateY(-25%)' }}>
-                ❤
-              </div>
+            <div className="flex items-center justify-center mb-2"> 
+              <span className="text-red-400 text-xl mr-2" title={`Health: ${playerHealth}/${MAX_PLAYER_HEALTH}`} aria-label={`Health: ${playerHealth} out of ${MAX_PLAYER_HEALTH}`}>❤</span>
+            </div> 
+            <div className="w-full bg-gray-700 h-6 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
               <div 
                 className="bg-gradient-to-r from-red-500 to-red-700 h-full transition-all duration-300 ease-out" 
                 style={{ width: `${Math.max(0, (playerHealth / MAX_PLAYER_HEALTH) * 100)}%`, borderRadius: '2px' }} 
                 aria-valuenow={playerHealth} 
                 aria-valuemin={0} 
                 aria-valuemax={MAX_PLAYER_HEALTH} 
-                aria-label={`Player health: ${playerHealth} out of ${MAX_PLAYER_HEALTH}`}
               ></div> 
             </div> 
           </div> 
@@ -1171,49 +1171,6 @@ const App: React.FC = () => {
         onScenarioSelected={handleCustomScenarioSelected}
         scenarios={SCENARIO_THEMES_LIST}
       />
-      
-      {/* Return to Menu Modal */}
-      {isReturnToMenuModalVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setIsReturnToMenuModalVisible(false)}>
-          <div className="bg-gray-900 shadow-2xl w-full max-w-md flex flex-col border border-gray-700" style={{ borderRadius: '4px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b border-gray-700 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-yellow-400 font-['Chakra_Petch']">Return to Main Menu?</h2>
-              <button
-                onClick={() => setIsReturnToMenuModalVisible(false)}
-                className="text-gray-400 hover:text-white text-2xl font-bold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
-                style={{ borderRadius: '4px' }}
-                aria-label="Close return to menu dialog"
-              >
-                ×
-              </button>
-            </div>
-            
-            <div className="p-6">
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to return to the main menu? Your current game progress will be lost.
-              </p>
-              
-              <div className="flex space-x-3">
-                <button 
-                  onClick={handleReturnToMainMenu}
-                  className="flex-1 bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 border border-red-500 transition-colors duration-150" 
-                  style={{ borderRadius: '4px' }}
-                > 
-                  Return to Menu 
-                </button> 
-                <button 
-                  onClick={() => setIsReturnToMenuModalVisible(false)}
-                  className="flex-1 bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-600 transition-colors duration-150" 
-                  style={{ borderRadius: '4px' }}
-                > 
-                  Cancel 
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
       {/* SVG Eye for technohorror motif, below main menu buttons on mobile */}
       <div className="w-full flex justify-center items-center mt-8 mb-2 sm:hidden" aria-hidden="false">
         <img 
@@ -1226,6 +1183,35 @@ const App: React.FC = () => {
           aria-label="Shuffle glyphs"
         />
       </div>
+
+      {/* Return to Menu Modal */}
+      {isReturnToMenuModalVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 border border-gray-600 p-6 rounded-lg max-w-md w-full text-center">
+            <h3 className="text-xl font-semibold text-white mb-4">Return to Main Menu?</h3>
+            <p className="text-gray-300 mb-6">
+              This will end your current game and return you to the main menu. All progress will be lost.
+            </p>
+            <div className="flex space-x-4 justify-center">
+              <button
+                onClick={() => {
+                  setIsReturnToMenuModalVisible(false);
+                  startGame();
+                }}
+                className="bg-red-600 text-white font-semibold py-2 px-4 rounded hover:bg-red-500 transition-colors"
+              >
+                Yes, Return
+              </button>
+              <button
+                onClick={() => setIsReturnToMenuModalVisible(false)}
+                className="bg-gray-600 text-white font-semibold py-2 px-4 rounded hover:bg-gray-500 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
