@@ -737,7 +737,7 @@ const App: React.FC = () => {
 
         {currentStory.isInCombat && currentStory.combatLog.length > 0 && !isGameOver && ( 
           <div className="bg-gray-800 bg-opacity-75 p-3 shadow-md mb-4 max-w-3xl w-full max-h-40 overflow-y-auto custom-scroll border border-gray-600" style={{ borderRadius: '4px' }}> 
-            <h4 className="text-md font-semibold text-red-400 mb-1">Combat Log:</h4> 
+            <h4 className="text-md font-semibold text-red-400 mb-1">Threat Log:</h4> 
             {currentStory.combatLog.map((logEntry, index) => ( 
               <p key={index} className="text-sm text-gray-200 py-0.5 whitespace-pre-line">▶ {logEntry}</p> 
             ))} 
