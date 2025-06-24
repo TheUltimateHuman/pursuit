@@ -23,12 +23,12 @@ type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fa
 // --- GLYPH FIELD OVERLAY COMPONENT (restored) ---
 const GLYPH_SET = [
   // Heavily weight star-like glyphs for starfield effect
-  ...Array(100).fill('.'),
-  ...Array(60).fill('·'),
-  ...Array(40).fill('•'),
-  ...Array(20).fill('∙'),
-  ...Array(20).fill('°'),
-  ...Array(20).fill('⋅'),
+  ...Array(160).fill('.'),
+  ...Array(80).fill('·'),
+  ...Array(60).fill('•'),
+  ...Array(60).fill('∙'),
+  ...Array(60).fill('°'),
+  ...Array(60).fill('⋅'),
   '∆', 'λ', 'µ', 'π', '†', '‡', '§', '¤', '☠', '☢', '☣', '⚠', '⛧', '⟁',
   '⩫', '⩪', '⩤', '⩥', '⧫', '⧖', '⧗', '⧛', '⧜', '⩶', '⩷', '⩸', '⩹', '⩺', '⩻', '⩼', '⩽', '⩾', '⩿',
   '⪀', '⪁', '⪂', '⪃', '⪄', '⪅', '⪆', '⪇', '⪈', '⪉', '⪊', '⪋', '⪌', '⪍', '⪎', '⪏', '⪐', '⪑',
@@ -776,7 +776,7 @@ const App: React.FC = () => {
                     <button
                         key="contemporary"
                         onClick={() => handleStartGameWithTheme("modern")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
                         disabled={isLoading}
                     >
                         Contemporary
@@ -784,7 +784,7 @@ const App: React.FC = () => {
                     <button
                         key="fantasy"
                         onClick={() => handleStartGameWithTheme("fantasy")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
                         disabled={isLoading}
                     >
                         Fantasy
@@ -792,7 +792,7 @@ const App: React.FC = () => {
                     <button
                         key="historical"
                         onClick={() => handleStartGameWithTheme("historical")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
                         disabled={isLoading}
                     >
                         Historical
@@ -800,7 +800,7 @@ const App: React.FC = () => {
                     <button
                         key="mythological"
                         onClick={() => handleStartGameWithTheme("mythological")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
                         disabled={isLoading}
                     >
                         Mythological
@@ -808,7 +808,7 @@ const App: React.FC = () => {
                     <button
                         key="science_fiction"
                         onClick={() => handleStartGameWithTheme("sci_fi")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
                         disabled={isLoading}
                     >
                         Science Fiction
