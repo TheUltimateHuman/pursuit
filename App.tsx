@@ -24,11 +24,11 @@ type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fa
 const GLYPH_SET = [
   // Heavily weight star-like glyphs for starfield effect
   ...Array(160).fill('.'),
-  ...Array(80).fill('·'),
-  ...Array(60).fill('•'),
-  ...Array(60).fill('∙'),
-  ...Array(60).fill('°'),
-  ...Array(60).fill('⋅'),
+  ...Array(100).fill('·'),
+  ...Array(80).fill('•'),
+  ...Array(80).fill('∙'),
+  ...Array(80).fill('°'),
+  ...Array(80).fill('⋅'),
   '∆', 'λ', 'µ', 'π', '†', '‡', '§', '¤', '☠', '☢', '☣', '⚠', '⛧', '⟁',
   '⩫', '⩪', '⩤', '⩥', '⧫', '⧖', '⧗', '⧛', '⧜', '⩶', '⩷', '⩸', '⩹', '⩺', '⩻', '⩼', '⩽', '⩾', '⩿',
   '⪀', '⪁', '⪂', '⪃', '⪄', '⪅', '⪆', '⪇', '⪈', '⪉', '⪊', '⪋', '⪌', '⪍', '⪎', '⪏', '⪐', '⪑',
@@ -772,11 +772,11 @@ const App: React.FC = () => {
                         Random 
                     </button> 
                     {/* Category random buttons in 2-column, 3-row grid on mobile */}
-                    <div className="w-full grid grid-cols-2 gap-3 my-4 sm:my-6 max-w-xs mx-auto">
+                    <div className="w-full grid grid-cols-2 gap-3 my-4 sm:my-6">
                         <button
                             key="realism"
                             onClick={() => handleStartGameWithTheme("realism")}
-                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-red-800 text-white focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-red-800 text-white focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
                             disabled={isLoading}
                         >
                             REALISM
@@ -784,7 +784,7 @@ const App: React.FC = () => {
                         <button
                             key="contemporary"
                             onClick={() => handleStartGameWithTheme("modern")}
-                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
                             disabled={isLoading}
                         >
                             Contemporary
@@ -792,7 +792,7 @@ const App: React.FC = () => {
                         <button
                             key="fantasy"
                             onClick={() => handleStartGameWithTheme("fantasy")}
-                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
                             disabled={isLoading}
                         >
                             Fantasy
@@ -800,7 +800,7 @@ const App: React.FC = () => {
                         <button
                             key="historical"
                             onClick={() => handleStartGameWithTheme("historical")}
-                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
                             disabled={isLoading}
                         >
                             Historical
@@ -808,7 +808,7 @@ const App: React.FC = () => {
                         <button
                             key="mythological"
                             onClick={() => handleStartGameWithTheme("mythological")}
-                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
                             disabled={isLoading}
                         >
                             Mythological
@@ -816,7 +816,7 @@ const App: React.FC = () => {
                         <button
                             key="science_fiction"
                             onClick={() => handleStartGameWithTheme("sci_fi")}
-                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
                             disabled={isLoading}
                         >
                             Science Fiction
