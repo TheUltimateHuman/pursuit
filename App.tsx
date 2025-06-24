@@ -71,6 +71,7 @@ function getRandomGlyph() {
 const GlyphFieldOverlay: React.FC = () => {
   // Calculate grid size based on viewport
   const [dimensions, setDimensions] = React.useState({ cols: 32, rows: 18 });
+  const [glyphs, setGlyphs] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     function updateDimensions() {
@@ -84,8 +85,14 @@ const GlyphFieldOverlay: React.FC = () => {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  const glyphs = useMemo(() => {
-    return Array.from({ length: dimensions.rows * dimensions.cols }, getRandomGlyph);
+  // Animate glyphs: shimmer effect
+  React.useEffect(() => {
+    function randomizeGlyphs() {
+      setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, getRandomGlyph));
+    }
+    randomizeGlyphs();
+    const interval = setInterval(randomizeGlyphs, 350); // Flicker every 350ms
+    return () => clearInterval(interval);
   }, [dimensions]);
 
   return (
@@ -178,11 +185,16 @@ const App: React.FC = () => {
   // Typing effect for title (with terminal-style underscore)
   const [typedTitle, setTypedTitle] = useState('');
   const [typingIndex, setTypingIndex] = useState(0);
+  const [underscorePos, setUnderscorePos] = useState(0);
+  const [underscoreDir, setUnderscoreDir] = useState(1);
+  const fullTitle = 'QUARRY';
+
   useEffect(() => {
-    const fullTitle = 'QUARRY';
     let i = 0;
     setTypedTitle('');
     setTypingIndex(0);
+    setUnderscorePos(0);
+    setUnderscoreDir(1);
     const timeout = setTimeout(() => {
       const interval = setInterval(() => {
         setTypedTitle((prev) => {
@@ -203,6 +215,24 @@ const App: React.FC = () => {
       clearTimeout(timeout);
     };
   }, []);
+
+  // Animate underscore after typing finishes
+  useEffect(() => {
+    if (typingIndex < fullTitle.length) return;
+    setUnderscorePos(0);
+    setUnderscoreDir(1);
+    const interval = setInterval(() => {
+      setUnderscorePos((pos) => {
+        if (pos + underscoreDir >= fullTitle.length || pos + underscoreDir < 0) {
+          setUnderscoreDir((dir) => -dir);
+          return pos + -underscoreDir;
+        }
+        return pos + underscoreDir;
+      });
+    }, 400); // Slower, more ominous
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typingIndex]);
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
@@ -667,16 +697,35 @@ const App: React.FC = () => {
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
         <h1 
           className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
-          style={{ fontSize: '4.5rem', letterSpacing: '0.15em', minHeight: '6.5rem' }}
+          style={{ fontSize: '4.5rem', letterSpacing: '0.15em', minHeight: '6.5rem', position: 'relative' }}
           onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         >
-          {typedTitle}
-          {typingIndex < 6 && (
-            <span style={{ color: '#ffe066', fontWeight: 400, fontFamily: 'inherit', marginLeft: '-0.1em', marginRight: '0.05em' }}>
-              _
-            </span>
-          )}
+          <span style={{ position: 'relative', display: 'inline-block' }}>
+            {typedTitle.split('').map((char, idx) => (
+              <span key={idx} style={{ position: 'relative', zIndex: 1 }}>{char}</span>
+            ))}
+            {/* Animated underscore as underline */}
+            {typingIndex < fullTitle.length ? (
+              <span style={{ color: '#ffe066', fontWeight: 400, fontFamily: 'inherit', marginLeft: '-0.1em', marginRight: '0.05em' }}>
+                _
+              </span>
+            ) : (
+              <span style={{
+                position: 'absolute',
+                left: `calc(${underscorePos} * 1em + ${underscorePos * 0.15}em)`,
+                bottom: '-0.15em',
+                color: '#ffe066',
+                fontWeight: 400,
+                fontFamily: 'inherit',
+                fontSize: '1.1em',
+                transition: 'left 0.38s cubic-bezier(0.4,0,0.2,1)',
+                zIndex: 0,
+              }}>
+                _
+              </span>
+            )}
+          </span>
         </h1> 
         {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
           <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
