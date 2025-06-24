@@ -98,8 +98,14 @@ function getRandomGlyphForGenre(genre: string | undefined | null): string {
   } else if (genre.toLowerCase().startsWith('mythological:')) {
     genreSet = [...GLYPH_SETS.common, ...GLYPH_SETS.mythological];
   } else {
-    // For any other genre or no match, use common glyphs
-    genreSet = GLYPH_SETS.common;
+    // For any other genre or no match, use all glyphs (same as main menu)
+    genreSet = [
+      ...GLYPH_SETS.common,
+      ...GLYPH_SETS.scifi,
+      ...GLYPH_SETS.fantasy,
+      ...GLYPH_SETS.historical,
+      ...GLYPH_SETS.mythological,
+    ];
   }
 
   return genreSet[Math.floor(Math.random() * genreSet.length)];
