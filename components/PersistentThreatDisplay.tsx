@@ -51,12 +51,13 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
 
   return (
     <div
-      className={`bg-red-900 bg-opacity-60 backdrop-blur-sm p-3 rounded-lg shadow-xl mb-6 max-w-3xl w-full text-center border ${isInCombat && threat.status === 'engaged' ? 'border-red-500' : 'border-red-700'}`}
+      className={`bg-red-900 bg-opacity-60 backdrop-blur-sm p-3 shadow-xl mb-6 max-w-3xl w-full text-center border ${isInCombat && threat.status === 'engaged' ? 'border-red-500' : 'border-red-700'}`}
+      style={{ borderRadius: '4px' }}
       title={threat.description} 
       aria-label={`Threat details: ${threat.name}. ${displayMessage || 'No specific action noted'}. ${ariaStatusDescription}.`}
     >
       <h4 className="text-md font-semibold text-red-300 mb-1">
-        Threat: <span className="text-red-200 font-bold">{threat.name}</span>
+        THREAT: <span className="text-red-200 font-bold">{threat.name}</span>
       </h4>
       {displayMessage && !isInCombat && ( 
          <p className="text-sm italic text-red-300">
@@ -77,11 +78,12 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
             {[0, 1, 2, 3, 4, 5].map((pos) => (
               <div
                 key={pos}
-                className={`h-2 flex-1 mx-1 rounded transition-all duration-300 ${
+                className={`h-2 flex-1 mx-1 transition-all duration-300 ${
                   pos === visualIndicator.position 
                     ? `${visualIndicator.color} shadow-lg` 
                     : 'bg-white bg-opacity-30'
                 }`}
+                style={{ borderRadius: '2px' }}
               />
             ))}
           </div>
@@ -99,10 +101,10 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
         </div>
       )}
       {threat.status !== 'defeated' && threat.status !== 'hidden' && !isInCombat && (
-        <div className="w-full bg-gray-700 rounded-full h-2.5 mt-2 overflow-hidden">
+        <div className="w-full bg-gray-700 h-2.5 mt-2 overflow-hidden" style={{ borderRadius: '2px' }}>
           <div
-            className="bg-red-600 h-2.5 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${(threat.currentHealth / threat.maxHealth) * 100}%` }}
+            className="bg-red-600 h-2.5 transition-all duration-500 ease-out"
+            style={{ width: `${(threat.currentHealth / threat.maxHealth) * 100}%`, borderRadius: '1px' }}
             title={`Threat Health: ${threat.currentHealth}/${threat.maxHealth}`}
             aria-label={`Threat health: ${threat.currentHealth} out of ${threat.maxHealth}`}
           ></div>

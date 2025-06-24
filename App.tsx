@@ -60,6 +60,7 @@ const App: React.FC = () => {
   // --- NEW STATE FOR CUSTOM SCENARIO INPUT ---
   const [isCustomScenarioInputVisible, setIsCustomScenarioInputVisible] = useState<boolean>(false);
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
+  const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
@@ -157,7 +158,7 @@ const App: React.FC = () => {
           switch (effect.type) { 
             case "player_ability_gain": 
               if (!tempPlayerAbilities.find(ab => ab.name === effect.abilityName)) { 
-                tempPlayerAbilities.push({ name: effect.abilityName, description: effect.description, uses: effect.uses }); 
+                tempPlayerAbilities.push({ name: effect.abilityName, description: effect.description, uses: effect.uses ?? undefined }); 
               } else { 
                   tempPlayerAbilities = tempPlayerAbilities.map(ab => 
                     ab.name === effect.abilityName ? { ...ab, description: effect.description, uses: effect.uses ?? ab.uses } : ab 
@@ -184,7 +185,7 @@ const App: React.FC = () => {
             case "player_ability_update": 
               tempPlayerAbilities = tempPlayerAbilities.map(ab => 
                 ab.name === (effect as PlayerAbilityUpdateEffect).abilityName 
-                  ? { ...ab, uses: (effect as PlayerAbilityUpdateEffect).newUses, description: (effect as PlayerAbilityUpdateEffect).description || ab.description } 
+                  ? { ...ab, uses: (effect as PlayerAbilityUpdateEffect).newUses ?? undefined, description: (effect as PlayerAbilityUpdateEffect).description || ab.description } 
                   : ab 
               ); 
               break; 
@@ -498,6 +499,11 @@ const App: React.FC = () => {
     processApiResponse(fetchInitialStory(selectedTheme), true); 
   }, [processApiResponse, isLoading, lastUsedThemeType, lastUsedCustomScenario, setError]); 
 
+  const handleReturnToMainMenu = useCallback(() => {
+    setIsReturnToMenuModalVisible(false);
+    startGame();
+  }, [startGame]);
+
   if (!API_KEY_AVAILABLE) { 
     return <ApiKeyMissingBanner />; 
   } 
@@ -514,11 +520,15 @@ const App: React.FC = () => {
 
 
   return ( 
-    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-center p-4 selection:bg-red-700 selection:text-white"> 
+    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-center p-4 selection:bg-red-700 selection:text-white font-['Inter']"> 
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
-        <h1 className="text-8xl uppercase font-medium tracking-wider text-yellow-400 italic"> 
+        <h1 
+          className={`text-8xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+          onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
+          title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
+        > 
           QUARRY 
         </h1> 
       </header> 
@@ -532,7 +542,8 @@ const App: React.FC = () => {
                     <button
                         onClick={handleRegenerateInitialScene}
                         disabled={isLoading}
-                        className="absolute top-2 right-2 bg-sky-700 text-white font-semibold p-1 rounded-full shadow-md transition-all duration-150 ease-in-out hover:bg-sky-600 hover:shadow-lg transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-75 disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none text-lg border border-sky-600"
+                        className="absolute top-2 right-2 bg-gray-500 text-white font-semibold p-2 shadow-md transition-all duration-150 ease-in-out hover:bg-gray-400 hover:shadow-lg transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none text-lg border border-gray-400"
+                        style={{ borderRadius: '4px' }}
                         title="Regenerate Initial Scene (same category)"
                         aria-label="Regenerate Initial Scene (same category)"
                     >
@@ -553,12 +564,12 @@ const App: React.FC = () => {
         {!isGameOver && !isInitialLoad && ( 
           <div className="w-full max-w-lg text-center my-4"> 
             <div className="text-xl font-semibold text-red-300 mb-1"> 
-              Health: {playerHealth} / {MAX_PLAYER_HEALTH} 
+              HEALTH: {playerHealth} / {MAX_PLAYER_HEALTH} 
             </div> 
-            <div className="w-full bg-gray-700 rounded-full h-4 border-2 border-gray-600 overflow-hidden shadow-md"> 
+            <div className="w-full bg-gray-700 h-4 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
               <div 
-                className="bg-gradient-to-r from-red-500 to-red-700 h-full rounded-full transition-all duration-300 ease-out" 
-                style={{ width: `${Math.max(0, (playerHealth / MAX_PLAYER_HEALTH) * 100)}%` }} 
+                className="bg-gradient-to-r from-red-500 to-red-700 h-full transition-all duration-300 ease-out" 
+                style={{ width: `${Math.max(0, (playerHealth / MAX_PLAYER_HEALTH) * 100)}%`, borderRadius: '2px' }} 
                 aria-valuenow={playerHealth} 
                 aria-valuemin={0} 
                 aria-valuemax={MAX_PLAYER_HEALTH} 
@@ -570,12 +581,12 @@ const App: React.FC = () => {
         {!isInitialLoad && <InventoryDisplay items={inventory} />} 
 
         {!isInitialLoad && playerAbilities.length > 0 && !isGameOver && (
-            <div className="bg-purple-800 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl mb-6 max-w-3xl w-full"> 
+            <div className="bg-purple-800 bg-opacity-60 backdrop-blur-md p-4 shadow-xl mb-6 max-w-3xl w-full border border-purple-600" style={{ borderRadius: '4px' }}> 
                 <h3 className="text-lg font-semibold text-purple-200 mb-2 border-b border-purple-300 pb-1">Abilities:</h3> 
                 <ul className="list-none text-gray-200 flex flex-col space-y-1 custom-scroll max-h-24 overflow-y-auto pr-2"> 
                     {playerAbilities.map((ability, index) => ( 
                         <li key={index} className="text-sm py-0.5 hover:text-purple-100 transition-colors duration-150" title={ability.description}> 
-                            <span className="text-purple-300 mr-1.5">&#✦</span> {ability.name} {ability.uses !== undefined ? `(${ability.uses} use${ability.uses === 1 ? '' : 's'} left)` : ''} 
+                            <span className="text-purple-300 mr-1.5">&#✦</span> {ability.name} {ability.uses !== undefined && ability.uses !== null ? `(${ability.uses} use${ability.uses === 1 ? '' : 's'} left)` : ''} 
                         </li> 
                     ))} 
                 </ul> 
@@ -583,7 +594,7 @@ const App: React.FC = () => {
         )} 
 
         {currentStory.isInCombat && currentStory.combatLog.length > 0 && !isGameOver && ( 
-          <div className="bg-gray-800 bg-opacity-75 p-3 rounded-lg shadow-md mb-4 max-w-3xl w-full max-h-40 overflow-y-auto custom-scroll"> 
+          <div className="bg-gray-800 bg-opacity-75 p-3 shadow-md mb-4 max-w-3xl w-full max-h-40 overflow-y-auto custom-scroll border border-gray-600" style={{ borderRadius: '4px' }}> 
             <h4 className="text-md font-semibold text-red-400 mb-1">Combat Log:</h4> 
             {currentStory.combatLog.map((logEntry, index) => ( 
               <p key={index} className="text-sm text-gray-200 py-0.5 whitespace-pre-line">▶ {logEntry}</p> 
@@ -780,7 +791,7 @@ const App: React.FC = () => {
             {/* Enhanced Memory Log - Shows below choices */}
             {!isDisplayingInitialStartOptions && !isGameOver && !isLoading && (memoryLog.length > 0 || playerChoices.length > 0) && (
                 <div className="w-full max-w-3xl mt-6">
-                    <div className="bg-gray-700 bg-opacity-60 backdrop-blur-md p-4 rounded-lg shadow-xl">
+                    <div className="bg-gray-700 bg-opacity-60 backdrop-blur-md p-4 shadow-xl border border-gray-500" style={{ borderRadius: '4px' }}>
                         <h3 className="text-lg font-semibold text-yellow-300 mb-3 border-b border-yellow-400 pb-1">Memory Log:</h3>
                         <div className="max-h-48 overflow-y-auto custom-scroll pr-2 space-y-2">
                             {(() => {
@@ -853,6 +864,51 @@ const App: React.FC = () => {
         onScenarioSelected={handleCustomScenarioSelected} 
         scenarios={SCENARIO_THEMES_LIST} 
       /> 
+
+      {/* Return to Menu Confirmation Modal */}
+      {isReturnToMenuModalVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4" onClick={() => setIsReturnToMenuModalVisible(false)}>
+          <div
+            className="bg-gray-800 shadow-2xl w-full max-w-md flex flex-col border border-gray-600"
+            style={{ borderRadius: '4px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <header className="p-4 border-b border-gray-700 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-yellow-400 font-['Chakra_Petch']">Return to Menu?</h2>
+              <button
+                onClick={() => setIsReturnToMenuModalVisible(false)}
+                className="text-gray-400 hover:text-white transition-colors text-2xl"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </header>
+
+            <div className="p-6">
+              <p className="text-gray-200 mb-6 text-center">
+                Are you sure you want to return to the main menu? Your current game progress will be lost.
+              </p>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleReturnToMainMenu}
+                  className="flex-1 bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 transition-all duration-150"
+                  style={{ borderRadius: '4px' }}
+                >
+                  Return to Menu
+                </button>
+                <button
+                  onClick={() => setIsReturnToMenuModalVisible(false)}
+                  className="flex-1 bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-150"
+                  style={{ borderRadius: '4px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div> 
   ); 

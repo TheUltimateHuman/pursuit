@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface StoryDisplayProps {
@@ -6,11 +5,23 @@ interface StoryDisplayProps {
 }
 
 const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
+  // Split the text by the divider and process each part
+  const parts = text.split('◈ ◈ ◈');
+  
   return (
-    <div className="bg-gray-800 bg-opacity-80 backdrop-blur-sm p-6 rounded-lg shadow-2xl w-full">
-      <p className="text-lg md:text-xl leading-relaxed text-gray-100 whitespace-pre-line custom-scroll max-h-96 overflow-y-auto">
-        {text}
-      </p>
+    <div className="bg-gray-800 bg-opacity-80 backdrop-blur-sm p-6 shadow-2xl w-full border border-gray-600" style={{ borderRadius: '4px' }}>
+      <div className="text-lg md:text-xl leading-relaxed text-gray-100 custom-scroll max-h-96 overflow-y-auto font-['Inter']">
+        {parts.map((part, index) => (
+          <React.Fragment key={index}>
+            <p className="whitespace-pre-line">{part}</p>
+            {index < parts.length - 1 && (
+              <div className="flex justify-center my-4">
+                <span className="text-yellow-400 text-2xl font-light">◈ ◈ ◈</span>
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 };
