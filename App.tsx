@@ -232,7 +232,7 @@ const App: React.FC = () => {
   const underscorePosRef = useRef(fullTitle.length - 1);
   const underscoreDirRef = useRef(-1);
 
-  // Initial typing animation
+  // Initial typing animation with blinking underscore during long pauses
   useEffect(() => {
     let i = 0;
     setTypedTitle('');
@@ -242,6 +242,22 @@ const App: React.FC = () => {
     underscorePosRef.current = fullTitle.length - 1;
     underscoreDirRef.current = -1;
     let cancelled = false;
+    let blinkInterval: NodeJS.Timeout | null = null;
+
+    function setBlinking(active: boolean) {
+      if (active) {
+        setIsUnderscoreVisible(true);
+        if (!blinkInterval) {
+          blinkInterval = setInterval(() => {
+            setIsUnderscoreVisible((v) => !v);
+          }, 400);
+        }
+      } else {
+        if (blinkInterval) clearInterval(blinkInterval);
+        blinkInterval = null;
+        setIsUnderscoreVisible(true);
+      }
+    }
 
     function typeNextChar() {
       if (cancelled) return;
@@ -257,16 +273,22 @@ const App: React.FC = () => {
           if (char === ' ' || char === '\n') extra += 120;
           if (/[.,!?;:]/.test(char)) extra += 180;
           const randomPause = base + extra + Math.floor(Math.random() * 180); // 180-480ms
-          setTimeout(typeNextChar, randomPause);
+          // Blink if pause is long enough
+          if (randomPause > 400) setBlinking(true); else setBlinking(false);
+          setTimeout(() => {
+            setBlinking(false);
+            typeNextChar();
+          }, randomPause);
           return next;
         } else {
           setTypingIndex(fullTitle.length);
+          setBlinking(false);
           return prev;
         }
       });
     }
     setTimeout(typeNextChar, 400); // Initial pause
-    return () => { cancelled = true; };
+    return () => { cancelled = true; if (blinkInterval) clearInterval(blinkInterval); };
   }, []);
 
   // Terminal-style underline animation: move left to right (Q to Y), then right to left (Y to Q)
