@@ -824,35 +824,43 @@ const App: React.FC = () => {
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         >
           <span style={{ position: 'relative', display: 'inline-block' }}>
-            {typedTitle.split('').map((char, idx) => (
-              <span key={idx} style={{ position: 'relative', display: 'inline-block', minWidth: '1em' }}>
-                {char}
-                {/* Animated underscore as underline, only after typing finishes */}
-                {typingIndex === fullTitle.length && underscorePos === idx && isUnderscoreVisible && (
-                  <span style={{
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    bottom: '-0.18em',
-                    color: '#ffe066',
-                    fontWeight: 400,
-                    fontFamily: 'inherit',
-                    fontSize: '1.1em',
-                    textAlign: 'center',
-                    transition: 'left 0.38s cubic-bezier(0.4,0,0.2,1)',
-                    zIndex: 0,
-                    pointerEvents: 'none',
-                  }}>
+            {/* If on main menu, show animated/typing title. If in game, show static title. */}
+            {isInitialLoad ? (
+              <>
+                {typedTitle.split('').map((char, idx) => (
+                  <span key={idx} style={{ position: 'relative', display: 'inline-block', minWidth: '1em' }}>
+                    {char}
+                    {/* Animated underscore as underline, only after typing finishes */}
+                    {typingIndex === fullTitle.length && underscorePos === idx && isUnderscoreVisible && (
+                      <span style={{
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        bottom: '-0.18em',
+                        color: '#ffe066',
+                        fontWeight: 400,
+                        fontFamily: 'inherit',
+                        fontSize: '1.1em',
+                        textAlign: 'center',
+                        transition: 'left 0.38s cubic-bezier(0.4,0,0.2,1)',
+                        zIndex: 0,
+                        pointerEvents: 'none',
+                      }}>
+                        _
+                      </span>
+                    )}
+                  </span>
+                ))}
+                {/* Blinking underscore while typing */}
+                {typingIndex < fullTitle.length && (
+                  <span style={{ color: '#ffe066', fontWeight: 400, fontFamily: 'inherit', marginLeft: '-0.1em', marginRight: '0.05em' }}>
                     _
                   </span>
                 )}
-              </span>
-            ))}
-            {/* Blinking underscore while typing */}
-            {typingIndex < fullTitle.length && (
-              <span style={{ color: '#ffe066', fontWeight: 400, fontFamily: 'inherit', marginLeft: '-0.1em', marginRight: '0.05em' }}>
-                _
-              </span>
+              </>
+            ) : (
+              // In game: show static title, no underscore
+              <>{fullTitle}</>
             )}
           </span>
         </h1> 
