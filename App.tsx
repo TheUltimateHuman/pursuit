@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 // App.tsx (with Custom Scenario Selection Feature) 
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'; 
 import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect } from './types'; 
 import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/geminiService'; 
 import StoryDisplay from './components/StoryDisplay'; 
@@ -189,6 +189,10 @@ const App: React.FC = () => {
   const [underscorePos, setUnderscorePos] = useState(fullTitle.length - 1); // Start at Y
   const [underscoreDir, setUnderscoreDir] = useState(-1); // Start moving left (Y to Q)
 
+  // Use refs to track current state for animation
+  const underscorePosRef = useRef(fullTitle.length - 1);
+  const underscoreDirRef = useRef(-1);
+
   // Initial typing animation
   useEffect(() => {
     let i = 0;
@@ -196,6 +200,8 @@ const App: React.FC = () => {
     setTypingIndex(0);
     setUnderscorePos(fullTitle.length - 1); // Start at Y
     setUnderscoreDir(-1); // Start moving left (Y to Q)
+    underscorePosRef.current = fullTitle.length - 1;
+    underscoreDirRef.current = -1;
     const timeout = setTimeout(() => {
       const interval = setInterval(() => {
         setTypedTitle((prev) => {
@@ -222,18 +228,25 @@ const App: React.FC = () => {
     if (typingIndex < fullTitle.length) return;
     
     const interval = setInterval(() => {
-      setUnderscorePos((pos) => {
-        const newPos = pos + underscoreDir;
-        // If we hit Q (pos === 0) while moving left, or Y (pos === length-1) while moving right
-        if (newPos <= 0) {
-          setUnderscoreDir(1); // Start moving right (Q to Y)
-          return 0; // Stay at Q
-        } else if (newPos >= fullTitle.length - 1) {
-          setUnderscoreDir(-1); // Start moving left (Y to Q)
-          return fullTitle.length - 1; // Stay at Y
-        }
-        return newPos;
-      });
+      const currentPos = underscorePosRef.current;
+      const currentDir = underscoreDirRef.current;
+      const newPos = currentPos + currentDir;
+      
+      // If we hit Q (pos === 0) while moving left, or Y (pos === length-1) while moving right
+      if (newPos <= 0) {
+        underscoreDirRef.current = 1; // Start moving right (Q to Y)
+        underscorePosRef.current = 0;
+        setUnderscoreDir(1);
+        setUnderscorePos(0);
+      } else if (newPos >= fullTitle.length - 1) {
+        underscoreDirRef.current = -1; // Start moving left (Y to Q)
+        underscorePosRef.current = fullTitle.length - 1;
+        setUnderscoreDir(-1);
+        setUnderscorePos(fullTitle.length - 1);
+      } else {
+        underscorePosRef.current = newPos;
+        setUnderscorePos(newPos);
+      }
     }, 800); // Slower, more ominous (was 400ms)
     
     return () => clearInterval(interval);
