@@ -106,7 +106,8 @@ function getRandomGlyphForGenre(genre: string | undefined | null): string {
 }
 
 // --- GLYPH FIELD OVERLAY COMPONENT ---
-const GlyphFieldOverlay: React.FC<{ currentScenario?: string | null }> = ({ currentScenario }) => {
+const GlyphFieldOverlay = React.forwardRef<{ shuffleGlyphs: () => void }, { currentScenario?: string | null }>(
+  ({ currentScenario }, ref) => {
   // Calculate grid size based on viewport
   const [dimensions, setDimensions] = React.useState({ cols: 32, rows: 18 });
   const [glyphs, setGlyphs] = React.useState<string[]>([]);
@@ -123,16 +124,19 @@ const GlyphFieldOverlay: React.FC<{ currentScenario?: string | null }> = ({ curr
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  // Animate glyphs: shimmer effect
-  React.useEffect(() => {
-    function randomizeGlyphs() {
-      setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, () => getRandomGlyphForGenre(currentScenario)));
-    }
-    randomizeGlyphs();
-    // Animation disabled: do not set interval
-    // const interval = setInterval(randomizeGlyphs, 10000);
-    // return () => clearInterval(interval);
+  // Shuffle glyphs function
+  const randomizeGlyphs = React.useCallback(() => {
+    setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, () => getRandomGlyphForGenre(currentScenario)));
   }, [dimensions, currentScenario]);
+
+  React.useEffect(() => {
+    randomizeGlyphs();
+  }, [dimensions, currentScenario, randomizeGlyphs]);
+
+  // Expose shuffleGlyphs to parent via ref
+  React.useImperativeHandle(ref, () => ({
+    shuffleGlyphs: randomizeGlyphs
+  }), [randomizeGlyphs]);
 
   return (
     <div
@@ -167,7 +171,7 @@ const GlyphFieldOverlay: React.FC<{ currentScenario?: string | null }> = ({ curr
       </div>
     </div>
   );
-};
+});
 
 const App: React.FC = () => { 
   const [currentStory, setCurrentStory] = useState<StoryState>({ 
@@ -727,9 +731,13 @@ const App: React.FC = () => {
   const specificThemeButtonClass = `${themeButtonBaseClass} text-white bg-gray-600`; 
   const customThemeButtonClass = `${themeButtonBaseClass} text-yellow-300 bg-gray-700`;
 
+  // Ref for glyph overlay
+  const glyphOverlayRef = React.useRef<{ shuffleGlyphs: () => void }>(null);
+
   return ( 
     <div className={`min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 pl-2 pr-4 selection:bg-red-700 selection:text-white font-['Inter']${isInitialLoad ? ' overflow-hidden' : ''}`} style={{ position: 'relative', zIndex: 1 }}>
-      <GlyphFieldOverlay currentScenario={currentScenarioTheme} />
+      {/* Glyph overlay with ref for shuffling */}
+      <GlyphFieldOverlay ref={glyphOverlayRef} currentScenario={currentScenarioTheme} />
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
@@ -1148,11 +1156,15 @@ const App: React.FC = () => {
         scenarios={SCENARIO_THEMES_LIST}
       />
       {/* SVG Eye for technohorror motif, below main menu buttons on mobile */}
-      <div className="w-full flex justify-center items-center mt-8 mb-2 sm:hidden" aria-hidden="true">
+      <div className="w-full flex justify-center items-center mt-8 mb-2 sm:hidden" aria-hidden="false">
         <img 
           src="eye.svg" 
           alt="Technohorror Eye" 
-          style={{ width: '25%', height: 'auto', display: 'block' }}
+          style={{ width: '25%', height: 'auto', display: 'block', cursor: 'pointer' }}
+          onClick={() => glyphOverlayRef.current?.shuffleGlyphs()}
+          tabIndex={0}
+          role="button"
+          aria-label="Shuffle glyphs"
         />
       </div>
     </div>
