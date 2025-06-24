@@ -833,8 +833,8 @@ const App: React.FC = () => {
         
         {!isGameOver && !isInitialLoad && ( 
           <div className="w-full max-w-lg text-center my-4"> 
-            <div className="relative w-full bg-gray-700 h-4 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
-              <div className="absolute top-0 left-2 z-10 text-yellow-400 text-sm" style={{ transform: 'translateY(-50%)' }}>
+            <div className="relative w-full bg-gray-700 h-6 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
+              <div className="absolute top-0 left-2 z-10 text-yellow-400 text-base" style={{ transform: 'translateY(-25%)' }}>
                 ❤
               </div>
               <div 
