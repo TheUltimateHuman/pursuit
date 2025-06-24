@@ -91,7 +91,7 @@ const GlyphFieldOverlay: React.FC = () => {
       setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, getRandomGlyph));
     }
     randomizeGlyphs();
-    const interval = setInterval(randomizeGlyphs, 1400); // Slower flicker (was 700ms)
+    const interval = setInterval(randomizeGlyphs, 4000); // Much slower flicker for visual spice
     return () => clearInterval(interval);
   }, [dimensions]);
 
@@ -953,6 +953,7 @@ const App: React.FC = () => {
                     > 
                       SELECT...
                     </button> 
+                    <div className="h-3" /> {/* Add vertical gap between buttons */}
                     <button 
                       key="custom" 
                       onClick={() => setIsCustomScenarioInputVisible(true)} 
