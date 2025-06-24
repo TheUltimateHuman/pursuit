@@ -174,21 +174,25 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
-  // Typing effect for title (fixed)
+  // Typing effect for title (with terminal-style underscore)
   const [typedTitle, setTypedTitle] = useState('');
+  const [typingIndex, setTypingIndex] = useState(0);
   useEffect(() => {
     const fullTitle = 'QUARRY';
     let i = 0;
     setTypedTitle('');
+    setTypingIndex(0);
     const timeout = setTimeout(() => {
       const interval = setInterval(() => {
         setTypedTitle((prev) => {
           if (i < fullTitle.length) {
             const next = prev + fullTitle[i];
             i++;
+            setTypingIndex(i);
             return next;
           } else {
             clearInterval(interval);
+            setTypingIndex(fullTitle.length);
             return prev;
           }
         });
@@ -667,6 +671,11 @@ const App: React.FC = () => {
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         >
           {typedTitle}
+          {typingIndex < 6 && (
+            <span style={{ color: '#ffe066', fontWeight: 400, fontFamily: 'inherit', marginLeft: '-0.1em', marginRight: '0.05em' }}>
+              _
+            </span>
+          )}
         </h1> 
         {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
           <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
@@ -802,7 +811,7 @@ const App: React.FC = () => {
                     <button 
                         key="random" 
                         onClick={() => handleStartGameWithTheme("random")}
-                        className={randomThemeButtonClass + " focus:ring-black"} 
+                        className={randomThemeButtonClass + " focus:ring-2 focus:ring-black focus:ring-opacity-75"} 
                         disabled={isLoading} 
                     > 
                         RANDOM
@@ -1041,6 +1050,12 @@ const App: React.FC = () => {
         onScenarioSelected={handleCustomScenarioSelected}
         scenarios={SCENARIO_THEMES_LIST}
       />
+      {/* Technohorror Eye Motif for mobile, below main menu buttons */}
+      <div className="w-full flex justify-center items-center mt-8 mb-2 sm:hidden" aria-hidden="true">
+        <span style={{ fontSize: '2.5rem', color: '#ffe066', filter: 'drop-shadow(0 0 6px #000)' }}>
+          👁
+        </span>
+      </div>
     </div>
   );
 };
