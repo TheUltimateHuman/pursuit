@@ -129,8 +129,9 @@ const GlyphFieldOverlay: React.FC<{ currentScenario?: string | null }> = ({ curr
       setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, () => getRandomGlyphForGenre(currentScenario)));
     }
     randomizeGlyphs();
-    const interval = setInterval(randomizeGlyphs, 10000); // Much slower animation (10 seconds) for a more atmospheric effect
-    return () => clearInterval(interval);
+    // Animation disabled: do not set interval
+    // const interval = setInterval(randomizeGlyphs, 10000);
+    // return () => clearInterval(interval);
   }, [dimensions, currentScenario]);
 
   return (
