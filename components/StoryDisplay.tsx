@@ -10,10 +10,10 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
   const [isTyping, setIsTyping] = useState(true);
   const [showDivider, setShowDivider] = useState(false);
 
-  // Split the text by the divider and process each part
-  const parts = text.split('◈ ◈ ◈');
-
   useEffect(() => {
+    // Split the text by the divider and process each part
+    const parts = text.split('◈ ◈ ◈');
+    
     // Reset typing state when text changes
     setTypedText('');
     setCurrentPartIndex(0);
@@ -65,7 +65,7 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
     return () => {
       cancelled = true;
     };
-  }, [text, parts]);
+  }, [text]); // Only depend on text, not parts
 
   return (
     <div className="bg-gray-800 bg-opacity-80 backdrop-blur-sm p-6 shadow-2xl w-full border border-gray-600" style={{ borderRadius: '4px' }}>
