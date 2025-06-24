@@ -521,7 +521,7 @@ const App: React.FC = () => {
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
         <h1 
-          className={`text-8xl md:text-8xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+          className={`text-7xl md:text-7xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
           onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         > 
