@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface StoryDisplayProps {
   text: string;
@@ -6,66 +6,59 @@ interface StoryDisplayProps {
 
 const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
   const [typedText, setTypedText] = useState('');
-  const [currentPartIndex, setCurrentPartIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
   const [showDivider, setShowDivider] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Split the text by the divider and process each part
     const parts = text.split('◈ ◈ ◈');
-    
-    // Reset typing state when text changes
+    let currentPart = 0;
+    let currentCharIndex = 0;
+    let accumulator = '';
+    let cancelled = false;
+
     setTypedText('');
-    setCurrentPartIndex(0);
     setIsTyping(true);
     setShowDivider(false);
 
-    let currentCharIndex = 0;
-    let currentPart = 0;
-    let cancelled = false;
-
     function typeNextChar() {
       if (cancelled) return;
-
       if (currentPart >= parts.length) {
         setIsTyping(false);
         return;
       }
-
       const currentPartText = parts[currentPart];
-      
       if (currentCharIndex < currentPartText.length) {
-        setTypedText(prev => prev + currentPartText[currentCharIndex]);
+        accumulator = accumulator + currentPartText[currentCharIndex];
+        setTypedText(accumulator);
         currentCharIndex++;
-        setTimeout(typeNextChar, 30); // Faster typing speed than title
+        timeoutRef.current = setTimeout(typeNextChar, 30);
       } else {
-        // Finished typing current part
         if (currentPart < parts.length - 1) {
-          // Show divider for a moment before continuing
           setShowDivider(true);
-          setTimeout(() => {
+          timeoutRef.current = setTimeout(() => {
             if (!cancelled) {
               setShowDivider(false);
-              setTypedText(prev => prev + '◈ ◈ ◈');
+              accumulator = accumulator + '◈ ◈ ◈';
+              setTypedText(accumulator);
               currentPart++;
               currentCharIndex = 0;
-              setTimeout(typeNextChar, 200); // Pause before next part
+              timeoutRef.current = setTimeout(typeNextChar, 200);
             }
-          }, 500); // Show divider for 500ms
+          }, 500);
         } else {
-          // Finished all parts
           setIsTyping(false);
         }
       }
     }
 
-    // Start typing after a short delay
-    setTimeout(typeNextChar, 100);
+    timeoutRef.current = setTimeout(typeNextChar, 100);
 
     return () => {
       cancelled = true;
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [text]); // Only depend on text, not parts
+  }, [text]);
 
   return (
     <div className="bg-gray-800 bg-opacity-80 backdrop-blur-sm p-6 shadow-2xl w-full border border-gray-600" style={{ borderRadius: '4px' }}>
