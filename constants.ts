@@ -808,9 +808,20 @@ INVENTORY MANAGEMENT DURING GAMEPLAY:
 * **Narrative Integration**: When adding an item, describe its discovery naturally within the sceneDescription. The item should feel like a logical consequence of the player's actions.
 * **Item Removal**: Use removeItem when items are consumed, lost, or destroyed through player actions or narrative events (e.g., using a key to unlock a door, losing items during a chase, items being damaged in combat).
 
+NARRATIVE FORMATTING FOR READABILITY:
+* **Paragraph Breaks**: Use paragraph breaks (double line breaks) to separate different aspects of the scene. For example: separate environment description from threat presence, or player's immediate situation from sensory details.
+* **Scene Structure**: Organize sceneDescription into logical sections: environment/setting, threat presence/behavior, player's immediate situation, and sensory/atmospheric details.
+* **Combat/Crisis Formatting**: During intense moments, use paragraph breaks to separate immediate action, environmental effects, threat behavior, and player's condition for better readability.
+* **Example Structure**: 
+  - First paragraph: Immediate environment and setting
+  - Second paragraph: Threat presence and behavior
+  - Third paragraph: Player's immediate situation and available options
+  - Additional paragraphs: Sensory details, atmospheric elements, or specific interactions
+* **Readability Priority**: The goal is to make the narrative easier to read and digest, especially during tense or complex scenes.
+
 BASE JSON RESPONSE STRUCTURE (NON-COMBAT/NON-CRISIS):
 {
-  "sceneDescription": "string (Atmospheric, dread-inducing narrative, 80-120 words)",
+  "sceneDescription": "string (Atmospheric, dread-inducing narrative, 80-120 words. Use paragraph breaks and new lines to separate different aspects of the scene - environment, threat presence, player's immediate situation, and sensory details. This improves readability and creates better scene structure.)",
   "choices": [ // EXACTLY 4 Choice objects. Refer to "CHOICE PHRASING" and "CHOICE GENERATION GUIDANCE" rules.
     { "text": "Action 1", "triggersCombat": false },
     { "text": "Action 2, possibly leading to combat/crisis", "triggersCombat": true }, // Ensure one such option if threat is 'imminent'
@@ -833,7 +844,7 @@ BASE JSON RESPONSE STRUCTURE (NON-COMBAT/NON-CRISIS):
 
 COMBAT/CRISIS JSON RESPONSE STRUCTURE (WHEN 'engaged'):
 {
-  "sceneDescription": "string (Concise, visceral narrative of this combat/crisis turn, 60-100 words.)",
+  "sceneDescription": "string (Concise, visceral narrative of this combat/crisis turn, 60-100 words. Use paragraph breaks and new lines to separate different aspects - immediate action, environmental effects, threat behavior, and player's condition. This improves readability during intense moments.)",
   "combatOutcome": { ... as defined above ... },
   "combatChoices": [ // EXACTLY 4 Choice objects. Refer to "CHOICE PHRASING" and "CHOICE GENERATION GUIDANCE" rules.
     { "text": "Offensive Action A", "triggersCombat": false },
