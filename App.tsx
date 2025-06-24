@@ -296,6 +296,7 @@ const App: React.FC = () => {
     let pauseTimeout: NodeJS.Timeout | null = null;
     let blinkInterval: NodeJS.Timeout | null = null;
     let isPaused = false;
+    let moveTimeout: NodeJS.Timeout | null = null;
     
     const startBlinking = () => {
       setIsUnderscoreVisible(true);
@@ -308,13 +309,11 @@ const App: React.FC = () => {
       setIsUnderscoreVisible(true);
     };
     
-    const interval = setInterval(() => {
+    function moveUnderscore() {
       if (isPaused) return;
-      
       const currentPos = underscorePosRef.current;
       const currentDir = underscoreDirRef.current;
       const newPos = currentPos + currentDir;
-      
       // If we hit Q (pos === 0) while moving left, or Y (pos === length-1) while moving right
       if (newPos <= 0) {
         underscoreDirRef.current = 1; // Start moving right (Q to Y)
@@ -328,6 +327,7 @@ const App: React.FC = () => {
         pauseTimeout = setTimeout(() => {
           isPaused = false;
           stopBlinking();
+          moveUnderscore();
         }, pauseDuration * 1800); // Each tick is 1.8s
       } else if (newPos >= fullTitle.length - 1) {
         underscoreDirRef.current = -1; // Start moving left (Y to Q)
@@ -341,18 +341,22 @@ const App: React.FC = () => {
         pauseTimeout = setTimeout(() => {
           isPaused = false;
           stopBlinking();
+          moveUnderscore();
         }, pauseDuration * 1800); // Each tick is 1.8s
       } else {
         underscorePosRef.current = newPos;
         setUnderscorePos(newPos);
         stopBlinking();
+        // Randomize next move interval (e.g., 1.1s to 2.2s)
+        const randomMove = 1100 + Math.random() * 1100;
+        moveTimeout = setTimeout(moveUnderscore, randomMove);
       }
-    }, 1800); // Much slower animation (1.8s per tick, was 800ms)
-    
+    }
+    moveUnderscore();
     return () => {
-      clearInterval(interval);
       if (pauseTimeout) clearTimeout(pauseTimeout);
       if (blinkInterval) clearInterval(blinkInterval);
+      if (moveTimeout) clearTimeout(moveTimeout);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typingIndex]);
