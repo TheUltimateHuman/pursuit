@@ -223,12 +223,13 @@ const App: React.FC = () => {
     
     const interval = setInterval(() => {
       setUnderscorePos((pos) => {
+        const newPos = pos + underscoreDir;
         // If we hit Q (pos === 0) while moving left, or Y (pos === length-1) while moving right
-        if ((pos === 0 && underscoreDir === -1) || (pos === fullTitle.length - 1 && underscoreDir === 1)) {
+        if (newPos <= 0 || newPos >= fullTitle.length - 1) {
           setUnderscoreDir(dir => -dir); // Reverse direction
-          return pos + (-underscoreDir); // Move in new direction
+          return newPos <= 0 ? 0 : fullTitle.length - 1; // Clamp to bounds
         }
-        return pos + underscoreDir;
+        return newPos;
       });
     }, 400); // Keep the same ominous speed
     
@@ -699,7 +700,7 @@ const App: React.FC = () => {
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
         <h1 
           className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
-          style={{ fontSize: '4.5rem', letterSpacing: '0.15em', minHeight: '6.5rem', position: 'relative' }}
+          style={{ fontSize: '3.5rem', letterSpacing: '0.1em', minHeight: '5rem', position: 'relative' }}
           onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         >
