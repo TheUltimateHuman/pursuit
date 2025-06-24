@@ -10,7 +10,7 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
   
   return (
     <div className="bg-gray-800 bg-opacity-80 backdrop-blur-sm p-6 shadow-2xl w-full border border-gray-600" style={{ borderRadius: '4px' }}>
-      <div className="text-lg md:text-xl leading-relaxed text-gray-100 custom-scroll max-h-96 overflow-y-auto font-['Inter']">
+      <div className="text-lg md:text-xl leading-relaxed text-gray-100 font-['Inter']">
         {parts.map((part, index) => (
           <React.Fragment key={index}>
             <p className="whitespace-pre-line">{part}</p>
