@@ -91,7 +91,7 @@ const GlyphFieldOverlay: React.FC = () => {
       setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, getRandomGlyph));
     }
     randomizeGlyphs();
-    const interval = setInterval(randomizeGlyphs, 350); // Flicker every 350ms
+    const interval = setInterval(randomizeGlyphs, 700); // Slower flicker (was 350ms)
     return () => clearInterval(interval);
   }, [dimensions]);
 
@@ -216,20 +216,23 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Animate underscore after typing finishes
+  // Terminal-style underline animation: move left to right, then right to left, under each letter
   useEffect(() => {
     if (typingIndex < fullTitle.length) return;
     setUnderscorePos(0);
     setUnderscoreDir(1);
     const interval = setInterval(() => {
       setUnderscorePos((pos) => {
-        if (pos + underscoreDir >= fullTitle.length || pos + underscoreDir < 0) {
-          setUnderscoreDir((dir) => -dir);
-          return pos + -underscoreDir;
+        if (pos + underscoreDir >= fullTitle.length) {
+          setUnderscoreDir(-1);
+          return pos - 1;
+        } else if (pos + underscoreDir < 0) {
+          setUnderscoreDir(1);
+          return pos + 1;
         }
         return pos + underscoreDir;
       });
-    }, 400); // Slower, more ominous
+    }, 400); // Ominous speed
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typingIndex]);
@@ -1105,7 +1108,7 @@ const App: React.FC = () => {
         <img 
           src="eye.svg" 
           alt="Technohorror Eye" 
-          style={{ width: '50%', height: 'auto', display: 'block' }}
+          style={{ width: '25%', height: 'auto', display: 'block' }}
         />
       </div>
     </div>
