@@ -516,12 +516,13 @@ const App: React.FC = () => {
 
 
   return ( 
-    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-2 pb-4 px-4 selection:bg-red-700 selection:text-white font-['Inter']"> 
+    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 px-4 selection:bg-red-700 selection:text-white font-['Inter']"> 
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
         <h1 
-          className={`text-7xl md:text-7xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+          className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+          style={{ fontSize: '5.625rem' }}
           onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         > 
