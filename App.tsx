@@ -276,13 +276,11 @@ const App: React.FC = () => {
           // Blink if pause is long enough
           if (randomPause > 400) setBlinking(true); else setBlinking(false);
           setTimeout(() => {
-            setBlinking(false);
             typeNextChar();
           }, randomPause);
           return next;
         } else {
           setTypingIndex(fullTitle.length);
-          setBlinking(false);
           return prev;
         }
       });
