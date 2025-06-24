@@ -62,13 +62,13 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
-  // Random glyph starfield for background overlay
+  // Generate a random glyph starfield overlay ONCE per page load
   const glyphs = ['.', '·', '•', '░', '▒', '▓', '█', '╳', '╬', '¤', '†', '§', 'Ω', 'Ψ', 'Ξ', 'Ж'];
   const glyphStarfield = useMemo(() => {
     const lines = [];
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 18; i++) { // 18 lines for full screen height
       let line = '';
-      for (let j = 0; j < 64; j++) {
+      for (let j = 0; j < 80; j++) { // 80 glyphs per line for wide screens
         const pool = Math.random() < 0.7 ? ['.', '·', '•'] : glyphs;
         line += pool[Math.floor(Math.random() * pool.length)];
       }
@@ -532,415 +532,409 @@ const App: React.FC = () => {
 
 
   return ( 
-    <div className="relative min-h-screen w-full bg-gray-900 overflow-x-hidden">
-      {/* Glyph starfield overlay background */}
+    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 px-4 selection:bg-red-700 selection:text-white font-['Inter'] relative overflow-x-hidden">
+      {/* Glyph starfield overlay, very transparent, yellow, beneath all content */}
       <pre
-        className="fixed inset-0 w-full h-full pointer-events-none select-none font-mono text-yellow-400 z-0"
+        className="fixed inset-0 w-full h-full pointer-events-none select-none z-0 text-yellow-400 font-mono opacity-10 text-xs md:text-base"
         style={{
-          opacity: 0.08,
-          fontSize: 'clamp(8px, 1.2vw, 18px)',
           lineHeight: '1.1',
           userSelect: 'none',
-          background: 'transparent',
+          color: '#facc15', // Tailwind yellow-400
+          background: 'none',
           whiteSpace: 'pre',
         }}
         aria-hidden="true"
-      >
-        {glyphStarfield}
-      </pre>
+      >{glyphStarfield}</pre>
       
-      <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 px-4 selection:bg-red-700 selection:text-white font-['Inter']"> 
-        {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
+      {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
+      
+      <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
+        <h1 
+          className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+          style={{ fontSize: '5.625rem' }}
+          onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
+          title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
+        > 
+          QUARRY 
+        </h1> 
+        {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
+          <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
+            "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|EXISTENTIAL HORROR:|COSMIC HORROR:|SURREAL:|MUNDANE:|CONTEMPORARY:|MYSTERY:|SCIENCE FICTION:|SCI_FI:|MODERN:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
+          </p>
+        )}
+      </header> 
+
+      <main className="w-full max-w-3xl flex flex-col items-center"> 
         
-        <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
-          <h1 
-            className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
-            style={{ fontSize: '5.625rem' }}
-            onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
-            title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
-          > 
-            QUARRY 
-          </h1> 
-          {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
-            <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
-              "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|EXISTENTIAL HORROR:|COSMIC HORROR:|SURREAL:|MUNDANE:|CONTEMPORARY:|MYSTERY:|SCIENCE FICTION:|SCI_FI:|MODERN:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
-            </p>
-          )}
-        </header> 
+        {(!isInitialLoad || currentStory.sceneDescription !== "Welcome to QUARRY.") && ( 
+            <div className="relative w-full max-w-3xl mb-8">
+                <StoryDisplay text={currentStory.sceneDescription} />
+                {showRegenerateButton && (
+                    <button
+                        onClick={handleRegenerateInitialScene}
+                        disabled={isLoading}
+                        className="absolute top-2 right-2 bg-gray-500 text-white font-semibold p-1.5 shadow-md transition-all duration-150 ease-in-out hover:bg-gray-400 hover:shadow-lg transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none text-base border border-gray-400"
+                        style={{ borderRadius: '4px' }}
+                        title="Regenerate Initial Scene (same category)"
+                        aria-label="Regenerate Initial Scene (same category)"
+                    >
+                        ⥁
+                    </button>
+                )}
+            </div>
+        )} 
 
-        <main className="w-full max-w-3xl flex flex-col items-center"> 
-          
-          {(!isInitialLoad || currentStory.sceneDescription !== "Welcome to QUARRY.") && ( 
-              <div className="relative w-full max-w-3xl mb-8">
-                  <StoryDisplay text={currentStory.sceneDescription} />
-                  {showRegenerateButton && (
-                      <button
-                          onClick={handleRegenerateInitialScene}
-                          disabled={isLoading}
-                          className="absolute top-2 right-2 bg-gray-500 text-white font-semibold p-1.5 shadow-md transition-all duration-150 ease-in-out hover:bg-gray-400 hover:shadow-lg transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none text-base border border-gray-400"
-                          style={{ borderRadius: '4px' }}
-                          title="Regenerate Initial Scene (same category)"
-                          aria-label="Regenerate Initial Scene (same category)"
-                      >
-                          ⥁
-                      </button>
-                  )}
-              </div>
-          )} 
-
-          {currentStory.persistentThreat && !isGameOver && !isInitialLoad && ( 
-            <PersistentThreatDisplay 
-              threat={currentStory.persistentThreat} 
-              message={currentStory.threatEncounterMessage} 
-              isInCombat={currentStory.isInCombat} 
-            /> 
-          )} 
-          
-          {!isGameOver && !isInitialLoad && ( 
-            <div className="w-full max-w-lg text-center my-4"> 
-              <div className="text-xl font-semibold text-red-300 mb-1"> 
-                HEALTH: {playerHealth} / {MAX_PLAYER_HEALTH} 
-              </div> 
-              <div className="w-full bg-gray-700 h-4 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
-                <div 
-                  className="bg-gradient-to-r from-red-500 to-red-700 h-full transition-all duration-300 ease-out" 
-                  style={{ width: `${Math.max(0, (playerHealth / MAX_PLAYER_HEALTH) * 100)}%`, borderRadius: '2px' }} 
-                  aria-valuenow={playerHealth} 
-                  aria-valuemin={0} 
-                  aria-valuemax={MAX_PLAYER_HEALTH} 
-                ></div> 
-              </div> 
+        {currentStory.persistentThreat && !isGameOver && !isInitialLoad && ( 
+          <PersistentThreatDisplay 
+            threat={currentStory.persistentThreat} 
+            message={currentStory.threatEncounterMessage} 
+            isInCombat={currentStory.isInCombat} 
+          /> 
+        )} 
+        
+        {!isGameOver && !isInitialLoad && ( 
+          <div className="w-full max-w-lg text-center my-4"> 
+            <div className="text-xl font-semibold text-red-300 mb-1"> 
+              HEALTH: {playerHealth} / {MAX_PLAYER_HEALTH} 
             </div> 
-          )} 
-
-          {!isInitialLoad && <InventoryDisplay items={inventory} />} 
-
-          {!isInitialLoad && playerAbilities.length > 0 && !isGameOver && (
-              <div className="bg-purple-800 bg-opacity-60 backdrop-blur-md p-4 shadow-xl mb-6 max-w-3xl w-full border border-purple-600" style={{ borderRadius: '4px' }}> 
-                  <h3 className="text-lg font-semibold text-purple-200 mb-2 border-b border-purple-300 pb-1">Abilities:</h3> 
-                  <ul className="list-none text-gray-200 flex flex-col space-y-1 custom-scroll max-h-24 overflow-y-auto pr-2"> 
-                      {playerAbilities.map((ability, index) => ( 
-                          <li key={index} className="text-sm py-0.5 hover:text-purple-100 transition-colors duration-150" title={ability.description}> 
-                              <span className="text-purple-300 mr-1.5">&#✦</span> {ability.name} {ability.uses !== undefined && ability.uses !== null ? `(${ability.uses} use${ability.uses === 1 ? '' : 's'} left)` : ''} 
-                          </li> 
-                      ))} 
-                  </ul> 
-              </div> 
-          )} 
-
-          {currentStory.isInCombat && currentStory.combatLog.length > 0 && !isGameOver && ( 
-            <div className="bg-gray-800 bg-opacity-75 p-3 shadow-md mb-4 max-w-3xl w-full max-h-40 overflow-y-auto custom-scroll border border-gray-600" style={{ borderRadius: '4px' }}> 
-              <h4 className="text-md font-semibold text-red-400 mb-1">Combat Log:</h4> 
-              {currentStory.combatLog.map((logEntry, index) => ( 
-                <p key={index} className="text-sm text-gray-200 py-0.5 whitespace-pre-line">▶ {logEntry}</p> 
-              ))} 
+            <div className="w-full bg-gray-700 h-4 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
+              <div 
+                className="bg-gradient-to-r from-red-500 to-red-700 h-full transition-all duration-300 ease-out" 
+                style={{ width: `${Math.max(0, (playerHealth / MAX_PLAYER_HEALTH) * 100)}%`, borderRadius: '2px' }} 
+                aria-valuenow={playerHealth} 
+                aria-valuemin={0} 
+                aria-valuemax={MAX_PLAYER_HEALTH} 
+              ></div> 
             </div> 
-          )} 
-
-          {isGameOver && (persistentThreat?.status === 'defeated' || gameEndType === 'alternate_win') && ( 
-             <div className="w-full max-w-3xl flex flex-col items-center my-6"> 
-              <p className="text-4xl font-bold text-green-400 my-4 tracking-wider uppercase" 
-                 aria-live="polite"> 
-                    SUCCESS 
-                </p> 
-                <div className="bg-green-800 bg-opacity-60 backdrop-blur-md p-6 shadow-xl mb-6 max-w-2xl w-full text-center border-2 border-green-600" style={{ borderRadius: '4px' }}>
-                  <p className="text-lg mb-4 whitespace-pre-line text-green-100 leading-relaxed"> 
-                    {gameOverSummaryText || "Victory achieved."} 
-                  </p> 
-                </div>
-                <button 
-                  onClick={startGame} 
-                  className="bg-gray-600 text-white font-semibold py-3 px-6 shadow-md transition-all duration-150 ease-in-out hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 text-lg border border-gray-400" 
-                  style={{ borderRadius: '4px' }}
-                > 
-                  Play Again 
-                </button> 
-             </div> 
-          )}
-
-          {isGameOver && persistentThreat?.status !== 'defeated' && gameEndType !== 'alternate_win' && ( 
-            <div className="bg-black bg-opacity-80 p-6 shadow-xl mb-6 max-w-3xl w-full text-center border-2 border-red-700" style={{ borderRadius: '4px' }}> 
-              <h2 className="text-3xl font-bold text-red-500 mb-3">GAME OVER</h2> 
-              <p className="text-xl mb-4 whitespace-pre-line text-gray-300"> 
-                {error || gameOverSummaryText || "The End."} 
-              </p> 
-              <button 
-                onClick={startGame} 
-                className="mt-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 shadow-md transition duration-150 text-lg border border-gray-500" 
-                style={{ borderRadius: '4px' }}
-              > 
-                Play Again 
-              </button> 
-             </div> 
-          )} 
-
-          {error && !isGameOver && ( 
-            <div className="bg-red-800 bg-opacity-90 p-4 shadow-md mb-6 max-w-3xl w-full text-center" style={{ borderRadius: '4px' }}> 
-              <p className="font-semibold text-yellow-300">Error:</p> 
-              <p className="text-gray-200">{error}</p> 
-              <button 
-                onClick={startGame} 
-                className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 shadow transition duration-150 border border-gray-500" 
-                style={{ borderRadius: '4px' }}
-              > 
-                Restart 
-              </button> 
-            </div> 
-          )} 
-          
-          <div className="w-full max-w-xl flex flex-col items-center mt-4 md:mt-6"> 
-
-              {isDisplayingInitialStartOptions && (
-                   <>
-                   <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4"> 
-                      <button 
-                          key="random" 
-                          onClick={() => handleStartGameWithTheme("random")} 
-                          className={randomThemeButtonClass} 
-                          disabled={isLoading} 
-                      > 
-                          Random 
-                      </button> 
-                      <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>Realism</button> 
-                      <button 
-                        key="select" 
-                        onClick={() => setIsCustomScenarioModalVisible(true)} 
-                        className={customThemeButtonClass} 
-                        disabled={isLoading} 
-                      > 
-                        Select... 
-                      </button> 
-                      <button 
-                        key="custom" 
-                        onClick={() => setIsCustomScenarioInputVisible(true)} 
-                        className={customThemeButtonClass} 
-                        disabled={isLoading} 
-                      > 
-                        Custom... 
-                      </button> 
-                  </div>
-                  </>
-              )}
-
-              {/* Custom Scenario Input Modal */}
-              {isDisplayingInitialStartOptions && isCustomScenarioInputVisible && !isLoading && (
-                  <div className="w-full flex flex-col items-center space-y-3 mt-4">
-                      <div className="w-full max-w-md">
-                          <label htmlFor="customScenario" className="block text-sm font-medium text-gray-300 mb-2">
-                              Enter your custom scenario (max 200 characters):
-                          </label>
-                          <textarea 
-                              id="customScenario"
-                              value={customScenarioText} 
-                              onChange={(e) => setCustomScenarioText(e.target.value)} 
-                              placeholder="e.g., Derelict Spaceship, Ancient Ruin Exploration, Corporate Espionage... (Add 'REALISM:' prefix for realistic scenarios)" 
-                              rows={3} 
-                              maxLength={200}
-                              className="w-full p-3 bg-gray-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
-                              style={{ borderRadius: '4px' }}
-                              disabled={isLoading} 
-                              aria-label="Custom scenario input" 
-                          />
-                          <div className="text-xs text-gray-400 mt-1 text-right">
-                              {customScenarioText.length}/200 characters
-                          </div>
-                      </div>
-                      <div className="flex space-x-3 w-full sm:w-auto">
-                          <button 
-                              onClick={handleCustomScenarioSubmit} 
-                              disabled={isLoading || !customScenarioText.trim()} 
-                              className="flex-1 sm:flex-none bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:bg-red-400 disabled:cursor-not-allowed border border-red-500" 
-                              style={{ borderRadius: '4px' }}
-                          > 
-                              Start Game 
-                          </button> 
-                          <button 
-                              onClick={() => setIsCustomScenarioInputVisible(false)} 
-                              disabled={isLoading} 
-                              className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed border border-gray-600" 
-                              style={{ borderRadius: '4px' }}
-                          > 
-                              Cancel 
-                          </button>
-                      </div> 
-                  </div> 
-              )}
-
-              {!isDisplayingInitialStartOptions && isCustomChoiceInputVisible && !isGameOver && !isLoading && ( 
-                  <div className="w-full flex flex-col items-center space-y-3"> 
-                      <textarea 
-                          id="customChoice" 
-                          value={customChoiceText} 
-                          onChange={(e) => setCustomChoiceText(e.target.value)} 
-                          placeholder="Describe your action in detail..." 
-                          rows={3} 
-                          className="w-full p-3 bg-gray-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
-                          style={{ borderRadius: '4px' }}
-                          disabled={isLoading} 
-                          aria-label="Custom choice input" 
-                      />
-                      <div className="flex space-x-3 w-full sm:w-auto">
-                          <button 
-                              onClick={handleCustomChoiceSubmit} 
-                              disabled={isLoading || !customChoiceText.trim()} 
-                              className="flex-1 sm:flex-none bg-gray-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:bg-gray-400 disabled:cursor-not-allowed border border-gray-400" 
-                              style={{ borderRadius: '4px' }}
-                          > 
-                              Submit 
-                          </button> 
-                          <button 
-                              onClick={() => setIsCustomChoiceInputVisible(false)} 
-                              disabled={isLoading} 
-                              className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed border border-gray-600" 
-                              style={{ borderRadius: '4px' }}
-                          > 
-                              Cancel 
-                          </button> 
-                      </div> 
-                  </div> 
-              )} 
-
-              {!isDisplayingInitialStartOptions && !isGameOver && !isCustomChoiceInputVisible && !isLoading && ( 
-                  <> 
-                      <button 
-                          onClick={() => { 
-                              setIsCustomChoiceInputVisible(true); 
-                              setCustomChoiceText(""); 
-                          }} 
-                          disabled={isLoading} 
-                          className="w-full bg-gray-700 text-white font-semibold py-3 px-5 shadow-md 
-                                       transition-all duration-150 ease-in-out 
-                                       hover:bg-gray-600 hover:shadow-lg transform hover:scale-105 
-                                       focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 
-                                       disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none 
-                                       border border-gray-600 mb-4" 
-                          style={{ borderRadius: '4px' }}
-                      > 
-                          Write your own... 
-                      </button> 
-
-                      {currentDisplayedChoices.length > 0 && ( 
-                          <ChoicesDisplay 
-                              choices={currentDisplayedChoices} 
-                              onChoiceSelected={handleChoiceSelected} 
-                              disabled={isLoading} 
-                              isInCombat={currentStory.isInCombat}
-                          /> 
-                      )} 
-                  </> 
-              )} 
-
-              {/* Enhanced Memory Log - Shows below choices */}
-              {!isDisplayingInitialStartOptions && !isGameOver && !isLoading && (memoryLog.length > 0 || playerChoices.length > 0) && (
-                  <div className="w-full max-w-3xl mt-6">
-                      <div className="bg-gray-700 bg-opacity-60 backdrop-blur-md p-4 shadow-xl border border-gray-500" style={{ borderRadius: '4px' }}>
-                          <h3 className="text-lg font-semibold text-yellow-300 mb-3 border-b border-yellow-400 pb-1">Memory Log:</h3>
-                          <div className="max-h-48 overflow-y-auto custom-scroll pr-2 space-y-2">
-                              {(() => {
-                                  // Create combined timeline of events and choices
-                                  const timeline = [];
-                                  
-                                  // Add events with type marker
-                                  memoryLog.slice(-6).forEach((entry, index) => {
-                                      timeline.push({
-                                          type: 'event',
-                                          content: entry,
-                                          originalIndex: index
-                                      });
-                                  });
-                                  
-                                  // Add choices with type marker
-                                  playerChoices.slice(-4).forEach((choice, index) => {
-                                      timeline.push({
-                                          type: 'choice',
-                                          content: choice,
-                                          originalIndex: index
-                                      });
-                                  });
-                                  
-                                  // Sort by original index to maintain chronological order
-                                  timeline.sort((a, b) => a.originalIndex - b.originalIndex);
-                                  
-                                  // Display interleaved timeline
-                                  return timeline.map((item, index) => (
-                                      <div 
-                                          key={`timeline-${index}`} 
-                                          className={`text-sm text-gray-200 py-1 border-l-2 pl-3 ${
-                                              item.type === 'event' 
-                                                  ? 'border-yellow-400' 
-                                                  : 'border-red-700'
-                                          }`}
-                                      >
-                                          <span className={`font-medium ${
-                                              item.type === 'event' 
-                                                  ? 'text-yellow-300' 
-                                                  : 'text-red-300'
-                                          }`}>
-                                              {item.type === 'event' ? 'Event:' : 'Choice:'}
-                                          </span> {item.content}
-                                      </div>
-                                  ));
-                              })()}
-                          </div>
-                      </div>
-                  </div>
-              )}
-              
-              {!isDisplayingInitialStartOptions && !isLoading && !error && !isGameOver && currentDisplayedChoices.length === 0 && !isCustomChoiceInputVisible && (
-                   <div className="text-center p-4 bg-gray-800 border border-gray-700 w-full" style={{ borderRadius: '4px' }}>
-                       <p className="text-xl text-gray-400">No clear path...</p>
-                       <button 
-                           onClick={() => setIsCustomChoiceInputVisible(true)} 
-                           className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 shadow transition duration-150 border border-gray-500" 
-                           style={{ borderRadius: '4px' }}
-                       > 
-                           Describe Your Action 
-                       </button> 
-                   </div>
-               )}
           </div> 
-        </main> 
+        )} 
+
+        {!isInitialLoad && <InventoryDisplay items={inventory} />} 
+
+        {!isInitialLoad && playerAbilities.length > 0 && !isGameOver && (
+            <div className="bg-purple-800 bg-opacity-60 backdrop-blur-md p-4 shadow-xl mb-6 max-w-3xl w-full border border-purple-600" style={{ borderRadius: '4px' }}> 
+                <h3 className="text-lg font-semibold text-purple-200 mb-2 border-b border-purple-300 pb-1">Abilities:</h3> 
+                <ul className="list-none text-gray-200 flex flex-col space-y-1 custom-scroll max-h-24 overflow-y-auto pr-2"> 
+                    {playerAbilities.map((ability, index) => ( 
+                        <li key={index} className="text-sm py-0.5 hover:text-purple-100 transition-colors duration-150" title={ability.description}> 
+                            <span className="text-purple-300 mr-1.5">&#✦</span> {ability.name} {ability.uses !== undefined && ability.uses !== null ? `(${ability.uses} use${ability.uses === 1 ? '' : 's'} left)` : ''} 
+                        </li> 
+                    ))} 
+                </ul> 
+            </div> 
+        )} 
+
+        {currentStory.isInCombat && currentStory.combatLog.length > 0 && !isGameOver && ( 
+          <div className="bg-gray-800 bg-opacity-75 p-3 shadow-md mb-4 max-w-3xl w-full max-h-40 overflow-y-auto custom-scroll border border-gray-600" style={{ borderRadius: '4px' }}> 
+            <h4 className="text-md font-semibold text-red-400 mb-1">Combat Log:</h4> 
+            {currentStory.combatLog.map((logEntry, index) => ( 
+              <p key={index} className="text-sm text-gray-200 py-0.5 whitespace-pre-line">▶ {logEntry}</p> 
+            ))} 
+          </div> 
+        )} 
+
+        {isGameOver && (persistentThreat?.status === 'defeated' || gameEndType === 'alternate_win') && ( 
+           <div className="w-full max-w-3xl flex flex-col items-center my-6"> 
+            <p className="text-4xl font-bold text-green-400 my-4 tracking-wider uppercase" 
+               aria-live="polite"> 
+                SUCCESS 
+            </p> 
+            <div className="bg-green-800 bg-opacity-60 backdrop-blur-md p-6 shadow-xl mb-6 max-w-2xl w-full text-center border-2 border-green-600" style={{ borderRadius: '4px' }}>
+              <p className="text-lg mb-4 whitespace-pre-line text-green-100 leading-relaxed"> 
+                {gameOverSummaryText || "Victory achieved."} 
+              </p> 
+            </div>
+            <button 
+              onClick={startGame} 
+              className="bg-gray-600 text-white font-semibold py-3 px-6 shadow-md transition-all duration-150 ease-in-out hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 text-lg border border-gray-400" 
+              style={{ borderRadius: '4px' }}
+            > 
+              Play Again 
+            </button> 
+           </div> 
+        )}
+
+        {isGameOver && persistentThreat?.status !== 'defeated' && gameEndType !== 'alternate_win' && ( 
+          <div className="bg-black bg-opacity-80 p-6 shadow-xl mb-6 max-w-3xl w-full text-center border-2 border-red-700" style={{ borderRadius: '4px' }}> 
+            <h2 className="text-3xl font-bold text-red-500 mb-3">GAME OVER</h2> 
+            <p className="text-xl mb-4 whitespace-pre-line text-gray-300"> 
+              {error || gameOverSummaryText || "The End."} 
+            </p> 
+            <button 
+              onClick={startGame} 
+              className="mt-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 shadow-md transition duration-150 text-lg border border-gray-500" 
+              style={{ borderRadius: '4px' }}
+            > 
+              Play Again 
+            </button> 
+           </div> 
+        )} 
+
+        {error && !isGameOver && ( 
+          <div className="bg-red-800 bg-opacity-90 p-4 shadow-md mb-6 max-w-3xl w-full text-center" style={{ borderRadius: '4px' }}> 
+            <p className="font-semibold text-yellow-300">Error:</p> 
+            <p className="text-gray-200">{error}</p> 
+            <button 
+              onClick={startGame} 
+              className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 shadow transition duration-150 border border-gray-500" 
+              style={{ borderRadius: '4px' }}
+            > 
+              Restart 
+            </button> 
+          </div> 
+        )} 
         
-        <ScenarioSelectorModal 
-          isOpen={isCustomScenarioModalVisible} 
-          onClose={() => setIsCustomScenarioModalVisible(false)} 
-          onScenarioSelected={handleCustomScenarioSelected} 
-          scenarios={SCENARIO_THEMES_LIST} 
-        /> 
+        <div className="w-full max-w-xl flex flex-col items-center mt-4 md:mt-6"> 
 
-        {/* Return to Menu Modal */}
-        {isReturnToMenuModalVisible && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                  <div className="bg-gray-800 shadow-2xl w-full max-w-md flex flex-col border border-gray-600" style={{ borderRadius: '4px' }}>
-                      <div className="p-6 text-center">
-                          <h2 className="text-2xl font-bold text-yellow-400 font-['Chakra_Petch']">Return to Menu?</h2>
-                          <p className="text-gray-400 mt-3 mb-6">This will end your current game. Are you sure?</p>
-                          <div className="flex space-x-3">
-                              <button 
-                                  onClick={() => {
-                                      setIsReturnToMenuModalVisible(false);
-                                      startGame();
-                                  }} 
-                                  className="flex-1 bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 border border-red-500" 
-                                  style={{ borderRadius: '4px' }}
-                              > 
-                                  Return to Menu 
-                              </button> 
-                              <button 
-                                  onClick={() => setIsReturnToMenuModalVisible(false)} 
-                                  className="flex-1 bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-600" 
-                                  style={{ borderRadius: '4px' }}
-                              > 
-                                  Cancel 
-                              </button>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          )}
+            {isDisplayingInitialStartOptions && ( 
+                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4"> 
+                    <button 
+                        key="random" 
+                        onClick={() => handleStartGameWithTheme("random")} 
+                        className={randomThemeButtonClass} 
+                        disabled={isLoading} 
+                    > 
+                        Random 
+                    </button> 
+                    <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>Realism</button> 
+                    <button 
+                      key="select" 
+                      onClick={() => setIsCustomScenarioModalVisible(true)} 
+                      className={customThemeButtonClass} 
+                      disabled={isLoading} 
+                    > 
+                      Select... 
+                    </button> 
+                    <button 
+                      key="custom" 
+                      onClick={() => setIsCustomScenarioInputVisible(true)} 
+                      className={customThemeButtonClass} 
+                      disabled={isLoading} 
+                    > 
+                      Custom... 
+                    </button> 
+                </div> 
+            )} 
 
-    </div>
-  );
-};
+            {/* Custom Scenario Input Modal */}
+            {isDisplayingInitialStartOptions && isCustomScenarioInputVisible && !isLoading && (
+                <div className="w-full flex flex-col items-center space-y-3 mt-4">
+                    <div className="w-full max-w-md">
+                        <label htmlFor="customScenario" className="block text-sm font-medium text-gray-300 mb-2">
+                            Enter your custom scenario (max 200 characters):
+                        </label>
+                        <textarea 
+                            id="customScenario"
+                            value={customScenarioText} 
+                            onChange={(e) => setCustomScenarioText(e.target.value)} 
+                            placeholder="e.g., Derelict Spaceship, Ancient Ruin Exploration, Corporate Espionage... (Add 'REALISM:' prefix for realistic scenarios)" 
+                            rows={3} 
+                            maxLength={200}
+                            className="w-full p-3 bg-gray-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
+                            style={{ borderRadius: '4px' }}
+                            disabled={isLoading} 
+                            aria-label="Custom scenario input" 
+                        />
+                        <div className="text-xs text-gray-400 mt-1 text-right">
+                            {customScenarioText.length}/200 characters
+                        </div>
+                    </div>
+                    <div className="flex space-x-3 w-full sm:w-auto">
+                        <button 
+                            onClick={handleCustomScenarioSubmit} 
+                            disabled={isLoading || !customScenarioText.trim()} 
+                            className="flex-1 sm:flex-none bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:bg-red-400 disabled:cursor-not-allowed border border-red-500" 
+                            style={{ borderRadius: '4px' }}
+                        > 
+                            Start Game 
+                        </button> 
+                        <button 
+                            onClick={() => setIsCustomScenarioInputVisible(false)} 
+                            disabled={isLoading} 
+                            className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed border border-gray-600" 
+                            style={{ borderRadius: '4px' }}
+                        > 
+                            Cancel 
+                        </button>
+                    </div> 
+                </div> 
+            )}
 
-export default App;
+            {!isDisplayingInitialStartOptions && isCustomChoiceInputVisible && !isGameOver && !isLoading && ( 
+                <div className="w-full flex flex-col items-center space-y-3"> 
+                    <textarea 
+                        id="customChoice" 
+                        value={customChoiceText} 
+                        onChange={(e) => setCustomChoiceText(e.target.value)} 
+                        placeholder="Describe your action in detail..." 
+                        rows={3} 
+                        className="w-full p-3 bg-gray-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
+                        style={{ borderRadius: '4px' }}
+                        disabled={isLoading} 
+                        aria-label="Custom choice input" 
+                    />
+                    <div className="flex space-x-3 w-full sm:w-auto">
+                        <button 
+                            onClick={handleCustomChoiceSubmit} 
+                            disabled={isLoading || !customChoiceText.trim()} 
+                            className="flex-1 sm:flex-none bg-gray-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:bg-gray-400 disabled:cursor-not-allowed border border-gray-400" 
+                            style={{ borderRadius: '4px' }}
+                        > 
+                            Submit 
+                        </button> 
+                        <button 
+                            onClick={() => setIsCustomChoiceInputVisible(false)} 
+                            disabled={isLoading} 
+                            className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed border border-gray-600" 
+                            style={{ borderRadius: '4px' }}
+                        > 
+                            Cancel 
+                        </button> 
+                    </div> 
+                </div> 
+            )} 
+
+            {!isDisplayingInitialStartOptions && !isGameOver && !isCustomChoiceInputVisible && !isLoading && ( 
+                <> 
+                    <button 
+                        onClick={() => { 
+                            setIsCustomChoiceInputVisible(true); 
+                            setCustomChoiceText(""); 
+                        }} 
+                        disabled={isLoading} 
+                        className="w-full bg-gray-700 text-white font-semibold py-3 px-5 shadow-md 
+                                     transition-all duration-150 ease-in-out 
+                                     hover:bg-gray-600 hover:shadow-lg transform hover:scale-105 
+                                     focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 
+                                     disabled:bg-gray-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none 
+                                     border border-gray-600 mb-4" 
+                        style={{ borderRadius: '4px' }}
+                    > 
+                        Write your own... 
+                    </button> 
+
+                    {currentDisplayedChoices.length > 0 && ( 
+                        <ChoicesDisplay 
+                            choices={currentDisplayedChoices} 
+                            onChoiceSelected={handleChoiceSelected} 
+                            disabled={isLoading} 
+                            isInCombat={currentStory.isInCombat}
+                        /> 
+                    )} 
+                </> 
+            )} 
+
+            {/* Enhanced Memory Log - Shows below choices */}
+            {!isDisplayingInitialStartOptions && !isGameOver && !isLoading && (memoryLog.length > 0 || playerChoices.length > 0) && (
+                <div className="w-full max-w-3xl mt-6">
+                    <div className="bg-gray-700 bg-opacity-60 backdrop-blur-md p-4 shadow-xl border border-gray-500" style={{ borderRadius: '4px' }}>
+                        <h3 className="text-lg font-semibold text-yellow-300 mb-3 border-b border-yellow-400 pb-1">Memory Log:</h3>
+                        <div className="max-h-48 overflow-y-auto custom-scroll pr-2 space-y-2">
+                            {(() => {
+                                // Create combined timeline of events and choices
+                                const timeline = [];
+                                
+                                // Add events with type marker
+                                memoryLog.slice(-6).forEach((entry, index) => {
+                                    timeline.push({
+                                        type: 'event',
+                                        content: entry,
+                                        originalIndex: index
+                                    });
+                                });
+                                
+                                // Add choices with type marker
+                                playerChoices.slice(-4).forEach((choice, index) => {
+                                    timeline.push({
+                                        type: 'choice',
+                                        content: choice,
+                                        originalIndex: index
+                                    });
+                                });
+                                
+                                // Sort by original index to maintain chronological order
+                                timeline.sort((a, b) => a.originalIndex - b.originalIndex);
+                                
+                                // Display interleaved timeline
+                                return timeline.map((item, index) => (
+                                    <div 
+                                        key={`timeline-${index}`} 
+                                        className={`text-sm text-gray-200 py-1 border-l-2 pl-3 ${
+                                            item.type === 'event' 
+                                                ? 'border-yellow-400' 
+                                                : 'border-red-700'
+                                        }`}
+                                    >
+                                        <span className={`font-medium ${
+                                            item.type === 'event' 
+                                                ? 'text-yellow-300' 
+                                                : 'text-red-300'
+                                        }`}>
+                                            {item.type === 'event' ? 'Event:' : 'Choice:'}
+                                        </span> {item.content}
+                                    </div>
+                                ));
+                            })()}
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {!isDisplayingInitialStartOptions && !isLoading && !error && !isGameOver && currentDisplayedChoices.length === 0 && !isCustomChoiceInputVisible && (
+                 <div className="text-center p-4 bg-gray-800 border border-gray-700 w-full" style={{ borderRadius: '4px' }}>
+                     <p className="text-xl text-gray-400">No clear path...</p>
+                     <button 
+                         onClick={() => setIsCustomChoiceInputVisible(true)} 
+                         className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 shadow transition duration-150 border border-gray-500" 
+                         style={{ borderRadius: '4px' }}
+                     > 
+                         Describe Your Action 
+                     </button> 
+                 </div>
+             )}
+        </div> 
+      </main> 
+      
+      <ScenarioSelectorModal 
+        isOpen={isCustomScenarioModalVisible} 
+        onClose={() => setIsCustomScenarioModalVisible(false)} 
+        onScenarioSelected={handleCustomScenarioSelected} 
+        scenarios={SCENARIO_THEMES_LIST} 
+      /> 
+
+      {/* Return to Menu Modal */}
+      {isReturnToMenuModalVisible && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-gray-800 shadow-2xl w-full max-w-md flex flex-col border border-gray-600" style={{ borderRadius: '4px' }}>
+                    <div className="p-6 text-center">
+                        <h2 className="text-2xl font-bold text-yellow-400 font-['Chakra_Petch']">Return to Menu?</h2>
+                        <p className="text-gray-400 mt-3 mb-6">This will end your current game. Are you sure?</p>
+                        <div className="flex space-x-3">
+                            <button 
+                                onClick={() => {
+                                    setIsReturnToMenuModalVisible(false);
+                                    startGame();
+                                }} 
+                                className="flex-1 bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 border border-red-500" 
+                                style={{ borderRadius: '4px' }}
+                            > 
+                                Return to Menu 
+                            </button> 
+                            <button 
+                                onClick={() => setIsReturnToMenuModalVisible(false)} 
+                                className="flex-1 bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-600" 
+                                style={{ borderRadius: '4px' }}
+                            > 
+                                Cancel 
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+
+    </div> 
+  ); 
+ }; 
+
+ export default App;
