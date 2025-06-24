@@ -81,7 +81,7 @@ const ScenarioSelectorModal: React.FC<ScenarioSelectorModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-gray-900 shadow-2xl w-full max-w-4xl max-h-[80vh] flex flex-col border border-gray-700" style={{ borderRadius: '4px' }} onClick={(e) => e.stopPropagation()}>
         <div className="p-6 border-b border-gray-700 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-yellow-400 font-['Chakra_Petch']">Select a Scenario</h2>
+          <h2 className="text-2xl font-medium text-yellow-400 italic font-['Chakra_Petch'] tracking-wider">Select a Scenario</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white text-3xl font-bold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
