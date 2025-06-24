@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Choice } from '../types'; 
 
@@ -22,14 +21,12 @@ const ChoicesDisplay: React.FC<ChoicesDisplayProps> = ({ choices, onChoiceSelect
             key={index}
             onClick={() => onChoiceSelected(choice)}
             disabled={disabled}
-            className={`
-              bg-gray-600 text-white font-semibold py-3 px-5 rounded-lg shadow-md 
-              transition-all duration-150 ease-in-out 
-              hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 
-              focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 
-              disabled:bg-gray-400 disabled:text-gray-300 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
-              text-left break-words
-            `}
+            className={`w-full mb-3 p-4 text-left transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none border ${
+              choice.triggersCombat
+                ? 'bg-red-800 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-700 focus:ring-red-600 border-red-600'
+                : 'bg-gray-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-500 focus:ring-gray-400 border-gray-400'
+            }`}
+            style={{ borderRadius: '4px' }}
             aria-label={`Choice: ${choiceText}`}
           >
             {choiceText}

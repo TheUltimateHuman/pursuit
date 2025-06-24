@@ -512,7 +512,7 @@ const App: React.FC = () => {
   const isDisplayingInitialStartOptions = isInitialLoad && !isLoading && currentStory.choices.length === 1 && currentStory.choices[0] === "Begin"; 
   const showRegenerateButton = !isInitialLoad && !isLoading && !isGameOver && !isCustomChoiceInputVisible && memoryLog.length <= 1 && currentDisplayedChoices.length > 0; 
 
-  const themeButtonBaseClass = "w-full font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"; 
+  const themeButtonBaseClass = "w-full font-semibold py-3 px-5 shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none border"; 
   const randomThemeButtonClass = `${themeButtonBaseClass} bg-yellow-500 text-black font-bold hover:bg-yellow-400 focus:ring-yellow-300`; 
   const realismThemeButtonClass = `${themeButtonBaseClass} text-white bg-red-800 hover:bg-red-700 focus:ring-red-600 disabled:bg-red-900 disabled:text-gray-300`; 
   const specificThemeButtonClass = `${themeButtonBaseClass} text-white bg-gray-600 hover:bg-gray-500 focus:ring-gray-400 disabled:bg-gray-400`; 
@@ -608,14 +608,15 @@ const App: React.FC = () => {
                aria-live="polite"> 
                 SUCCESS 
             </p> 
-            <div className="bg-green-800 bg-opacity-60 backdrop-blur-md p-6 rounded-lg shadow-xl mb-6 max-w-2xl w-full text-center border-2 border-green-600">
+            <div className="bg-green-800 bg-opacity-60 backdrop-blur-md p-6 shadow-xl mb-6 max-w-2xl w-full text-center border-2 border-green-600" style={{ borderRadius: '4px' }}>
               <p className="text-lg mb-4 whitespace-pre-line text-green-100 leading-relaxed"> 
                 {gameOverSummaryText || "Victory achieved."} 
               </p> 
             </div>
             <button 
               onClick={startGame} 
-              className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-150 ease-in-out hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 text-lg" 
+              className="bg-gray-600 text-white font-semibold py-3 px-6 shadow-md transition-all duration-150 ease-in-out hover:bg-gray-500 hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 text-lg border border-gray-400" 
+              style={{ borderRadius: '4px' }}
             > 
               Play Again 
             </button> 
@@ -623,14 +624,15 @@ const App: React.FC = () => {
         )}
 
         {isGameOver && persistentThreat?.status !== 'defeated' && gameEndType !== 'alternate_win' && ( 
-          <div className="bg-black bg-opacity-80 p-6 rounded-lg shadow-xl mb-6 max-w-3xl w-full text-center border-2 border-red-700"> 
+          <div className="bg-black bg-opacity-80 p-6 shadow-xl mb-6 max-w-3xl w-full text-center border-2 border-red-700" style={{ borderRadius: '4px' }}> 
             <h2 className="text-3xl font-bold text-red-500 mb-3">GAME OVER</h2> 
             <p className="text-xl mb-4 whitespace-pre-line text-gray-300"> 
               {error || gameOverSummaryText || "The End."} 
             </p> 
             <button 
               onClick={startGame} 
-              className="mt-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150 text-lg border border-gray-500" 
+              className="mt-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 shadow-md transition duration-150 text-lg border border-gray-500" 
+              style={{ borderRadius: '4px' }}
             > 
               Play Again 
             </button> 
@@ -638,12 +640,13 @@ const App: React.FC = () => {
         )} 
 
         {error && !isGameOver && ( 
-          <div className="bg-red-800 bg-opacity-90 p-4 rounded-lg shadow-md mb-6 max-w-3xl w-full text-center"> 
+          <div className="bg-red-800 bg-opacity-90 p-4 shadow-md mb-6 max-w-3xl w-full text-center" style={{ borderRadius: '4px' }}> 
             <p className="font-semibold text-yellow-300">Error:</p> 
             <p className="text-gray-200">{error}</p> 
             <button 
               onClick={startGame} 
-              className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 border border-gray-500" 
+              className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 shadow transition duration-150 border border-gray-500" 
+              style={{ borderRadius: '4px' }}
             > 
               Restart 
             </button> 
@@ -700,7 +703,8 @@ const App: React.FC = () => {
                             placeholder="e.g., Derelict Spaceship, Ancient Ruin Exploration, Corporate Espionage... (Add 'REALISM:' prefix for realistic scenarios)" 
                             rows={3} 
                             maxLength={200}
-                            className="w-full p-3 bg-gray-800 text-white border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
+                            className="w-full p-3 bg-gray-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
+                            style={{ borderRadius: '4px' }}
                             disabled={isLoading} 
                             aria-label="Custom scenario input" 
                         />
@@ -712,20 +716,19 @@ const App: React.FC = () => {
                         <button 
                             onClick={handleCustomScenarioSubmit} 
                             disabled={isLoading || !customScenarioText.trim()} 
-                            className="flex-1 sm:flex-none bg-red-600 text-white font-semibold py-3 px-5 rounded-lg shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:bg-red-400 disabled:cursor-not-allowed" 
+                            className="flex-1 sm:flex-none bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:bg-red-400 disabled:cursor-not-allowed border border-red-500" 
+                            style={{ borderRadius: '4px' }}
                         > 
                             Start Game 
                         </button> 
                         <button 
-                            onClick={() => {
-                                setIsCustomScenarioInputVisible(false);
-                                setCustomScenarioText("");
-                            }} 
+                            onClick={() => setIsCustomScenarioInputVisible(false)} 
                             disabled={isLoading} 
-                            className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed" 
+                            className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed border border-gray-600" 
+                            style={{ borderRadius: '4px' }}
                         > 
                             Cancel 
-                        </button> 
+                        </button>
                     </div> 
                 </div> 
             )}
@@ -733,26 +736,30 @@ const App: React.FC = () => {
             {!isDisplayingInitialStartOptions && isCustomChoiceInputVisible && !isGameOver && !isLoading && ( 
                 <div className="w-full flex flex-col items-center space-y-3"> 
                     <textarea 
+                        id="customChoice" 
                         value={customChoiceText} 
                         onChange={(e) => setCustomChoiceText(e.target.value)} 
-                        placeholder="Enter your action..." 
+                        placeholder="Describe your action in detail..." 
                         rows={3} 
-                        className="w-full p-3 bg-gray-800 text-white border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
+                        className="w-full p-3 bg-gray-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
+                        style={{ borderRadius: '4px' }}
                         disabled={isLoading} 
-                        aria-label="Custom action input" 
-                    /> 
-                    <div className="flex space-x-3 w-full sm:w-auto"> 
+                        aria-label="Custom choice input" 
+                    />
+                    <div className="flex space-x-3 w-full sm:w-auto">
                         <button 
                             onClick={handleCustomChoiceSubmit} 
                             disabled={isLoading || !customChoiceText.trim()} 
-                            className="flex-1 sm:flex-none bg-gray-600 text-white font-semibold py-3 px-5 rounded-lg shadow-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:bg-gray-400 disabled:cursor-not-allowed" 
+                            className="flex-1 sm:flex-none bg-gray-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:bg-gray-400 disabled:cursor-not-allowed border border-gray-400" 
+                            style={{ borderRadius: '4px' }}
                         > 
                             Submit 
                         </button> 
                         <button 
                             onClick={() => setIsCustomChoiceInputVisible(false)} 
                             disabled={isLoading} 
-                            className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed" 
+                            className="flex-1 sm:flex-none bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed border border-gray-600" 
+                            style={{ borderRadius: '4px' }}
                         > 
                             Cancel 
                         </button> 
@@ -845,16 +852,17 @@ const App: React.FC = () => {
             )}
             
             {!isDisplayingInitialStartOptions && !isLoading && !error && !isGameOver && currentDisplayedChoices.length === 0 && !isCustomChoiceInputVisible && (
-                 <div className="text-center p-4 bg-gray-800 rounded-lg border border-gray-700 w-full"> 
-                     <p className="text-xl text-gray-400">No clear path...</p> 
+                 <div className="text-center p-4 bg-gray-800 border border-gray-700 w-full" style={{ borderRadius: '4px' }}>
+                     <p className="text-xl text-gray-400">No clear path...</p>
                      <button 
-                         onClick={startGame} 
-                         className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 border border-gray-500" 
+                         onClick={() => setIsCustomChoiceInputVisible(true)} 
+                         className="mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 shadow transition duration-150 border border-gray-500" 
+                         style={{ borderRadius: '4px' }}
                      > 
-                         Restart? 
+                         Describe Your Action 
                      </button> 
-                 </div> 
-             )} 
+                 </div>
+             )}
         </div> 
       </main> 
       
@@ -865,50 +873,36 @@ const App: React.FC = () => {
         scenarios={SCENARIO_THEMES_LIST} 
       /> 
 
-      {/* Return to Menu Confirmation Modal */}
+      {/* Return to Menu Modal */}
       {isReturnToMenuModalVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4" onClick={() => setIsReturnToMenuModalVisible(false)}>
-          <div
-            className="bg-gray-800 shadow-2xl w-full max-w-md flex flex-col border border-gray-600"
-            style={{ borderRadius: '4px' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <header className="p-4 border-b border-gray-700 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-yellow-400 font-['Chakra_Petch']">Return to Menu?</h2>
-              <button
-                onClick={() => setIsReturnToMenuModalVisible(false)}
-                className="text-gray-400 hover:text-white transition-colors text-2xl"
-                aria-label="Close"
-              >
-                &times;
-              </button>
-            </header>
-
-            <div className="p-6">
-              <p className="text-gray-200 mb-6 text-center">
-                Are you sure you want to return to the main menu? Your current game progress will be lost.
-              </p>
-              
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleReturnToMainMenu}
-                  className="flex-1 bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 transition-all duration-150"
-                  style={{ borderRadius: '4px' }}
-                >
-                  Return to Menu
-                </button>
-                <button
-                  onClick={() => setIsReturnToMenuModalVisible(false)}
-                  className="flex-1 bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-150"
-                  style={{ borderRadius: '4px' }}
-                >
-                  Cancel
-                </button>
-              </div>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-gray-800 shadow-2xl w-full max-w-md flex flex-col border border-gray-600" style={{ borderRadius: '4px' }}>
+                    <div className="p-6 text-center">
+                        <h2 className="text-2xl font-bold text-yellow-400 font-['Chakra_Petch']">Return to Menu?</h2>
+                        <p className="text-gray-400 mt-3 mb-6">This will end your current game. Are you sure?</p>
+                        <div className="flex space-x-3">
+                            <button 
+                                onClick={() => {
+                                    setIsReturnToMenuModalVisible(false);
+                                    startGame();
+                                }} 
+                                className="flex-1 bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 border border-red-500" 
+                                style={{ borderRadius: '4px' }}
+                            > 
+                                Return to Menu 
+                            </button> 
+                            <button 
+                                onClick={() => setIsReturnToMenuModalVisible(false)} 
+                                className="flex-1 bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-600" 
+                                style={{ borderRadius: '4px' }}
+                            > 
+                                Cancel 
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      )}
+        )}
 
     </div> 
   ); 

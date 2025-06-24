@@ -24,29 +24,20 @@ const ScenarioSelectorModal: React.FC<ScenarioSelectorModalProps> = ({ isOpen, o
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div
-        className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col border border-gray-600"
-        onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
-      >
-        <header className="p-4 border-b border-gray-700 flex justify-between items-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col border border-gray-600" style={{ borderRadius: '4px' }}>
+        <div className="p-6 border-b border-gray-700">
           <h2 className="text-2xl font-bold text-yellow-400">Select a Custom Scenario</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors text-2xl"
-            aria-label="Close"
-          >
-            &times;
-          </button>
-        </header>
-
-        <div className="p-4">
+        </div>
+        
+        <div className="p-6 flex-1 overflow-y-auto">
           <input
             type="text"
             placeholder="Search scenarios..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 bg-gray-900 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            className="w-full p-3 bg-gray-900 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-red-500" 
+            style={{ borderRadius: '4px' }}
           />
         </div>
 
