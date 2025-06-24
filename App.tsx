@@ -761,58 +761,67 @@ const App: React.FC = () => {
         
         <div className="w-full max-w-xl flex flex-col items-center mt-4 md:mt-6"> 
 
-            {isDisplayingInitialStartOptions && ( 
-                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4"> 
+            {isDisplayingInitialStartOptions && (
+                <div className="w-full flex flex-col items-center">
                     <button 
                         key="random" 
-                        onClick={() => handleStartGameWithTheme("random")} 
+                        onClick={() => handleStartGameWithTheme("random")}
                         className={randomThemeButtonClass} 
                         disabled={isLoading} 
                     > 
                         Random 
                     </button> 
-                    <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>REALISM</button>
-                    {/* New category buttons */}
-                    <button
-                        key="contemporary"
-                        onClick={() => handleStartGameWithTheme("modern")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
-                        disabled={isLoading}
-                    >
-                        Contemporary
-                    </button>
-                    <button
-                        key="fantasy"
-                        onClick={() => handleStartGameWithTheme("fantasy")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
-                        disabled={isLoading}
-                    >
-                        Fantasy
-                    </button>
-                    <button
-                        key="historical"
-                        onClick={() => handleStartGameWithTheme("historical")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
-                        disabled={isLoading}
-                    >
-                        Historical
-                    </button>
-                    <button
-                        key="mythological"
-                        onClick={() => handleStartGameWithTheme("mythological")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
-                        disabled={isLoading}
-                    >
-                        Mythological
-                    </button>
-                    <button
-                        key="science_fiction"
-                        onClick={() => handleStartGameWithTheme("sci_fi")}
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-100 text-gray-800"
-                        disabled={isLoading}
-                    >
-                        Science Fiction
-                    </button>
+                    {/* Category random buttons in 2-column, 3-row grid on mobile */}
+                    <div className="w-full grid grid-cols-2 gap-3 my-4 sm:my-6 max-w-xs mx-auto">
+                        <button
+                            key="realism"
+                            onClick={() => handleStartGameWithTheme("realism")}
+                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-red-800 text-white focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            disabled={isLoading}
+                        >
+                            REALISM
+                        </button>
+                        <button
+                            key="contemporary"
+                            onClick={() => handleStartGameWithTheme("modern")}
+                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            disabled={isLoading}
+                        >
+                            Contemporary
+                        </button>
+                        <button
+                            key="fantasy"
+                            onClick={() => handleStartGameWithTheme("fantasy")}
+                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            disabled={isLoading}
+                        >
+                            Fantasy
+                        </button>
+                        <button
+                            key="historical"
+                            onClick={() => handleStartGameWithTheme("historical")}
+                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            disabled={isLoading}
+                        >
+                            Historical
+                        </button>
+                        <button
+                            key="mythological"
+                            onClick={() => handleStartGameWithTheme("mythological")}
+                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            disabled={isLoading}
+                        >
+                            Mythological
+                        </button>
+                        <button
+                            key="science_fiction"
+                            onClick={() => handleStartGameWithTheme("sci_fi")}
+                            className="col-span-1 font-semibold py-2 px-2 text-base border bg-gray-100 text-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg"
+                            disabled={isLoading}
+                        >
+                            Science Fiction
+                        </button>
+                    </div>
                     {/* Existing Select and Custom buttons */}
                     <button 
                       key="select" 
@@ -830,8 +839,8 @@ const App: React.FC = () => {
                     > 
                       Custom... 
                     </button> 
-                </div> 
-            )} 
+                </div>
+            )}
 
             {/* Custom Scenario Input Modal */}
             {isDisplayingInitialStartOptions && isCustomScenarioInputVisible && !isLoading && (
