@@ -1050,11 +1050,13 @@ const App: React.FC = () => {
         onScenarioSelected={handleCustomScenarioSelected}
         scenarios={SCENARIO_THEMES_LIST}
       />
-      {/* Technohorror Eye Motif for mobile, below main menu buttons */}
+      {/* SVG Eye for technohorror motif, below main menu buttons on mobile */}
       <div className="w-full flex justify-center items-center mt-8 mb-2 sm:hidden" aria-hidden="true">
-        <span style={{ fontSize: '2.5rem', color: '#ffe066', filter: 'drop-shadow(0 0 6px #000)' }}>
-          👁
-        </span>
+        <img 
+          src="/eye.svg" 
+          alt="Technohorror Eye" 
+          style={{ width: '60px', height: '32px', filter: 'drop-shadow(0 0 6px #000) brightness(1.2) sepia(1) hue-rotate(30deg) saturate(6)', display: 'block' }}
+        />
       </div>
     </div>
   );
