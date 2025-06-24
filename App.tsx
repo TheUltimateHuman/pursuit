@@ -658,7 +658,8 @@ const App: React.FC = () => {
         
         <div className="w-full max-w-xl flex flex-col items-center mt-4 md:mt-6"> 
 
-            {isDisplayingInitialStartOptions && ( 
+            {isDisplayingInitialStartOptions && (
+                 <>
                  <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4"> 
                     <button 
                         key="random" 
@@ -685,8 +686,27 @@ const App: React.FC = () => {
                     > 
                       Custom... 
                     </button> 
-                </div> 
-            )} 
+                </div>
+                <pre className="mt-8 w-full text-xs md:text-base text-red-400 font-mono text-center select-none" style={{lineHeight: '1.1', userSelect: 'none'}} aria-hidden="true">
+{`
+           .     .        .  .     . .     .  .
+      .  .   .   .  .  .   . .   .   .  .   .
+        .   .   .     _______   .    .   .
+   .  .   .   .  .  /       \\     .    .  .
+      .   .  .     /  /\\ /\\  \\  .   .
+   .   .   .     /  /__V__\\  \\    .   .
+        .   .   /  /  /_\\  \\  \\   .
+   .  .   .    /  /  /___\\  \\  \\    .
+      .   .   /__/__/_____\\__\\__\\  .
+   .    .   .  |  |  |   |  |  |  |   .
+        .   .  |  |  |   |  |  |  |  .
+   .  .    .   |  |  |   |  |  |  |   .
+
+      Q U A R R Y   -   T H E   H U N T   B E G I N S
+`}
+                </pre>
+                </>
+            )}
 
             {/* Custom Scenario Input Modal */}
             {isDisplayingInitialStartOptions && isCustomScenarioInputVisible && !isLoading && (
