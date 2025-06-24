@@ -68,7 +68,7 @@ function getRandomGlyph() {
   return GLYPH_SET[Math.floor(Math.random() * GLYPH_SET.length)];
 }
 
-const GlyphFieldOverlay: React.FC<{ tick: number }> = ({ tick }) => {
+const GlyphFieldOverlay: React.FC = () => {
   // Calculate grid size based on viewport
   const [dimensions, setDimensions] = React.useState({ cols: 32, rows: 18 });
   const [glyphs, setGlyphs] = React.useState<string[]>([]);
@@ -87,8 +87,13 @@ const GlyphFieldOverlay: React.FC<{ tick: number }> = ({ tick }) => {
 
   // Animate glyphs: shimmer effect
   React.useEffect(() => {
-    setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, getRandomGlyph));
-  }, [tick, dimensions]);
+    function randomizeGlyphs() {
+      setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, getRandomGlyph));
+    }
+    randomizeGlyphs();
+    const interval = setInterval(randomizeGlyphs, 1400); // Slower flicker (was 700ms)
+    return () => clearInterval(interval);
+  }, [dimensions]);
 
   return (
     <div
@@ -119,17 +124,7 @@ const GlyphFieldOverlay: React.FC<{ tick: number }> = ({ tick }) => {
         }}
       >
         {glyphs.map((glyph, i) => (
-          <span
-            key={i}
-            style={{
-              opacity: 0.2 + Math.random() * 0.3, // subtle random flicker (0.2-0.5)
-              textShadow: '0 0 2px #ffe066, 0 0 8px #ff0040, 1px 0 2px #00fff7', // glow/glitch
-              transform: `skewX(${(Math.random() * 4 - 2).toFixed(2)}deg) skewY(${(Math.random() * 4 - 2).toFixed(2)}deg)`, // slight random skew
-              transition: 'opacity 0.3s, transform 0.3s',
-            }}
-          >
-            {glyph}
-          </span>
+          <span key={i} style={{ opacity: Math.random() * 0.7 + 0.3 }}>{glyph}</span>
         ))}
       </div>
     </div>
@@ -198,9 +193,6 @@ const App: React.FC = () => {
   const underscorePosRef = useRef(fullTitle.length - 1);
   const underscoreDirRef = useRef(-1);
 
-  // Add a tick state to drive only the glyph shimmer animation
-  const [glyphTick, setGlyphTick] = useState(0);
-
   // Initial typing animation
   useEffect(() => {
     let i = 0;
@@ -210,7 +202,6 @@ const App: React.FC = () => {
     setUnderscoreDir(-1); // Start moving left (Y to Q)
     underscorePosRef.current = fullTitle.length - 1;
     underscoreDirRef.current = -1;
-    setGlyphTick(0); // Reset glyph shimmer tick when typing starts
     const timeout = setTimeout(() => {
       const interval = setInterval(() => {
         setTypedTitle((prev) => {
@@ -232,28 +223,23 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Glyph shimmer animation (driven by its own timer)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setGlyphTick(tick => tick + 1);
-    }, 800);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Terminal-style underline animation: move left to right (Q to Y), then right to left (Y to Q), driven by its own timer
+  // Terminal-style underline animation: move left to right (Q to Y), then right to left (Y to Q)
   useEffect(() => {
     if (typingIndex < fullTitle.length) return;
+    
     const interval = setInterval(() => {
       const currentPos = underscorePosRef.current;
       const currentDir = underscoreDirRef.current;
       const newPos = currentPos + currentDir;
+      
+      // If we hit Q (pos === 0) while moving left, or Y (pos === length-1) while moving right
       if (newPos <= 0) {
-        underscoreDirRef.current = 1;
+        underscoreDirRef.current = 1; // Start moving right (Q to Y)
         underscorePosRef.current = 0;
         setUnderscoreDir(1);
         setUnderscorePos(0);
       } else if (newPos >= fullTitle.length - 1) {
-        underscoreDirRef.current = -1;
+        underscoreDirRef.current = -1; // Start moving left (Y to Q)
         underscorePosRef.current = fullTitle.length - 1;
         setUnderscoreDir(-1);
         setUnderscorePos(fullTitle.length - 1);
@@ -261,9 +247,11 @@ const App: React.FC = () => {
         underscorePosRef.current = newPos;
         setUnderscorePos(newPos);
       }
-    }, 900); // Methodical, slow pace
+    }, 800); // Slower, more ominous (was 400ms)
+    
     return () => clearInterval(interval);
-  }, [typingIndex, fullTitle.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typingIndex]);
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
@@ -411,20 +399,20 @@ const App: React.FC = () => {
         setCombatLog([]); 
         setIsInCombat(false); 
 
-        if (persistentThreatDetails) { 
-          const newThreat: PersistentThreat = { 
-            name: persistentThreatDetails.name, 
-            description: persistentThreatDetails.description, 
-            maxHealth: persistentThreatDetails.maxHealth, 
-            currentHealth: persistentThreatDetails.maxHealth, 
-            senses: persistentThreatDetails.senses || [], 
-            status: updatedThreatStatus || 'distant', 
-            lastKnownAction: threatEncounterMessage || "Lurking...", 
-            redacted: persistentThreatDetails.redacted
-          }; 
-          tempPersistentThreat = newThreat; 
-          setPersistentThreat(newThreat); 
-        } else { 
+        if (persistentThreatDetails) {
+          const newThreat: PersistentThreat = {
+            name: persistentThreatDetails.name,
+            description: persistentThreatDetails.description,
+            maxHealth: persistentThreatDetails.maxHealth,
+            currentHealth: persistentThreatDetails.maxHealth,
+            senses: persistentThreatDetails.senses || [],
+            status: updatedThreatStatus || 'distant',
+            lastKnownAction: threatEncounterMessage || "Lurking...",
+            redacted: (persistentThreatDetails as any).redacted || false,
+          };
+          tempPersistentThreat = newThreat;
+          setPersistentThreat(newThreat);
+        } else {
             setPersistentThreat(null); 
         } 
       } else { 
@@ -723,7 +711,7 @@ const App: React.FC = () => {
 
   return ( 
     <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 pl-2 pr-4 selection:bg-red-700 selection:text-white font-['Inter']" style={{ position: 'relative', zIndex: 1 }}>
-      <GlyphFieldOverlay tick={glyphTick} />
+      <GlyphFieldOverlay />
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
@@ -900,10 +888,10 @@ const App: React.FC = () => {
                     <button 
                         key="random" 
                         onClick={() => handleStartGameWithTheme("random")}
-                        className={randomThemeButtonClass + " focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-75"} 
+                        className={randomThemeButtonClass + " focus:ring-2 focus:ring-black focus:ring-opacity-75"} 
                         disabled={isLoading} 
                     > 
-                        RANDOM SCENARIO
+                        RANDOM
                     </button> 
                     {/* Category random buttons in 2-column, 3-row grid on mobile */}
                     <div className="w-full grid grid-cols-2 gap-3 my-4 sm:my-6">
@@ -957,24 +945,22 @@ const App: React.FC = () => {
                         </button>
                     </div>
                     {/* Existing Select and Custom buttons */}
-                    <div className="w-full flex flex-col gap-3">
-                      <button 
-                        key="select" 
-                        onClick={() => setIsCustomScenarioModalVisible(true)} 
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
-                        disabled={isLoading} 
-                      > 
-                        SELECT...
-                      </button> 
-                      <button 
-                        key="custom" 
-                        onClick={() => setIsCustomScenarioInputVisible(true)} 
-                        className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
-                        disabled={isLoading} 
-                      > 
-                        CUSTOM...
-                      </button> 
-                    </div>
+                    <button 
+                      key="select" 
+                      onClick={() => setIsCustomScenarioModalVisible(true)} 
+                      className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
+                      disabled={isLoading} 
+                    > 
+                      SELECT...
+                    </button> 
+                    <button 
+                      key="custom" 
+                      onClick={() => setIsCustomScenarioInputVisible(true)} 
+                      className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
+                      disabled={isLoading} 
+                    > 
+                      CUSTOM...
+                    </button> 
                 </div>
             )}
 

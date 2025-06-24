@@ -85,7 +85,6 @@ export interface GeminiApiResponse {
     description: string;
     maxHealth: number;
     senses?: string[]; // Primary senses defined at pursuer creation
-    redacted?: boolean;
   };
   updatedThreatStatus?: PersistentThreat['status'];
   threatEncounterMessage?: string;

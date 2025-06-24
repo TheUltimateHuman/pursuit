@@ -54,11 +54,11 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
       className={`bg-red-900 bg-opacity-60 backdrop-blur-sm p-3 shadow-xl mb-6 max-w-3xl w-full text-center border ${isInCombat && threat.status === 'engaged' ? 'border-red-500' : 'border-red-700'}`}
       style={{ borderRadius: '4px' }}
       title={threat.description} 
-      aria-label={`Threat details: ${threat.name}. ${displayMessage || 'No specific action noted'}. ${ariaStatusDescription}.`}
+      aria-label={`Threat details: ${threat.redacted ? '[REDACTED]' : threat.name}. ${displayMessage || 'No specific action noted'}. ${ariaStatusDescription}.`}
     >
       <h4 className="text-md font-semibold text-red-300 mb-1">
         THREAT: {threat.redacted ? (
-          <span className="font-bold px-2 py-0.5 rounded bg-black text-yellow-200 tracking-widest" style={{letterSpacing:'0.15em'}}>[REDACTED]</span>
+          <span className="font-bold px-2 py-0.5 rounded" style={{ background: 'black', color: 'white', letterSpacing: '0.08em' }} aria-label="Threat name is redacted">[REDACTED]</span>
         ) : (
           <span className="text-red-200 font-bold">{threat.name}</span>
         )}
