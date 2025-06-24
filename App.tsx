@@ -728,7 +728,7 @@ const App: React.FC = () => {
   const customThemeButtonClass = `${themeButtonBaseClass} text-yellow-300 bg-gray-700`;
 
   return ( 
-    <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 pl-2 pr-4 selection:bg-red-700 selection:text-white font-['Inter']" style={{ position: 'relative', zIndex: 1 }}>
+    <div className={`min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 pl-2 pr-4 selection:bg-red-700 selection:text-white font-['Inter']${isInitialLoad ? ' overflow-hidden' : ''}`} style={{ position: 'relative', zIndex: 1 }}>
       <GlyphFieldOverlay currentScenario={currentScenarioTheme} />
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
