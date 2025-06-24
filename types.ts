@@ -3,6 +3,12 @@ export interface Choice {
   triggersCombat?: boolean; // If this choice leads directly to combat
 }
 
+export interface InventoryItem {
+  name: string;
+  quantity: number;
+  displayName?: string; // Optional: for custom display names like "Rifle Rounds (5)"
+}
+
 export interface PersistentThreat {
   name: string;
   description: string;
@@ -11,7 +17,6 @@ export interface PersistentThreat {
   currentHealth: number;
   senses?: string[]; // Primary senses for detection (e.g., "Acute Hearing", "Thermal Vision")
   lastKnownAction?: string;
-  redacted?: boolean;
 }
 
 export interface CombatOutcome {
@@ -71,9 +76,9 @@ export type GameplayEffect =
 export interface GeminiApiResponse {
   sceneDescription: string;
   choices: (string | Choice)[]; // Can be simple strings or Choice objects
-  addItem?: string;
-  removeItem?: string;
-  initialInventory?: string[]; // For player's starting items (1-3)
+  addItem?: string | InventoryItem; // Can be string (legacy) or structured InventoryItem
+  removeItem?: string | InventoryItem; // Can be string (legacy) or structured InventoryItem
+  initialInventory?: (string | InventoryItem)[]; // For player's starting items (1-3)
   memoryLogSummary?: string; // Concise summary of the current turn for the memory log
   gameplayEffects?: GameplayEffect[]; // New field for emergent effects
   gameOverSummary?: string; // New: Concise summary of game end (e.g., "You perished.")
@@ -114,3 +119,124 @@ export interface GroundingChunk {
 export interface GroundingMetadata {
   groundingChunks?: GroundingChunk[];
 }
+
+// Inventory utility functions
+export const parseInventoryItem = (item: string | InventoryItem): InventoryItem => {
+  if (typeof item === 'string') {
+    // Try to parse quantity from string format like "5 Rifle Rounds" or "Rifle Rounds (5)"
+    const quantityMatch = item.match(/^(\d+)\s+(.+)$/);
+    const parenthesesMatch = item.match(/^(.+?)\s*\((\d+)\)$/);
+    
+    if (quantityMatch) {
+      return {
+        name: quantityMatch[2].trim(),
+        quantity: parseInt(quantityMatch[1]),
+        displayName: item
+      };
+    } else if (parenthesesMatch) {
+      return {
+        name: parenthesesMatch[1].trim(),
+        quantity: parseInt(parenthesesMatch[2]),
+        displayName: item
+      };
+    } else {
+      return {
+        name: item,
+        quantity: 1,
+        displayName: item
+      };
+    }
+  }
+  return item;
+};
+
+export const formatInventoryItem = (item: InventoryItem): string => {
+  if (item.quantity === 1) {
+    return item.name;
+  }
+  return `${item.quantity} ${item.name}`;
+};
+
+export const addToInventory = (inventory: InventoryItem[], item: string | InventoryItem): InventoryItem[] => {
+  const parsedItem = parseInventoryItem(item);
+  const existingIndex = inventory.findIndex(invItem => invItem.name === parsedItem.name);
+  
+  if (existingIndex >= 0) {
+    // Item exists, add to quantity
+    const updatedInventory = [...inventory];
+    updatedInventory[existingIndex] = {
+      ...updatedInventory[existingIndex],
+      quantity: updatedInventory[existingIndex].quantity + parsedItem.quantity
+    };
+    return updatedInventory;
+  } else {
+    // New item
+    return [...inventory, parsedItem];
+  }
+};
+
+export const removeFromInventory = (inventory: InventoryItem[], item: string | InventoryItem): InventoryItem[] => {
+  const parsedItem = parseInventoryItem(item);
+  const existingIndex = inventory.findIndex(invItem => invItem.name === parsedItem.name);
+  
+  if (existingIndex >= 0) {
+    const existingItem = inventory[existingIndex];
+    const newQuantity = existingItem.quantity - parsedItem.quantity;
+    
+    if (newQuantity <= 0) {
+      // Remove item completely
+      return inventory.filter((_, index) => index !== existingIndex);
+    } else {
+      // Reduce quantity
+      const updatedInventory = [...inventory];
+      updatedInventory[existingIndex] = {
+        ...existingItem,
+        quantity: newQuantity
+      };
+      return updatedInventory;
+    }
+  }
+  
+  // Item not found, return unchanged inventory
+  return inventory;
+};
+
+export const hasItem = (inventory: InventoryItem[], itemName: string, requiredQuantity: number = 1): boolean => {
+  const item = inventory.find(invItem => invItem.name === itemName);
+  return item ? item.quantity >= requiredQuantity : false;
+};
+
+export const getItemQuantity = (inventory: InventoryItem[], itemName: string): number => {
+  const item = inventory.find(invItem => invItem.name === itemName);
+  return item ? item.quantity : 0;
+};
+
+// Test function to verify inventory system
+export const testInventorySystem = () => {
+  console.log("Testing inventory system...");
+  
+  let inventory: InventoryItem[] = [];
+  
+  // Test adding items
+  inventory = addToInventory(inventory, "5 Rifle Rounds");
+  console.log("After adding 5 Rifle Rounds:", inventory);
+  
+  inventory = addToInventory(inventory, "3 Bandages");
+  console.log("After adding 3 Bandages:", inventory);
+  
+  inventory = addToInventory(inventory, "2 Rifle Rounds");
+  console.log("After adding 2 more Rifle Rounds:", inventory);
+  
+  // Test removing items
+  inventory = removeFromInventory(inventory, "1 Rifle Round");
+  console.log("After removing 1 Rifle Round:", inventory);
+  
+  inventory = removeFromInventory(inventory, "2 Bandages");
+  console.log("After removing 2 Bandages:", inventory);
+  
+  // Test removing all of an item
+  inventory = removeFromInventory(inventory, "6 Rifle Rounds");
+  console.log("After removing all Rifle Rounds:", inventory);
+  
+  console.log("Inventory system test completed.");
+};

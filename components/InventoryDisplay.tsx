@@ -1,7 +1,8 @@
 import React from 'react';
+import { InventoryItem, formatInventoryItem } from '../types';
 
 interface InventoryDisplayProps {
-  items: string[];
+  items: InventoryItem[];
 }
 
 const InventoryDisplay: React.FC<InventoryDisplayProps> = ({ items }) => {
@@ -16,10 +17,10 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({ items }) => {
             <li 
               key={index} 
               className="text-sm py-0.5 hover:text-yellow-200 transition-colors duration-150" 
-              title={item}
-              aria-label={`Inventory item: ${item}`}
+              title={item.displayName || formatInventoryItem(item)}
+              aria-label={`Inventory item: ${formatInventoryItem(item)}`}
             >
-              <span className="text-yellow-400 mr-1.5">◆</span> {item}
+              <span className="text-yellow-400 mr-1.5">◆</span> {formatInventoryItem(item)}
             </li>
           ))
         )}

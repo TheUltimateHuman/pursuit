@@ -54,21 +54,14 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
       className={`bg-red-900 bg-opacity-60 backdrop-blur-sm p-3 shadow-xl mb-6 max-w-3xl w-full text-center border ${isInCombat && threat.status === 'engaged' ? 'border-red-500' : 'border-red-700'}`}
       style={{ borderRadius: '4px' }}
       title={threat.description} 
-      aria-label={`Threat details: ${threat.redacted ? '[REDACTED]' : threat.name}. ${displayMessage || 'No specific action noted'}. ${ariaStatusDescription}.`}
+      aria-label={`Threat status: ${displayMessage || 'No specific action noted'}. ${ariaStatusDescription}.`}
     >
-      <h4 className="text-md font-semibold text-red-300 mb-1">
-        THREAT: {threat.redacted ? (
-          <span className="font-bold px-2 py-0.5 rounded" style={{ background: 'black', color: '#ffe066', letterSpacing: '0.08em' }} aria-label="Threat name is redacted">[REDACTED]</span>
-        ) : (
-          <span className="text-red-200 font-bold">{threat.name}</span>
-        )}
-      </h4>
       {displayMessage && !isInCombat && ( 
-         <p className="text-sm italic text-red-300">
+         <p className="text-sm italic text-red-300 mb-2">
             "{displayMessage}"
         </p>
       )}
-      <div className="flex items-center justify-center mt-2">
+      <div className="flex items-center justify-center">
         {threat.status === 'engaged' ? (
           <div className="text-red-500 animate-pulse font-bold text-lg" title="WARNING! Combat Engaged" aria-label="WARNING! Combat Engaged">
             WARNING!
@@ -93,17 +86,6 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
           </div>
         )}
       </div>
-      {threat.senses && threat.senses.length > 0 && !isInCombat && (
-        <div className="mt-2 pt-1 border-t border-red-700 border-opacity-50">
-          <ul className="text-xs text-red-300 list-none p-0">
-            {threat.senses.map((sense, index) => (
-              <li key={index} className="inline-block mr-2 last:mr-0" title={sense}>
-                <span role="img" aria-label="indicator icon" className="mr-1">👁</span>{sense.split('(')[0].trim()}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       {threat.status !== 'defeated' && threat.status !== 'hidden' && !isInCombat && (
         <div className="w-full bg-gray-700 h-2.5 mt-2 overflow-hidden" style={{ borderRadius: '2px' }}>
           <div

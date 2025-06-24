@@ -2,7 +2,7 @@
 // App.tsx (with Custom Scenario Selection Feature) 
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'; 
-import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect } from './types'; 
+import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect, InventoryItem, addToInventory, removeFromInventory, parseInventoryItem } from './types'; 
 import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/geminiService'; 
 import StoryDisplay from './components/StoryDisplay'; 
 import ChoicesDisplay from './components/ChoicesDisplay'; 
@@ -11,7 +11,7 @@ import ApiKeyMissingBanner from './components/ApiKeyMissingBanner';
 import InventoryDisplay from './components/InventoryDisplay'; 
 import PersistentThreatDisplay from './components/PersistentThreatDisplay'; 
 import { MAX_PLAYER_HEALTH, SCENARIO_THEMES_LIST } from './constants'; 
-import ScenarioSelectorModal from './components/ScenarioSelectorModal'; // <-- IMPORT THE NEW COMPONENT 
+import ScenarioSelectorModal from './components/ScenarioSelectorModal'; // <-- IMPORT THE NEW COMPONENT
 
 // --- This is the ONLY configuration needed. It uses the env.js file. --- 
 import { API_KEY as API_KEY_FROM_ENV_JS } from './env.js'; 
@@ -183,7 +183,7 @@ const App: React.FC = () => {
     combatLog: [], 
     isInCombat: false, 
   }); 
-  const [inventory, setInventory] = useState<string[]>([]); 
+  const [inventory, setInventory] = useState<InventoryItem[]>([]); 
   const [isLoading, setIsLoading] = useState<boolean>(false); 
   const [error, setError] = useState<string | null>(null); 
   const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true); 
@@ -259,7 +259,7 @@ const App: React.FC = () => {
           setShowBlinkCursor(true);
           blinkInterval = setInterval(() => {
             setIsUnderscoreVisible((v) => !v);
-          }, 500);
+          }, 1500);
           return prev;
         }
       });
@@ -415,7 +415,11 @@ const App: React.FC = () => {
       setPlayerAbilities(tempPlayerAbilities); 
 
       if (isInitial) { 
-        setInventory(initialInventory?.slice(0, 3) || []); 
+        // Convert initialInventory to InventoryItem format
+        const initialInventoryItems: InventoryItem[] = (initialInventory || []).map(item => 
+          typeof item === 'string' ? parseInventoryItem(item) : item
+        );
+        setInventory(initialInventoryItems);
         setIsInitialLoad(false); 
         tempPlayerHealth = MAX_PLAYER_HEALTH; 
         setPlayerHealth(MAX_PLAYER_HEALTH); 
@@ -431,7 +435,6 @@ const App: React.FC = () => {
             senses: persistentThreatDetails.senses || [],
             status: updatedThreatStatus || 'distant',
             lastKnownAction: threatEncounterMessage || "Lurking...",
-            redacted: (persistentThreatDetails as any).redacted || false,
           };
           tempPersistentThreat = newThreat;
           setPersistentThreat(newThreat);
@@ -517,10 +520,10 @@ const App: React.FC = () => {
       setPersistentThreat(tempPersistentThreat); 
 
       if (addItem) { 
-        setInventory(prevInventory => prevInventory.includes(addItem) ? prevInventory : [...prevInventory, addItem]); 
+        setInventory(prevInventory => addToInventory(prevInventory, addItem)); 
       } 
       if (removeItem) { 
-        setInventory(prevInventory => prevInventory.filter(item => item !== removeItem)); 
+        setInventory(prevInventory => removeFromInventory(prevInventory, removeItem)); 
       } 
       
       const newChoicesToDisplay = newIsInCombat && combatChoices ? combatChoices : choices; 
@@ -660,8 +663,13 @@ const App: React.FC = () => {
     setPlayerChoices(prev => [...prev, choiceText]);
     
     if (!isInitialLoad) { 
+      // Convert inventory to string format for API compatibility
+      const inventoryStrings = inventory.map(item => 
+        item.quantity === 1 ? item.name : `${item.quantity} ${item.name}`
+      );
+      
       processApiResponse(fetchNextStorySegment( 
-        currentStory.sceneDescription, choiceText, inventory, playerHealth, 
+        currentStory.sceneDescription, choiceText, inventoryStrings, playerHealth, 
         persistentThreat, isInCombat, isTriggeringCombat, memoryLog, storyFlags, playerAbilities, 
         currentScenarioTheme || "Unknown Scenario",
         systemMemoryLog
@@ -679,8 +687,14 @@ const App: React.FC = () => {
     setPlayerChoices(prev => [...prev, customChoiceText.trim()]);
     
     setIsCustomChoiceInputVisible(false); 
+    
+    // Convert inventory to string format for API compatibility
+    const inventoryStrings = inventory.map(item => 
+      item.quantity === 1 ? item.name : `${item.quantity} ${item.name}`
+    );
+    
     processApiResponse(fetchNextStorySegment( 
-      currentStory.sceneDescription, customChoiceText.trim(), inventory, playerHealth, 
+      currentStory.sceneDescription, customChoiceText.trim(), inventoryStrings, playerHealth, 
       persistentThreat, isInCombat, false, memoryLog, storyFlags, playerAbilities, 
       currentScenarioTheme || "Unknown Scenario",
       systemMemoryLog
@@ -819,16 +833,17 @@ const App: React.FC = () => {
         
         {!isGameOver && !isInitialLoad && ( 
           <div className="w-full max-w-lg text-center my-4"> 
-            <div className="text-xl font-semibold text-red-300 mb-1"> 
-              HEALTH: {playerHealth} / {MAX_PLAYER_HEALTH} 
-            </div> 
-            <div className="w-full bg-gray-700 h-4 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
+            <div className="relative w-full bg-gray-700 h-4 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
+              <div className="absolute top-0 left-2 z-10 text-yellow-400 text-sm" style={{ transform: 'translateY(-50%)' }}>
+                ❤
+              </div>
               <div 
                 className="bg-gradient-to-r from-red-500 to-red-700 h-full transition-all duration-300 ease-out" 
                 style={{ width: `${Math.max(0, (playerHealth / MAX_PLAYER_HEALTH) * 100)}%`, borderRadius: '2px' }} 
                 aria-valuenow={playerHealth} 
                 aria-valuemin={0} 
                 aria-valuemax={MAX_PLAYER_HEALTH} 
+                aria-label={`Player health: ${playerHealth} out of ${MAX_PLAYER_HEALTH}`}
               ></div> 
             </div> 
           </div> 
@@ -1156,6 +1171,49 @@ const App: React.FC = () => {
         onScenarioSelected={handleCustomScenarioSelected}
         scenarios={SCENARIO_THEMES_LIST}
       />
+      
+      {/* Return to Menu Modal */}
+      {isReturnToMenuModalVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setIsReturnToMenuModalVisible(false)}>
+          <div className="bg-gray-900 shadow-2xl w-full max-w-md flex flex-col border border-gray-700" style={{ borderRadius: '4px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 border-b border-gray-700 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-yellow-400 font-['Chakra_Petch']">Return to Main Menu?</h2>
+              <button
+                onClick={() => setIsReturnToMenuModalVisible(false)}
+                className="text-gray-400 hover:text-white text-2xl font-bold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
+                style={{ borderRadius: '4px' }}
+                aria-label="Close return to menu dialog"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <p className="text-gray-300 mb-6">
+                Are you sure you want to return to the main menu? Your current game progress will be lost.
+              </p>
+              
+              <div className="flex space-x-3">
+                <button 
+                  onClick={handleReturnToMainMenu}
+                  className="flex-1 bg-red-600 text-white font-semibold py-3 px-5 shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 border border-red-500 transition-colors duration-150" 
+                  style={{ borderRadius: '4px' }}
+                > 
+                  Return to Menu 
+                </button> 
+                <button 
+                  onClick={() => setIsReturnToMenuModalVisible(false)}
+                  className="flex-1 bg-gray-700 text-white font-semibold py-3 px-5 shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-600 transition-colors duration-150" 
+                  style={{ borderRadius: '4px' }}
+                > 
+                  Cancel 
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* SVG Eye for technohorror motif, below main menu buttons on mobile */}
       <div className="w-full flex justify-center items-center mt-8 mb-2 sm:hidden" aria-hidden="false">
         <img 
