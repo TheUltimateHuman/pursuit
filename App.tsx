@@ -21,54 +21,85 @@ const API_KEY_AVAILABLE = typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FRO
 const MAX_MEMORY_LOG_ENTRIES = 15; 
 type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fantasy" | "mythological"; 
 
-// --- GLYPH FIELD OVERLAY COMPONENT (restored) ---
-const GLYPH_SET = [
-  // Heavily weight star-like glyphs for starfield effect
-  ...Array(160).fill('.'),
-  ...Array(200).fill('·'),
-  ...Array(100).fill('•'),
-  ...Array(100).fill('∙'),
-  ...Array(100).fill('°'),
-  ...Array(100).fill('⋅'),
-  ...Array(100).fill("'"),
-  '∆', 'λ', 'µ', 'π', '†', '‡', '§', '¤', '☠', '☢', '☣', '⚠', '⛧', '⟁',
-  '⩫', '⩪', '⩤', '⩥', '⧫', '⧖', '⧗', '⧛', '⧜', '⩶', '⩷', '⩸', '⩹', '⩺', '⩻', '⩼', '⩽', '⩾', '⩿',
-  '⪀', '⪁', '⪂', '⪃', '⪄', '⪅', '⪆', '⪇', '⪈', '⪉', '⪊', '⪋', '⪌', '⪍', '⪎', '⪏', '⪐', '⪑',
-  '⪒', '⪓', '⪔', '⪕', '⪖', '⪗', '⪘', '⪙', '⪚', '⪛', '⪜', '⪝', '⪞', '⪟', '⪠', '⪡', '⪢', '⪣',
-  '⪤', '⪥', '⪦', '⪧', '⪨', '⪩', '⪪', '⪫', '⪬', '⪭', '⪮', '⪯', '⪰', '⪱', '⪲', '⪳', '⪴', '⪵',
-  '⪶', '⪷', '⪸', '⪹', '⪺', '⪻', '⪼', '⪽', '⪾', '⪿', '⫀', '⫁', '⫂', '⫃', '⫄', '⫅', '⫆',
-  '⫇', '⫈', '⫉', '⫊', '⫋', '⫌', '⫍', '⫎', '⫏', '⫐', '⫑', '⫒', '⫓', '⫔', '⫕', '⫖', '⫗',
-  '⫘', '⫙', '⫚', '⫛', '⫝̸', '⫝', '⫞', '⫟', '⫠', '⫡', '⫢', '⫣', '⫤', '⫥', '⫦', '⫧', '⫨',
-  '⫩', '⫪', '⫫', '⫬', '⫭', '⫮', '⫯', '⫰', '⫱', '⫲', '⫳', '⫴', '⫵', '⫶', '⫷', '⫸', '⫹',
-  '⫺', '⫻', '⫼', '⫽', '⫾', '⫿', "☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷", "☍", "☌", "☋", "☊", 
-  "☡", "☥", "☦", "☨", "☩", "☫", "☬", "☭", "☮", "☯", "☸", "☽", "☾", "☿", "♁", "♆", "♇", "♔", 
-  "♕", "♖", "♗", "♘", "♙", "♚", "♛", "♜", "♝", "♞", "♟", "♤", "♧", "♢", "♣", "♠", "⚀", 
-  "⚁", "⚂", "⚃", "⚄", "⚅", "⚇", "⚈", "⚉", "⚚", "⚛", "⚜", "⚝", "⚞", "⚟", "⚠", "⚢", "⚣", 
-  "⚤", "⚥", "⚦", "⚧", "⚨", "⚩", "⚬", "⚭", "⚮", "⚯", "⚰", "⚱", "⚲", "⚳", "⚴", "⚵", 
-  "⚶", "⚷", "⚸", "⚹", "⚺", "⚻", "⚼", "⛤", "⛧", "⛩", "⛰", "⛴", "⛶", "⛷", "⛸", "⛻", "⛼", 
-  "⛿", "✠", "✡", "✢", "✣", "✤", "✥", "✦", "✧", "✩", "✪", "✫", "✬", "✭", "✮", "✯", "✰", 
-  "✱", "✲", "✳", "✴", "✵", "✶", "✷", "✸", "✹", "✺", "✻", "✼", "✽", "✾", "✿", "❂", "❃", 
-  "❄", "❅", "❆", "❇", "❈", "❉", "❊", "❋", "◈", "◉", "◊", "◌", "◍", "◎", "●", "◐", "◑", "◒", 
-  "◓", "◔", "◕", "◖", "◗", "◘", "◙", "◚", "◛", "◜", "◝", "◞", "◟", "◠", "◡", "◢", "◣", "◤", 
-  "◥", "◦", "◧", "◨", "◩", "◪", "◫", "◬", "◭", "◮", "◯", "◰", "◱", "◲", "◳", "◴", "◵", "◶", 
-  "◷", "◸", "◹", "◺", "◻", "◼", "◿","∰", "∮", "∇", "⧉", "⧠", "⧬", "⧵", "⧶", "⧷", "⩚", "⩛",
-   "⟠", "⟡", "⟢", "⟣", "⟦", "⟧", "⟬", "⟭", "⟮", "⟯", "‡", "§", "¶", "ℓ", "№", "⌁", "⌂", "⌖", "⌗", 
-  "⌙", "‽", "⁂", "∴", "∵", "∷",
-  '⌜', '⌝', '⌞', '⌟', '⌠', '⌡', '⌢', '⌣', '⌤', '⌥', '⌦', '⌧', '⌨', '〈', '〉', '⌫', '⌬', '⌭', '⌮', '⌯', '⌰', '⌱', '⌲', '⌳', '⌴', '⌵', '⌶', '⌷', '⌸', '⌹', '⌺', '⌻', '⌼', '⌽', '⌾', '⌿',
-  '∰', '∮', '∇', '⧉', '⧠', '⧬', '⧵', '⧶', '⧷', '⩚', '⩛',
-  '⟠', '⟡', '⟢', '⟣', '⟦', '⟧', '⟬', '⟭', '⟮', '⟯', '¶', 'ℓ', '№',
-  '‽', '⁂', '∴', '∵', '∷',
-  '⧸', '⧹', '⧺', '⧻', '⧼', '⧽', '⧾', '⧿', '⩀', '⩁', '⩂', '⩃', '⩄', '⩅', '⩆', '⩇', '⩈', '⩉', '⩊', '⩋', '⩌', '⩍', '⩎', '⩏', '⩐', '⩑', '⩒', '⩓', '⩔', '⩕', '⩖', '⩗', '⩘', '⩙',
-  '⟰', '⟱', '⟲', '⟳', '⟴', '⟵', '⟶', '⟷', '⟸', '⟹', '⟺', '⟻', '⟼', '⟽', '⟾', '⟿', '⤀', '⤁', '⤂', '⤃', '⤄', '⤅', '⤆', '⤇', '⤈', '⤉', '⤊', '⤋', '⤌', '⤍', '⤎', '⤏', '⤐', '⤑', '⤒', '⤓', '⤔', '⤕', '⤖', '⤗', '⤘', '⤙', '⤚', '⤛', '⤜', '⤝', '⤞', '⤟',
-  'ℵ', 'ℶ', 'ℷ', 'ℸ', 'ℹ', '℻', 'ℼ', 'ℽ', 'ℾ', 'ℿ', '⅀', '⅁', '⅂', '⅃', '⅄', 'ⅅ', 'ⅆ', 'ⅇ', 'ⅈ', 'ⅉ', '⅊', '⅋', '⅌', '⅍', 'ⅎ', '⅏',
-  '∅', '∃', '∄', '∈', '∉', '∊', '∋', '∌', '∍', '∎', '∏', '∐', '∑', '∓', '∔', '∕', '∖', '∗', '∘', '√', '∛', '∜', '∝', '∞', '∟', '∠', '∡', '∢', '∣', '∤', '∥', '∦', '∧', '∨', '∩', '∪', '∫', '∬', '∭'
-];
+// --- GLYPH SETS BY GENRE ---
+const GLYPH_SETS = {
+  // Common glyphs used across all genres (basic dots and simple shapes)
+  common: [
+    ...Array(160).fill('.'),
+    ...Array(200).fill('·'),
+    ...Array(100).fill('•'),
+    ...Array(100).fill('∙'),
+    ...Array(100).fill('°'),
+    ...Array(100).fill('⋅'),
+    ...Array(100).fill("'"),
+  ],
 
-function getRandomGlyph() {
-  return GLYPH_SET[Math.floor(Math.random() * GLYPH_SET.length)];
+  // Science Fiction glyphs (technological, mathematical, and scientific symbols)
+  scifi: [
+    '∆', 'λ', 'µ', 'π', '⚛', '⌬', '⌭', '⌮', '⌯', '⌰', '⌱', '⌲', '⌳',
+    '⌴', '⌵', '⌶', '⌷', '⌸', '⌹', '⌺', '⌻', '⌼', '⌽', '⌾', '⌿',
+    '∰', '∮', '∇', '⧉', '⧠', '⧬', '⧵', '⧶', '⧷', '⩚', '⩛',
+    '⟠', '⟡', '⟢', '⟣', '⟦', '⟧', '⟬', '⟭', '⟮', '⟯',
+    '∅', '∃', '∄', '∈', '∉', '∊', '∋', '∌', '∍', '∎', '∏',
+    '∐', '∑', '∓', '∔', '∕', '∖', '∗', '∘', '√', '∛', '∜',
+    '∝', '∞', '∟', '∠', '∡', '∢', '∣', '∤', '∥', '∦', '∧',
+    '∨', '∩', '∪', '∫', '∬', '∭'
+  ],
+
+  // Fantasy glyphs (mystical symbols, runes, and magical signs)
+  fantasy: [
+    '†', '‡', '§', '¤', '☠', '☢', '☣', '⚠', '⛧', '⟁',
+    '✠', '✡', '✢', '✣', '✤', '✥', '✦', '✧', '✩', '✪',
+    '✫', '✬', '✭', '✮', '✯', '✰', '✱', '✲', '✳', '✴',
+    '✵', '✶', '✷', '✸', '✹', '✺', '✻', '✼', '✽', '✾',
+    '✿', '❂', '❃', '❄', '❅', '❆', '❇', '❈', '❉', '❊',
+    '❋', '◈', '◉', '◊', '◌', '◍', '◎', '●', '◐', '◑',
+    '◒', '◓', '◔', '◕'
+  ],
+
+  // Historical glyphs (ancient symbols, hieroglyphs, and traditional marks)
+  historical: [
+    '☥', '☦', '☧', '☨', '☩', '☫', '☬', '☭', '☮', '☯',
+    '☸', '☽', '☾', '☿', '♁', '♆', '♇', '♔', '♕', '♖',
+    '♗', '♘', '♙', '♚', '♛', '♜', '♝', '♞', '♟', '♤',
+    '♧', '♢', '♣', '♠', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'
+  ],
+
+  // Mythological glyphs (divine symbols, celestial marks)
+  mythological: [
+    '⚇', '⚈', '⚉', '⚚', '⚜', '⚝', '⚞', '⚟', '⚢', '⚣',
+    '⚤', '⚥', '⚦', '⚧', '⚨', '⚩', '⚬', '⚭', '⚮', '⚯',
+    '⚰', '⚱', '⚲', '⚳', '⚶', '⚷', '⚸', '⚹', '⚺', '⚻',
+    '⚼', '⛤', '⛧', '⛩'
+  ]
+};
+
+function getRandomGlyphForGenre(genre: string | undefined | null): string {
+  // Default to common glyphs if no genre is specified
+  if (!genre) {
+    return GLYPH_SETS.common[Math.floor(Math.random() * GLYPH_SETS.common.length)];
+  }
+
+  // Determine which glyph set to use based on the genre prefix
+  let genreSet: string[];
+  if (genre.toLowerCase().startsWith('science fiction:')) {
+    genreSet = [...GLYPH_SETS.common, ...GLYPH_SETS.scifi];
+  } else if (genre.toLowerCase().startsWith('fantasy:')) {
+    genreSet = [...GLYPH_SETS.common, ...GLYPH_SETS.fantasy];
+  } else if (genre.toLowerCase().startsWith('historical:')) {
+    genreSet = [...GLYPH_SETS.common, ...GLYPH_SETS.historical];
+  } else if (genre.toLowerCase().startsWith('mythological:')) {
+    genreSet = [...GLYPH_SETS.common, ...GLYPH_SETS.mythological];
+  } else {
+    // For any other genre or no match, use common glyphs
+    genreSet = GLYPH_SETS.common;
+  }
+
+  return genreSet[Math.floor(Math.random() * genreSet.length)];
 }
 
-const GlyphFieldOverlay: React.FC = () => {
+// --- GLYPH FIELD OVERLAY COMPONENT ---
+const GlyphFieldOverlay: React.FC<{ currentScenario?: string | null }> = ({ currentScenario }) => {
   // Calculate grid size based on viewport
   const [dimensions, setDimensions] = React.useState({ cols: 32, rows: 18 });
   const [glyphs, setGlyphs] = React.useState<string[]>([]);
@@ -88,12 +119,12 @@ const GlyphFieldOverlay: React.FC = () => {
   // Animate glyphs: shimmer effect
   React.useEffect(() => {
     function randomizeGlyphs() {
-      setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, getRandomGlyph));
+      setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, () => getRandomGlyphForGenre(currentScenario)));
     }
     randomizeGlyphs();
-    const interval = setInterval(randomizeGlyphs, 4000); // Much slower flicker for visual spice
+    const interval = setInterval(randomizeGlyphs, 10000); // Much slower animation (10 seconds) for a more atmospheric effect
     return () => clearInterval(interval);
-  }, [dimensions]);
+  }, [dimensions, currentScenario]);
 
   return (
     <div
@@ -227,7 +258,12 @@ const App: React.FC = () => {
   useEffect(() => {
     if (typingIndex < fullTitle.length) return;
     
+    let pauseTimeout: NodeJS.Timeout | null = null;
+    let isPaused = false;
+    
     const interval = setInterval(() => {
+      if (isPaused) return;
+      
       const currentPos = underscorePosRef.current;
       const currentDir = underscoreDirRef.current;
       const newPos = currentPos + currentDir;
@@ -238,18 +274,33 @@ const App: React.FC = () => {
         underscorePosRef.current = 0;
         setUnderscoreDir(1);
         setUnderscorePos(0);
+        // Add random pause
+        isPaused = true;
+        const pauseDuration = Math.floor(Math.random() * 4) + 1; // 1-4 ticks
+        pauseTimeout = setTimeout(() => {
+          isPaused = false;
+        }, pauseDuration * 1800); // Each tick is 1.8s
       } else if (newPos >= fullTitle.length - 1) {
         underscoreDirRef.current = -1; // Start moving left (Y to Q)
         underscorePosRef.current = fullTitle.length - 1;
         setUnderscoreDir(-1);
         setUnderscorePos(fullTitle.length - 1);
+        // Add random pause
+        isPaused = true;
+        const pauseDuration = Math.floor(Math.random() * 4) + 1; // 1-4 ticks
+        pauseTimeout = setTimeout(() => {
+          isPaused = false;
+        }, pauseDuration * 1800); // Each tick is 1.8s
       } else {
         underscorePosRef.current = newPos;
         setUnderscorePos(newPos);
       }
-    }, 800); // Slower, more ominous (was 400ms)
+    }, 1800); // Much slower animation (1.8s per tick, was 800ms)
     
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (pauseTimeout) clearTimeout(pauseTimeout);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typingIndex]);
 
@@ -711,7 +762,7 @@ const App: React.FC = () => {
 
   return ( 
     <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 pl-2 pr-4 selection:bg-red-700 selection:text-white font-['Inter']" style={{ position: 'relative', zIndex: 1 }}>
-      <GlyphFieldOverlay />
+      <GlyphFieldOverlay currentScenario={currentScenarioTheme} />
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
