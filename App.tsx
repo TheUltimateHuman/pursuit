@@ -141,14 +141,13 @@ const GlyphFieldOverlay: React.FC<{ currentScenario?: string | null }> = ({ curr
         inset: 0,
         zIndex: 0,
         pointerEvents: 'none',
-        opacity: 0.08,
-        color: '#ffe066',
+        opacity: 0.22,
+        color: '#000',
         fontFamily: 'JetBrains Mono, monospace',
         fontWeight: 700,
         fontSize: '0.7rem',
         lineHeight: 1,
         userSelect: 'none',
-        mixBlendMode: 'screen',
         transition: 'opacity 0.5s',
       }}
     >
@@ -226,6 +225,7 @@ const App: React.FC = () => {
   const [typingIndex, setTypingIndex] = useState(0);
   const [underscorePos, setUnderscorePos] = useState(fullTitle.length - 1); // Start at Y
   const [underscoreDir, setUnderscoreDir] = useState(-1); // Start moving left (Y to Q)
+  const [isUnderscoreVisible, setIsUnderscoreVisible] = useState(true);
 
   // Use refs to track current state for animation
   const underscorePosRef = useRef(fullTitle.length - 1);
@@ -254,7 +254,7 @@ const App: React.FC = () => {
             return prev;
           }
         });
-      }, 120);
+      }, 240); // Slower, more human-like typing speed
     }, 0);
     return () => {
       clearTimeout(timeout);
@@ -266,7 +266,19 @@ const App: React.FC = () => {
     if (typingIndex < fullTitle.length) return;
     
     let pauseTimeout: NodeJS.Timeout | null = null;
+    let blinkInterval: NodeJS.Timeout | null = null;
     let isPaused = false;
+    
+    const startBlinking = () => {
+      setIsUnderscoreVisible(true);
+      blinkInterval = setInterval(() => {
+        setIsUnderscoreVisible((v) => !v);
+      }, 400);
+    };
+    const stopBlinking = () => {
+      if (blinkInterval) clearInterval(blinkInterval);
+      setIsUnderscoreVisible(true);
+    };
     
     const interval = setInterval(() => {
       if (isPaused) return;
@@ -281,32 +293,38 @@ const App: React.FC = () => {
         underscorePosRef.current = 0;
         setUnderscoreDir(1);
         setUnderscorePos(0);
-        // Add random pause
+        // Add random pause and start blinking
         isPaused = true;
+        startBlinking();
         const pauseDuration = Math.floor(Math.random() * 4) + 1; // 1-4 ticks
         pauseTimeout = setTimeout(() => {
           isPaused = false;
+          stopBlinking();
         }, pauseDuration * 1800); // Each tick is 1.8s
       } else if (newPos >= fullTitle.length - 1) {
         underscoreDirRef.current = -1; // Start moving left (Y to Q)
         underscorePosRef.current = fullTitle.length - 1;
         setUnderscoreDir(-1);
         setUnderscorePos(fullTitle.length - 1);
-        // Add random pause
+        // Add random pause and start blinking
         isPaused = true;
+        startBlinking();
         const pauseDuration = Math.floor(Math.random() * 4) + 1; // 1-4 ticks
         pauseTimeout = setTimeout(() => {
           isPaused = false;
+          stopBlinking();
         }, pauseDuration * 1800); // Each tick is 1.8s
       } else {
         underscorePosRef.current = newPos;
         setUnderscorePos(newPos);
+        stopBlinking();
       }
     }, 1800); // Much slower animation (1.8s per tick, was 800ms)
     
     return () => {
       clearInterval(interval);
       if (pauseTimeout) clearTimeout(pauseTimeout);
+      if (blinkInterval) clearInterval(blinkInterval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typingIndex]);
@@ -784,7 +802,7 @@ const App: React.FC = () => {
               <span key={idx} style={{ position: 'relative', display: 'inline-block', minWidth: '1em' }}>
                 {char}
                 {/* Animated underscore as underline, only after typing finishes */}
-                {typingIndex === fullTitle.length && underscorePos === idx && (
+                {typingIndex === fullTitle.length && underscorePos === idx && isUnderscoreVisible && (
                   <span style={{
                     position: 'absolute',
                     left: 0,
