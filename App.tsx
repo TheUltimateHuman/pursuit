@@ -198,8 +198,8 @@ const App: React.FC = () => {
   const underscorePosRef = useRef(fullTitle.length - 1);
   const underscoreDirRef = useRef(-1);
 
-  // Add a tick state to drive both animations
-  const [animationTick, setAnimationTick] = useState(0);
+  // Add a tick state to drive only the glyph shimmer animation
+  const [glyphTick, setGlyphTick] = useState(0);
 
   // Initial typing animation
   useEffect(() => {
@@ -210,7 +210,7 @@ const App: React.FC = () => {
     setUnderscoreDir(-1); // Start moving left (Y to Q)
     underscorePosRef.current = fullTitle.length - 1;
     underscoreDirRef.current = -1;
-    setAnimationTick(0); // Reset animation tick when typing starts
+    setGlyphTick(0); // Reset glyph shimmer tick when typing starts
     const timeout = setTimeout(() => {
       const interval = setInterval(() => {
         setTypedTitle((prev) => {
@@ -232,38 +232,38 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Remove individual intervals for glyphs and underscore, and use a single interval
+  // Glyph shimmer animation (driven by its own timer)
   useEffect(() => {
-    if (typingIndex < fullTitle.length) return;
-    // Only start animation after typing is fully complete
     const interval = setInterval(() => {
-      setAnimationTick(tick => tick + 1);
+      setGlyphTick(tick => tick + 1);
     }, 800);
     return () => clearInterval(interval);
-  }, [typingIndex]);
+  }, []);
 
-  // Terminal-style underline animation: move left to right (Q to Y), then right to left (Y to Q), driven by animationTick
+  // Terminal-style underline animation: move left to right (Q to Y), then right to left (Y to Q), driven by its own timer
   useEffect(() => {
     if (typingIndex < fullTitle.length) return;
-    if (animationTick === 0) return;
-    const currentPos = underscorePosRef.current;
-    const currentDir = underscoreDirRef.current;
-    const newPos = currentPos + currentDir;
-    if (newPos <= 0) {
-      underscoreDirRef.current = 1;
-      underscorePosRef.current = 0;
-      setUnderscoreDir(1);
-      setUnderscorePos(0);
-    } else if (newPos >= fullTitle.length - 1) {
-      underscoreDirRef.current = -1;
-      underscorePosRef.current = fullTitle.length - 1;
-      setUnderscoreDir(-1);
-      setUnderscorePos(fullTitle.length - 1);
-    } else {
-      underscorePosRef.current = newPos;
-      setUnderscorePos(newPos);
-    }
-  }, [animationTick, typingIndex]);
+    const interval = setInterval(() => {
+      const currentPos = underscorePosRef.current;
+      const currentDir = underscoreDirRef.current;
+      const newPos = currentPos + currentDir;
+      if (newPos <= 0) {
+        underscoreDirRef.current = 1;
+        underscorePosRef.current = 0;
+        setUnderscoreDir(1);
+        setUnderscorePos(0);
+      } else if (newPos >= fullTitle.length - 1) {
+        underscoreDirRef.current = -1;
+        underscorePosRef.current = fullTitle.length - 1;
+        setUnderscoreDir(-1);
+        setUnderscorePos(fullTitle.length - 1);
+      } else {
+        underscorePosRef.current = newPos;
+        setUnderscorePos(newPos);
+      }
+    }, 900); // Methodical, slow pace
+    return () => clearInterval(interval);
+  }, [typingIndex, fullTitle.length]);
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
@@ -723,7 +723,7 @@ const App: React.FC = () => {
 
   return ( 
     <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 pl-2 pr-4 selection:bg-red-700 selection:text-white font-['Inter']" style={{ position: 'relative', zIndex: 1 }}>
-      <GlyphFieldOverlay tick={animationTick} />
+      <GlyphFieldOverlay tick={glyphTick} />
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
