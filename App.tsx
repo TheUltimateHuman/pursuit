@@ -102,7 +102,7 @@ const GlyphFieldOverlay: React.FC = () => {
         fontSize: '0.7rem',
         lineHeight: 1,
         userSelect: 'none',
-        mixBlendMode: 'screen',
+        mixBlendMode: 'normal',
         transition: 'opacity 0.5s',
       }}
     >
