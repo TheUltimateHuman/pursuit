@@ -210,6 +210,7 @@ const App: React.FC = () => {
     setUnderscoreDir(-1); // Start moving left (Y to Q)
     underscorePosRef.current = fullTitle.length - 1;
     underscoreDirRef.current = -1;
+    setAnimationTick(0); // Reset animation tick when typing starts
     const timeout = setTimeout(() => {
       const interval = setInterval(() => {
         setTypedTitle((prev) => {
@@ -234,9 +235,10 @@ const App: React.FC = () => {
   // Remove individual intervals for glyphs and underscore, and use a single interval
   useEffect(() => {
     if (typingIndex < fullTitle.length) return;
+    // Only start animation after typing is fully complete
     const interval = setInterval(() => {
       setAnimationTick(tick => tick + 1);
-    }, 800); // Unified, slow, ominous
+    }, 800);
     return () => clearInterval(interval);
   }, [typingIndex]);
 
