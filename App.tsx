@@ -410,11 +410,9 @@ const App: React.FC = () => {
     setIsCustomScenarioModalVisible(false); 
     setLastUsedThemeType(null); 
     setLastUsedCustomScenario(scenario); // Store the selected custom scenario
-    setCurrentScenarioTheme(scenario); // Set the scenario theme first
-    startGame(); // Then start the game
-    setCurrentScenarioTheme(scenario); // Ensure the scenario theme is set after startGame
+    setCurrentScenarioTheme(scenario); // Set the scenario theme
     processApiResponse(fetchInitialStory(scenario), true); 
-  }, [startGame, processApiResponse, setError]);
+  }, [processApiResponse, setError]);
 
   // --- NEW HANDLER FOR CUSTOM SCENARIO INPUT ---
   const handleCustomScenarioSubmit = useCallback(() => {
@@ -432,12 +430,10 @@ const App: React.FC = () => {
     setIsCustomScenarioInputVisible(false);
     setLastUsedThemeType(null);
     setLastUsedCustomScenario(scenarioText);
-    setCurrentScenarioTheme(scenarioText); // Set the scenario theme first
-    startGame(); // Then start the game
-    setCurrentScenarioTheme(scenarioText); // Ensure the scenario theme is set after startGame
+    setCurrentScenarioTheme(scenarioText); // Set the scenario theme
     setCustomScenarioText("");
     processApiResponse(fetchInitialStory(scenarioText), true);
-  }, [customScenarioText, startGame, processApiResponse, setError]);
+  }, [customScenarioText, processApiResponse, setError]);
 
   const handleChoiceSelected = useCallback((choice: string | ChoiceType) => { 
     if (isGameOver) return; 
@@ -525,12 +521,17 @@ const App: React.FC = () => {
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
         <h1 
-          className={`text-9xl md:text-9xl lg:text-10xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+          className={`text-8xl md:text-8xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
           onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         > 
           QUARRY 
         </h1> 
+        {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
+          <p className="text-sm italic text-gray-300 mt-2 font-['Inter']">
+            "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MODERN:|SCI_FI:|FANTASY:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
+          </p>
+        )}
       </header> 
 
       <main className="w-full max-w-3xl flex flex-col items-center"> 
@@ -656,7 +657,7 @@ const App: React.FC = () => {
         <div className="w-full max-w-xl flex flex-col items-center mt-4 md:mt-6"> 
 
             {isDisplayingInitialStartOptions && ( 
-                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"> 
+                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4"> 
                     <button 
                         key="random" 
                         onClick={() => handleStartGameWithTheme("random")} 
@@ -666,10 +667,6 @@ const App: React.FC = () => {
                         Random 
                     </button> 
                     <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>Realism</button> 
-                    <button key="historical" onClick={() => handleStartGameWithTheme("historical")} className={specificThemeButtonClass} disabled={isLoading}>Historical</button> 
-                    <button key="modern" onClick={() => handleStartGameWithTheme("modern")} className={specificThemeButtonClass} disabled={isLoading}>Modern</button> 
-                    <button key="scifi" onClick={() => handleStartGameWithTheme("sci_fi")} className={specificThemeButtonClass} disabled={isLoading}>Sci-Fi</button> 
-                    <button key="fantasy" onClick={() => handleStartGameWithTheme("fantasy")} className={specificThemeButtonClass} disabled={isLoading}>Fantasy</button> 
                     <button 
                       key="select" 
                       onClick={() => setIsCustomScenarioModalVisible(true)} 
