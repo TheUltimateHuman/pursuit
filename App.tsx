@@ -314,40 +314,34 @@ const App: React.FC = () => {
       const currentPos = underscorePosRef.current;
       const currentDir = underscoreDirRef.current;
       const newPos = currentPos + currentDir;
-      // If we hit Q (pos === 0) while moving left, or Y (pos === length-1) while moving right
-      if (newPos <= 0) {
-        underscoreDirRef.current = 1; // Start moving right (Q to Y)
-        underscorePosRef.current = 0;
-        setUnderscoreDir(1);
-        setUnderscorePos(0);
-        // Add random pause and start blinking
-        isPaused = true;
-        startBlinking();
-        const pauseDuration = Math.floor(Math.random() * 4) + 1; // 1-4 ticks
-        pauseTimeout = setTimeout(() => {
-          isPaused = false;
-          stopBlinking();
-          moveUnderscore();
-        }, pauseDuration * 1800); // Each tick is 1.8s
-      } else if (newPos >= fullTitle.length - 1) {
-        underscoreDirRef.current = -1; // Start moving left (Y to Q)
-        underscorePosRef.current = fullTitle.length - 1;
-        setUnderscoreDir(-1);
-        setUnderscorePos(fullTitle.length - 1);
-        // Add random pause and start blinking
-        isPaused = true;
-        startBlinking();
-        const pauseDuration = Math.floor(Math.random() * 4) + 1; // 1-4 ticks
-        pauseTimeout = setTimeout(() => {
-          isPaused = false;
-          stopBlinking();
-          moveUnderscore();
-        }, pauseDuration * 1800); // Each tick is 1.8s
-      } else {
+      // If we are about to land on Q (0) or Y (length-1), move there, then pause, then reverse
+      if ((currentDir === -1 && currentPos === 1) || (currentDir === 1 && currentPos === fullTitle.length - 2)) {
+        // Move to end
         underscorePosRef.current = newPos;
         setUnderscorePos(newPos);
         stopBlinking();
-        // Randomize next move interval (e.g., 1.1s to 2.2s)
+        // Pause at the end
+        isPaused = true;
+        startBlinking();
+        const pauseDuration = Math.floor(Math.random() * 4) + 1; // 1-4 ticks
+        pauseTimeout = setTimeout(() => {
+          isPaused = false;
+          stopBlinking();
+          // Reverse direction
+          if (newPos === 0) {
+            underscoreDirRef.current = 1;
+            setUnderscoreDir(1);
+          } else if (newPos === fullTitle.length - 1) {
+            underscoreDirRef.current = -1;
+            setUnderscoreDir(-1);
+          }
+          moveUnderscore();
+        }, pauseDuration * 1800);
+      } else {
+        // Normal move
+        underscorePosRef.current = newPos;
+        setUnderscorePos(newPos);
+        stopBlinking();
         const randomMove = 1100 + Math.random() * 1100;
         moveTimeout = setTimeout(moveUnderscore, randomMove);
       }
