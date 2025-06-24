@@ -98,7 +98,7 @@ const GlyphFieldOverlay: React.FC<{ tick: number }> = ({ tick }) => {
         inset: 0,
         zIndex: 0,
         pointerEvents: 'none',
-        opacity: 0.05,
+        opacity: 0.08,
         color: '#ffe066',
         fontFamily: 'JetBrains Mono, monospace',
         fontWeight: 700,
@@ -224,7 +224,7 @@ const App: React.FC = () => {
             return prev;
           }
         });
-      }, 180);
+      }, 120);
     }, 0);
     return () => {
       clearTimeout(timeout);
