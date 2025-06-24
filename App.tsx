@@ -146,7 +146,7 @@ const GlyphFieldOverlay = React.forwardRef<{ shuffleGlyphs: () => void }, { curr
         inset: 0,
         zIndex: -1,
         pointerEvents: 'none',
-        opacity: 0.22,
+        opacity: 0.12,
         color: '#000',
         fontFamily: 'JetBrains Mono, monospace',
         fontWeight: 700,
@@ -154,6 +154,7 @@ const GlyphFieldOverlay = React.forwardRef<{ shuffleGlyphs: () => void }, { curr
         lineHeight: 1,
         userSelect: 'none',
         transition: 'opacity 0.5s',
+        mixBlendMode: 'multiply',
       }}
     >
       <div
