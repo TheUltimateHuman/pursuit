@@ -1,5 +1,3 @@
-
-
 export interface Choice {
   text: string;
   triggersCombat?: boolean; // If this choice leads directly to combat
@@ -13,6 +11,7 @@ export interface PersistentThreat {
   currentHealth: number;
   senses?: string[]; // Primary senses for detection (e.g., "Acute Hearing", "Thermal Vision")
   lastKnownAction?: string;
+  redacted?: boolean;
 }
 
 export interface CombatOutcome {
@@ -86,6 +85,7 @@ export interface GeminiApiResponse {
     description: string;
     maxHealth: number;
     senses?: string[]; // Primary senses defined at pursuer creation
+    redacted?: boolean;
   };
   updatedThreatStatus?: PersistentThreat['status'];
   threatEncounterMessage?: string;

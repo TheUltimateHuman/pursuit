@@ -98,7 +98,7 @@ const GlyphFieldOverlay: React.FC<{ tick: number }> = ({ tick }) => {
         inset: 0,
         zIndex: 0,
         pointerEvents: 'none',
-        opacity: 0.08,
+        opacity: 0.05,
         color: '#ffe066',
         fontFamily: 'JetBrains Mono, monospace',
         fontWeight: 700,
@@ -119,7 +119,17 @@ const GlyphFieldOverlay: React.FC<{ tick: number }> = ({ tick }) => {
         }}
       >
         {glyphs.map((glyph, i) => (
-          <span key={i} style={{ opacity: Math.random() * 0.7 + 0.3 }}>{glyph}</span>
+          <span
+            key={i}
+            style={{
+              opacity: 0.2 + Math.random() * 0.3, // subtle random flicker (0.2-0.5)
+              textShadow: '0 0 2px #ffe066, 0 0 8px #ff0040, 1px 0 2px #00fff7', // glow/glitch
+              transform: `skewX(${(Math.random() * 4 - 2).toFixed(2)}deg) skewY(${(Math.random() * 4 - 2).toFixed(2)}deg)`, // slight random skew
+              transition: 'opacity 0.3s, transform 0.3s',
+            }}
+          >
+            {glyph}
+          </span>
         ))}
       </div>
     </div>
@@ -214,7 +224,7 @@ const App: React.FC = () => {
             return prev;
           }
         });
-      }, 120);
+      }, 180);
     }, 0);
     return () => {
       clearTimeout(timeout);
@@ -408,6 +418,7 @@ const App: React.FC = () => {
             senses: persistentThreatDetails.senses || [], 
             status: updatedThreatStatus || 'distant', 
             lastKnownAction: threatEncounterMessage || "Lurking...", 
+            redacted: persistentThreatDetails.redacted
           }; 
           tempPersistentThreat = newThreat; 
           setPersistentThreat(newThreat); 
@@ -887,10 +898,10 @@ const App: React.FC = () => {
                     <button 
                         key="random" 
                         onClick={() => handleStartGameWithTheme("random")}
-                        className={randomThemeButtonClass + " focus:ring-2 focus:ring-black focus:ring-opacity-75"} 
+                        className={randomThemeButtonClass + " focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-75"} 
                         disabled={isLoading} 
                     > 
-                        RANDOM
+                        RANDOM SCENARIO
                     </button> 
                     {/* Category random buttons in 2-column, 3-row grid on mobile */}
                     <div className="w-full grid grid-cols-2 gap-3 my-4 sm:my-6">
@@ -944,22 +955,24 @@ const App: React.FC = () => {
                         </button>
                     </div>
                     {/* Existing Select and Custom buttons */}
-                    <button 
-                      key="select" 
-                      onClick={() => setIsCustomScenarioModalVisible(true)} 
-                      className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
-                      disabled={isLoading} 
-                    > 
-                      SELECT...
-                    </button> 
-                    <button 
-                      key="custom" 
-                      onClick={() => setIsCustomScenarioInputVisible(true)} 
-                      className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
-                      disabled={isLoading} 
-                    > 
-                      CUSTOM...
-                    </button> 
+                    <div className="w-full flex flex-col gap-3">
+                      <button 
+                        key="select" 
+                        onClick={() => setIsCustomScenarioModalVisible(true)} 
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
+                        disabled={isLoading} 
+                      > 
+                        SELECT...
+                      </button> 
+                      <button 
+                        key="custom" 
+                        onClick={() => setIsCustomScenarioInputVisible(true)} 
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
+                        disabled={isLoading} 
+                      > 
+                        CUSTOM...
+                      </button> 
+                    </div>
                 </div>
             )}
 
