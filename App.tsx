@@ -162,7 +162,7 @@ const GlyphFieldOverlay: React.FC<{ currentScenario?: string | null }> = ({ curr
         }}
       >
         {glyphs.map((glyph, i) => (
-          <span key={i} style={{ opacity: Math.random() * 0.7 + 0.3 }}>{glyph}</span>
+          <span key={i} style={{ opacity: 0.7 }}>{glyph}</span>
         ))}
       </div>
     </div>
@@ -241,25 +241,32 @@ const App: React.FC = () => {
     setUnderscoreDir(-1); // Start moving left (Y to Q)
     underscorePosRef.current = fullTitle.length - 1;
     underscoreDirRef.current = -1;
-    const timeout = setTimeout(() => {
-      const interval = setInterval(() => {
-        setTypedTitle((prev) => {
-          if (i < fullTitle.length) {
-            const next = prev + fullTitle[i];
-            i++;
-            setTypingIndex(i);
-            return next;
-          } else {
-            clearInterval(interval);
-            setTypingIndex(fullTitle.length);
-            return prev;
-          }
-        });
-      }, 240); // Slower, more human-like typing speed
-    }, 0);
-    return () => {
-      clearTimeout(timeout);
-    };
+    let cancelled = false;
+
+    function typeNextChar() {
+      if (cancelled) return;
+      setTypedTitle((prev) => {
+        if (i < fullTitle.length) {
+          const next = prev + fullTitle[i];
+          i++;
+          setTypingIndex(i);
+          // Determine pause: longer after space or punctuation
+          let base = 180; // base ms
+          let extra = 0;
+          const char = fullTitle[i - 1];
+          if (char === ' ' || char === '\n') extra += 120;
+          if (/[.,!?;:]/.test(char)) extra += 180;
+          const randomPause = base + extra + Math.floor(Math.random() * 180); // 180-480ms
+          setTimeout(typeNextChar, randomPause);
+          return next;
+        } else {
+          setTypingIndex(fullTitle.length);
+          return prev;
+        }
+      });
+    }
+    setTimeout(typeNextChar, 400); // Initial pause
+    return () => { cancelled = true; };
   }, []);
 
   // Terminal-style underline animation: move left to right (Q to Y), then right to left (Y to Q)
