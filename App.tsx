@@ -75,9 +75,16 @@ const GLYPH_SETS = {
 };
 
 function getRandomGlyphForGenre(genre: string | undefined | null): string {
-  // Default to common glyphs if no genre is specified
+  // If no genre is specified, use all glyphs (common + all genres)
   if (!genre) {
-    return GLYPH_SETS.common[Math.floor(Math.random() * GLYPH_SETS.common.length)];
+    const allGlyphs = [
+      ...GLYPH_SETS.common,
+      ...GLYPH_SETS.scifi,
+      ...GLYPH_SETS.fantasy,
+      ...GLYPH_SETS.historical,
+      ...GLYPH_SETS.mythological,
+    ];
+    return allGlyphs[Math.floor(Math.random() * allGlyphs.length)];
   }
 
   // Determine which glyph set to use based on the genre prefix
