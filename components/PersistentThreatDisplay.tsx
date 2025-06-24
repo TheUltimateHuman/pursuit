@@ -58,7 +58,7 @@ const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threa
     >
       <h4 className="text-md font-semibold text-red-300 mb-1">
         THREAT: {threat.redacted ? (
-          <span className="font-bold px-2 py-0.5 rounded" style={{ background: 'black', color: 'white', letterSpacing: '0.08em' }} aria-label="Threat name is redacted">[REDACTED]</span>
+          <span className="font-bold px-2 py-0.5 rounded" style={{ background: 'black', color: '#ffe066', letterSpacing: '0.08em' }} aria-label="Threat name is redacted">[REDACTED]</span>
         ) : (
           <span className="text-red-200 font-bold">{threat.name}</span>
         )}
