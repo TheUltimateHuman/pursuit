@@ -116,7 +116,7 @@ const GlyphFieldOverlay: React.FC = () => {
         }}
       >
         {glyphs.map((glyph, i) => (
-          <span key={i} style={{ opacity: Math.random() * 0.7 + 0.3 }}>{glyph}</span>
+          <span key={i} style={{ opacity: Math.random() * 0.7 + 0.3, transform: 'rotate(45deg)', display: 'inline-block' }}>{glyph}</span>
         ))}
       </div>
     </div>
@@ -164,6 +164,20 @@ const App: React.FC = () => {
   const [isCustomScenarioInputVisible, setIsCustomScenarioInputVisible] = useState<boolean>(false);
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
+
+  // Typing effect for title
+  const [typedTitle, setTypedTitle] = useState('');
+  useEffect(() => {
+    const fullTitle = 'QUARRY';
+    let i = 0;
+    setTypedTitle('');
+    const interval = setInterval(() => {
+      setTypedTitle((prev) => prev + fullTitle[i]);
+      i++;
+      if (i >= fullTitle.length) clearInterval(interval);
+    }, 120);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
@@ -627,11 +641,11 @@ const App: React.FC = () => {
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
         <h1 
           className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
-          style={{ fontSize: '5.625rem' }}
+          style={{ fontSize: '5.625rem', letterSpacing: '0.15em', minHeight: '6.5rem' }}
           onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
-        > 
-          QUARRY 
+        >
+          {typedTitle}
         </h1> 
         {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
           <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
@@ -770,7 +784,7 @@ const App: React.FC = () => {
                         className={randomThemeButtonClass + " focus:ring-black"} 
                         disabled={isLoading} 
                     > 
-                        Random 
+                        RANDOM
                     </button> 
                     {/* Category random buttons in 2-column, 3-row grid on mobile */}
                     <div className="w-full grid grid-cols-2 gap-3 my-4 sm:my-6">
@@ -788,7 +802,7 @@ const App: React.FC = () => {
                             className="w-full font-semibold py-2 px-2 text-base border bg-gray-900 text-gray-100 border-gray-700 hover:bg-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
                             disabled={isLoading}
                         >
-                            Contemporary
+                            CONTEMPORARY
                         </button>
                         <button
                             key="fantasy"
@@ -796,7 +810,7 @@ const App: React.FC = () => {
                             className="w-full font-semibold py-2 px-2 text-base border bg-gray-900 text-gray-100 border-gray-700 hover:bg-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
                             disabled={isLoading}
                         >
-                            Fantasy
+                            FANTASY
                         </button>
                         <button
                             key="historical"
@@ -804,7 +818,7 @@ const App: React.FC = () => {
                             className="w-full font-semibold py-2 px-2 text-base border bg-gray-900 text-gray-100 border-gray-700 hover:bg-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
                             disabled={isLoading}
                         >
-                            Historical
+                            HISTORICAL
                         </button>
                         <button
                             key="mythological"
@@ -812,7 +826,7 @@ const App: React.FC = () => {
                             className="w-full font-semibold py-2 px-2 text-base border bg-gray-900 text-gray-100 border-gray-700 hover:bg-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
                             disabled={isLoading}
                         >
-                            Mythological
+                            MYTHOLOGICAL
                         </button>
                         <button
                             key="science_fiction"
@@ -820,7 +834,7 @@ const App: React.FC = () => {
                             className="w-full font-semibold py-2 px-2 text-base border bg-gray-900 text-gray-100 border-gray-700 hover:bg-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
                             disabled={isLoading}
                         >
-                            Science Fiction
+                            SCIENCE FICTION
                         </button>
                     </div>
                     {/* Existing Select and Custom buttons */}
@@ -830,7 +844,7 @@ const App: React.FC = () => {
                       className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
                       disabled={isLoading} 
                     > 
-                      Select... 
+                      SELECT...
                     </button> 
                     <button 
                       key="custom" 
@@ -838,7 +852,7 @@ const App: React.FC = () => {
                       className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
                       disabled={isLoading} 
                     > 
-                      Custom... 
+                      CUSTOM...
                     </button> 
                 </div>
             )}
