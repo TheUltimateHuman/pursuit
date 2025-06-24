@@ -834,10 +834,10 @@ const App: React.FC = () => {
         
         {!isGameOver && !isInitialLoad && ( 
           <div className="w-full max-w-lg text-center my-4"> 
-            <div className="flex items-center justify-center mb-2"> 
-              <span className="text-red-400 text-xl mr-2" title={`Health: ${playerHealth}/${MAX_PLAYER_HEALTH}`} aria-label={`Health: ${playerHealth} out of ${MAX_PLAYER_HEALTH}`}>❤</span>
-            </div> 
-            <div className="w-full bg-gray-700 h-6 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
+            <div className="relative w-full bg-gray-700 h-6 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                <span className="text-yellow-200 text-lg" title={`Health: ${playerHealth}/${MAX_PLAYER_HEALTH}`} aria-label={`Health: ${playerHealth} out of ${MAX_PLAYER_HEALTH}`}>❤</span>
+              </div>
               <div 
                 className="bg-gradient-to-r from-red-500 to-red-700 h-full transition-all duration-300 ease-out" 
                 style={{ width: `${Math.max(0, (playerHealth / MAX_PLAYER_HEALTH) * 100)}%`, borderRadius: '2px' }} 
