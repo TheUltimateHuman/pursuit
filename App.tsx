@@ -698,7 +698,7 @@ const App: React.FC = () => {
                             id="customScenario"
                             value={customScenarioText} 
                             onChange={(e) => setCustomScenarioText(e.target.value)} 
-                            placeholder="e.g., Derelict Spaceship, Ancient Ruin Exploration, Corporate Espionage... (Add 'REALISM:' prefix for realistic scenarios)" 
+                            placeholder="e.g., Space Exploration, Ancient Discovery, Corporate Mission... (Add 'REALISM:' prefix for realistic scenarios)" 
                             rows={3} 
                             maxLength={200}
                             className="w-full p-3 bg-gray-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150" 
