@@ -62,20 +62,35 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
-  // Random glyph field for main menu (starscape)
-  const glyphs = ['.', '·', '•', '░', '▒', '▓', '█', '╳', '╬', '¤', '†', '§', 'Ω', 'Ψ', 'Ξ', 'Ж'];
-  const glyphField = useMemo(() => {
+  // ASCII art for QUARRY title
+  const asciiTitle = [
+    "  ██████  ██    ██  █    █  ██████  ██████  ██   ██",
+    " ██      ██    ██  ██  ██  ██      ██      ██   ██",
+    " ██  ██  ██    ██  ██  ██  █████   █████   ███████",
+    " ██   █  ██    ██  ██  ██  ██      ██      ██   ██",
+    "  █████   ██████    ████   ██████  ██████  ██   ██",
+  ];
+  // Starfield with a window for the ASCII title
+  const starGlyphs = ['.', '·', '•', '░', '▒', '╳', '¤', '†', '§', 'Ω'];
+  const asciiWithStarfield = useMemo(() => {
+    const pad = 4;
     const lines = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < asciiTitle.length; i++) {
       let line = '';
-      for (let j = 0; j < 32; j++) {
-        // Heavily weight '.' and '·' for a starry look
-        const pool = Math.random() < 0.7 ? ['.', '·', '•'] : glyphs;
-        line += pool[Math.floor(Math.random() * pool.length)];
+      for (let j = 0; j < asciiTitle[i].length + pad * 2; j++) {
+        if (j >= pad && j < pad + asciiTitle[i].length) {
+          line += asciiTitle[i][j - pad];
+        } else {
+          // 80% chance of empty, 20% chance of glyph
+          line += Math.random() < 0.8 ? ' ' : starGlyphs[Math.floor(Math.random() * starGlyphs.length)];
+        }
       }
       lines.push(line);
     }
-    return lines.join('\n');
+    // Add top and bottom starfield padding
+    const width = asciiTitle[0].length + pad * 2;
+    const starLine = () => Array.from({length: width}, () => Math.random() < 0.8 ? ' ' : starGlyphs[Math.floor(Math.random() * starGlyphs.length)]).join('');
+    return [starLine(), ...lines, starLine()].join('\n');
   }, []);
 
   useEffect(() => { 
@@ -537,17 +552,23 @@ const App: React.FC = () => {
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
-        <h1 
-          className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
-          style={{ fontSize: '5.625rem' }}
-          onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
-          title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
-        > 
-          QUARRY 
-        </h1> 
+        {isDisplayingInitialStartOptions ? (
+          <pre className="w-full overflow-x-auto text-xs md:text-lg lg:text-xl text-yellow-400 font-mono font-bold select-none mx-auto" style={{lineHeight: '1.1', userSelect: 'none', letterSpacing: '0.05em'}} aria-label="QUARRY title ASCII art">
+            {asciiWithStarfield}
+          </pre>
+        ) : (
+          <h1 
+            className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+            style={{ fontSize: '5.625rem' }}
+            onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
+            title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
+          > 
+            QUARRY 
+          </h1>
+        )}
         {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
           <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
-            "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|EXISTENTIAL HORROR:|COSMIC HORROR:|SURREAL:|MUNDANE:|CONTEMPORARY:|MYSTERY:|SCIENCE FICTION:|SCI_FI:|MODERN:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
+            "{(currentScenarioTheme || '').replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|EXISTENTIAL HORROR:|COSMIC HORROR:|SURREAL:|MUNDANE:|CONTEMPORARY:|MYSTERY:|SCIENCE FICTION:|SCI_FI:|MODERN:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
           </p>
         )}
       </header> 
@@ -703,7 +724,6 @@ const App: React.FC = () => {
                       Custom... 
                     </button> 
                 </div>
-                <pre className="mt-8 w-full text-xs md:text-base text-red-400 font-mono text-center select-none" style={{lineHeight: '1.1', userSelect: 'none'}} aria-hidden="true">{glyphField}</pre>
                 </>
             )}
 
