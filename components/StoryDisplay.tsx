@@ -19,12 +19,15 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
       setDisplayedText('');
       setCurrentIndex(0);
       setIsTyping(true);
+      setShowCursor(true); // Ensure cursor is visible when starting to type
     }
   }, [text]);
 
   // Typing animation effect
   useEffect(() => {
-    if (!isTyping || currentIndex >= text.length) {
+    if (!isTyping) return;
+
+    if (currentIndex >= text.length) {
       setIsTyping(false);
       return;
     }
@@ -38,14 +41,22 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
     return () => clearTimeout(timer);
   }, [currentIndex, text, isTyping]);
 
-  // Cursor blinking effect
+  // Cursor blinking effect - only when not typing
   useEffect(() => {
+    // Clear any existing interval
+    if (cursorIntervalRef.current) {
+      clearInterval(cursorIntervalRef.current);
+      cursorIntervalRef.current = null;
+    }
+
     if (!isTyping) {
+      // Start blinking only after typing is complete
       cursorIntervalRef.current = setInterval(() => {
         setShowCursor(prev => !prev);
-      }, 800); // Slower blink for scene text
+      }, 800);
     } else {
-      setShowCursor(true); // Keep cursor visible while typing
+      // Keep cursor visible while typing
+      setShowCursor(true);
     }
 
     return () => {
@@ -66,7 +77,7 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
             <p className="whitespace-pre-line">
               {part}
               {index === parts.length - 1 && !isTyping && showCursor && (
-                <span className="text-yellow-400 animate-pulse">|</span>
+                <span className="text-yellow-400">|</span>
               )}
             </p>
             {index < parts.length - 1 && (
