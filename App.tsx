@@ -525,7 +525,7 @@ const App: React.FC = () => {
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
         <h1 
-          className={`text-6xl md:text-8xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+          className={`text-7xl md:text-8xl uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
           onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         > 
@@ -542,7 +542,7 @@ const App: React.FC = () => {
                     <button
                         onClick={handleRegenerateInitialScene}
                         disabled={isLoading}
-                        className="absolute top-2 right-2 bg-gray-500 text-white font-semibold p-2 shadow-md transition-all duration-150 ease-in-out hover:bg-gray-400 hover:shadow-lg transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none text-lg border border-gray-400"
+                        className="absolute top-2 right-2 bg-gray-500 text-white font-semibold p-1.5 shadow-md transition-all duration-150 ease-in-out hover:bg-gray-400 hover:shadow-lg transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none text-base border border-gray-400"
                         style={{ borderRadius: '4px' }}
                         title="Regenerate Initial Scene (same category)"
                         aria-label="Regenerate Initial Scene (same category)"
