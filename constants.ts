@@ -183,6 +183,11 @@ export const SCENARIO_THEMES_LIST: string[] = [
   "Fantasy: Bargaining with a Dragon Who Has Your Village Hostage",
   "Fantasy: Protecting a Royal Heir from Assassination Attempt",
   "Fantasy: Supernatural Espionage Mission",
+  "Fantasy: Attacked by Wild Pokémon (Pokémon)",
+  "Fantasy: Lost in Viridian Forest (Pokémon)",
+  "Fantasy: Team Rocket Infiltration at Silph Co. (Pokémon)",
+  "Fantasy: Haunted by a Ghost-Type in Lavender Tower (Pokémon)",
+  "Fantasy: Pokémon League Challenge Gone Wrong (Pokémon)",
 
   // MYTHOLOGICAL
   "Mythological: Escaping the Wild Hunt",
@@ -857,6 +862,9 @@ GENERAL INSTRUCTIONS (RECAP OF CRITICALS):
 
 **ABSOLUTE EMPHASIS/MARKDOWN BAN (UPDATED):**
 * You MUST NOT use asterisks (*) for emphasis, nor any markdown formatting (bold, italics, underscores, etc.) for emphasis or style. Emphasis must be achieved through vivid word choice, sentence structure, and context ONLY. This is a strict rule and must be followed in all narrative fields.*
+
++**INTERWOVEN GAMEPLAY SYSTEMS DIRECTIVE (NEW):**
++* All gameplay systems—persistent threat, combat, stealth, negotiation, inventory, abilities, story flags, NPCs, and the memory log—are deeply interconnected. When generating narrative, choices, or outcomes, always consider how these systems interact. For example, an item or ability may change the outcome of a stealth attempt, an NPC may intervene in combat, or a story flag may unlock new negotiation options. The memory log is the authoritative source of world state and should reflect these interwoven events, ensuring continuity and emergent gameplay. Choices and outcomes should often reflect the interplay between systems: e.g., using an item to aid an NPC, an ability to change the threat's behavior, or a flag to unlock a new path. Let the systems influence each other naturally, creating a dynamic, living world.*
 `;
 
 export const INITIAL_GAME_PROMPT_JSON = `SCENARIO THEME: [SCENARIO_THEME_PLACEHOLDER]\n\n{

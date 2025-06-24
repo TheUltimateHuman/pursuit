@@ -150,6 +150,15 @@ const App: React.FC = () => {
   const [storyFlags, setStoryFlags] = useState<Record<string, any>>({}); 
   const [playerAbilities, setPlayerAbilities] = useState<{ name: string; description: string; uses?: number }[]>([]); 
 
+  // --- Add systemMemoryLog state (must be before any hooks that use it) ---
+  const [systemMemoryLog, setSystemMemoryLog] = useState({
+    npcs: [], // Array of {name, role, location, status, relationship, keyInfo, lastInteraction}
+    threat: null, // {name, status, health, senses, etc.}
+    flags: {},
+    inventory: [],
+    playerHealth: MAX_PLAYER_HEALTH,
+  });
+
   const [isCustomChoiceInputVisible, setIsCustomChoiceInputVisible] = useState<boolean>(false); 
   const [customChoiceText, setCustomChoiceText] = useState<string>(""); 
   const [lastUsedThemeType, setLastUsedThemeType] = useState<ThemeType | null>(null); 
@@ -522,7 +531,7 @@ const App: React.FC = () => {
         return; 
     } 
     setCurrentScenarioTheme(selectedTheme);
-    processApiResponse(fetchInitialStory(selectedTheme), true); 
+    processApiResponse(fetchInitialStory(selectedTheme, systemMemoryLog), true); 
   }, [startGame, processApiResponse, setLastUsedThemeType, setError]); 
 
   // --- NEW HANDLER FOR CUSTOM SCENARIO SELECTION --- 
@@ -536,7 +545,7 @@ const App: React.FC = () => {
     setLastUsedThemeType(null); 
     setLastUsedCustomScenario(scenario); // Store the selected custom scenario
     setCurrentScenarioTheme(scenario); // Set the scenario theme
-    processApiResponse(fetchInitialStory(scenario), true); 
+    processApiResponse(fetchInitialStory(scenario, systemMemoryLog), true); 
   }, [processApiResponse, setError]);
 
   // --- NEW HANDLER FOR CUSTOM SCENARIO INPUT ---
@@ -557,7 +566,7 @@ const App: React.FC = () => {
     setLastUsedCustomScenario(scenarioText);
     setCurrentScenarioTheme(scenarioText); // Set the scenario theme
     setCustomScenarioText("");
-    processApiResponse(fetchInitialStory(scenarioText), true);
+    processApiResponse(fetchInitialStory(scenarioText, systemMemoryLog), true);
   }, [customScenarioText, processApiResponse, setError]);
 
   const handleChoiceSelected = useCallback((choice: string | ChoiceType) => { 
@@ -572,12 +581,13 @@ const App: React.FC = () => {
       processApiResponse(fetchNextStorySegment( 
         currentStory.sceneDescription, choiceText, inventory, playerHealth, 
         persistentThreat, isInCombat, isTriggeringCombat, memoryLog, storyFlags, playerAbilities, 
-        currentScenarioTheme || "Unknown Scenario"
+        currentScenarioTheme || "Unknown Scenario",
+        systemMemoryLog
       )); 
     } 
   }, [ 
       isInitialLoad, currentStory.sceneDescription, inventory, playerHealth, persistentThreat, 
-      isInCombat, isGameOver, processApiResponse, memoryLog, storyFlags, playerAbilities, currentScenarioTheme
+      isInCombat, isGameOver, processApiResponse, memoryLog, storyFlags, playerAbilities, currentScenarioTheme, systemMemoryLog
   ]); 
 
   const handleCustomChoiceSubmit = useCallback(() => { 
@@ -590,12 +600,13 @@ const App: React.FC = () => {
     processApiResponse(fetchNextStorySegment( 
       currentStory.sceneDescription, customChoiceText.trim(), inventory, playerHealth, 
       persistentThreat, isInCombat, false, memoryLog, storyFlags, playerAbilities, 
-      currentScenarioTheme || "Unknown Scenario"
+      currentScenarioTheme || "Unknown Scenario",
+      systemMemoryLog
     )); 
     setCustomChoiceText(""); 
   }, [ 
     customChoiceText, isInitialLoad, currentStory.sceneDescription, inventory, playerHealth, 
-    persistentThreat, isInCombat, processApiResponse, setIsCustomChoiceInputVisible, memoryLog, storyFlags, playerAbilities, currentScenarioTheme
+    persistentThreat, isInCombat, processApiResponse, setIsCustomChoiceInputVisible, memoryLog, storyFlags, playerAbilities, currentScenarioTheme, systemMemoryLog
   ]); 
 
   const handleRegenerateInitialScene = useCallback(() => { 
@@ -604,7 +615,7 @@ const App: React.FC = () => {
     // If we have a stored custom scenario, use that instead of theme type
     if (lastUsedCustomScenario) {
       setCurrentScenarioTheme(lastUsedCustomScenario);
-      processApiResponse(fetchInitialStory(lastUsedCustomScenario), true);
+      processApiResponse(fetchInitialStory(lastUsedCustomScenario, systemMemoryLog), true);
       return;
     }
     
@@ -617,7 +628,7 @@ const App: React.FC = () => {
         return; 
     } 
     setCurrentScenarioTheme(selectedTheme);
-    processApiResponse(fetchInitialStory(selectedTheme), true); 
+    processApiResponse(fetchInitialStory(selectedTheme, systemMemoryLog), true); 
   }, [processApiResponse, isLoading, lastUsedThemeType, lastUsedCustomScenario, setError]); 
 
   const handleReturnToMainMenu = useCallback(() => {
@@ -638,7 +649,6 @@ const App: React.FC = () => {
   const realismThemeButtonClass = `${themeButtonBaseClass} text-white bg-red-800`; 
   const specificThemeButtonClass = `${themeButtonBaseClass} text-white bg-gray-600`; 
   const customThemeButtonClass = `${themeButtonBaseClass} text-yellow-300 bg-gray-700`;
-
 
   return ( 
     <div className="min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 pl-2 pr-4 selection:bg-red-700 selection:text-white font-['Inter']" style={{ position: 'relative', zIndex: 1 }}>

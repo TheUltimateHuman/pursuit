@@ -165,13 +165,14 @@ function parseGeminiJsonResponse<T>(responseText: string): T {
 export interface InitialStoryData extends GeminiApiResponse {
 }
 
-export const fetchInitialStory = async (selectedTheme: string): Promise<InitialStoryData> => {
+export const fetchInitialStory = async (selectedTheme: string, systemMemoryLog: any): Promise<InitialStoryData> => {
   if (!ai) throw new Error("Gemini API client not initialized. API_KEY might be missing, invalid, or client instantiation failed.");
   
+  const systemMemoryLogString = '[SYSTEM MEMORY LOG]\n' + JSON.stringify(systemMemoryLog, null, 2);
   const themedInitialPromptJson = INITIAL_GAME_PROMPT_JSON.replace(
     "[SCENARIO_THEME_PLACEHOLDER]",
-    selectedTheme 
-  );
+    selectedTheme
+  ) + '\n' + systemMemoryLogString;
   console.log('Prompt sent to LLM in fetchInitialStory:', themedInitialPromptJson); // DEBUG
 
   const MAX_ATTEMPTS = 2;
@@ -258,7 +259,8 @@ export const fetchNextStorySegment = async (
   memoryLog: string[],
   currentStoryFlags: Record<string, any>,
   currentPlayerAbilities: { name: string; description: string; uses?: number }[],
-  scenarioTheme: string
+  scenarioTheme: string,
+  systemMemoryLog: any
 ): Promise<GeminiApiResponse> => {
   if (!ai) throw new Error("Gemini API client not initialized. API_KEY might be missing, invalid, or client instantiation failed.");
 
@@ -284,6 +286,8 @@ export const fetchNextStorySegment = async (
     playerAbilitiesString = "Active Player Abilities:\n" + currentPlayerAbilities.map(ability => `- ${ability.name} (${ability.uses !== undefined ? ability.uses + ' use(s) left' : 'Ongoing/Passive'}): ${ability.description}`).join("\n");
   }
 
+  const systemMemoryLogString = '[SYSTEM MEMORY LOG]\n' + JSON.stringify(systemMemoryLog, null, 2);
+
   const prompt = `
 Context:
 Scenario Theme: ${scenarioTheme}
@@ -295,6 +299,7 @@ Player chose: "${playerChoiceText}"
 Current inventory: ${inventoryString}
 ${threatContextString}
 ${memoryLogString}
+${systemMemoryLogString}
 ${storyFlagsString}
 ${playerAbilitiesString}
 
