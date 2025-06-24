@@ -7,48 +7,22 @@ interface StoryDisplayProps {
 const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
   const [typedText, setTypedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
-  const [showDivider, setShowDivider] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const parts = text.split('◈ ◈ ◈');
-    let currentPart = 0;
     let currentCharIndex = 0;
-    let accumulator = '';
     let cancelled = false;
-
     setTypedText('');
     setIsTyping(true);
-    setShowDivider(false);
 
     function typeNextChar() {
       if (cancelled) return;
-      if (currentPart >= parts.length) {
-        setIsTyping(false);
-        return;
-      }
-      const currentPartText = parts[currentPart];
-      if (currentCharIndex < currentPartText.length) {
-        accumulator = accumulator + currentPartText[currentCharIndex];
-        setTypedText(accumulator);
+      if (currentCharIndex < text.length) {
+        setTypedText(text.slice(0, currentCharIndex + 1));
         currentCharIndex++;
         timeoutRef.current = setTimeout(typeNextChar, 30);
       } else {
-        if (currentPart < parts.length - 1) {
-          setShowDivider(true);
-          timeoutRef.current = setTimeout(() => {
-            if (!cancelled) {
-              setShowDivider(false);
-              accumulator = accumulator + '◈ ◈ ◈';
-              setTypedText(accumulator);
-              currentPart++;
-              currentCharIndex = 0;
-              timeoutRef.current = setTimeout(typeNextChar, 200);
-            }
-          }, 500);
-        } else {
-          setIsTyping(false);
-        }
+        setIsTyping(false);
       }
     }
 
@@ -67,11 +41,6 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
           {typedText}
           {isTyping && <span className="text-yellow-400 animate-pulse">|</span>}
         </p>
-        {showDivider && (
-          <div className="flex justify-center my-4">
-            <span className="text-yellow-400 text-2xl font-light">◈ ◈ ◈</span>
-          </div>
-        )}
       </div>
     </div>
   );
