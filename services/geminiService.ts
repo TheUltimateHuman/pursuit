@@ -172,6 +172,7 @@ export const fetchInitialStory = async (selectedTheme: string): Promise<InitialS
     "[SCENARIO_THEME_PLACEHOLDER]",
     selectedTheme 
   );
+  console.log('Prompt sent to LLM in fetchInitialStory:', themedInitialPromptJson); // DEBUG
 
   const MAX_ATTEMPTS = 2;
   let attempts = 0;
