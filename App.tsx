@@ -20,42 +20,6 @@ const API_KEY_AVAILABLE = typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FRO
 const MAX_MEMORY_LOG_ENTRIES = 15; 
 type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fantasy"; 
 
-// Techno-horror glyphs (no emoji, no English)
-const GLYPHS = [
-  '⍬', '⟁', '⟟', '⧫', '⩫', '⩪', '⧖', '⧗', '⧛', '⧜', '⧣', '⧤', '⧥', '⧦', '⧧', '⧨', '⧩', '⧪', '⧫', '⧬', '⧭', '⧮', '⧯', '⧰', '⧱', '⧲', '⧳', '⧴', '⧵', '⧶', '⧷', '⧸', '⧹', '⧺', '⧻', '⧼', '⧽', '⧾', '⧿', '⨀', '⨁', '⨂', '⨃', '⨄', '⨅', '⨆', '⨇', '⨈', '⨉', '⨊', '⨋', '⨌', '⨍', '⨎', '⨏', '⨐', '⨑', '⨒', '⨓', '⨔', '⨕', '⨖', '⨗', '⨘', '⨙', '⨚', '⨛', '⨜', '⨝', '⨞', '⨟', '⨠', '⨡', '⨢', '⨣', '⨤', '⨥', '⨦', '⨧', '⨨', '⨩', '⨪', '⨫', '⨬', '⨭', '⨮', '⨯', '⨰', '⨱', '⨲', '⨳', '⨴', '⨵', '⨶', '⨷', '⨸', '⨹', '⨺', '⨻', '⨼', '⨽', '⨾', '⨿', '⩀', '⩁', '⩂', '⩃', '⩄', '⩅', '⩆', '⩇', '⩈', '⩉', '⩊', '⩋', '⩌', '⩍', '⩎', '⩏', '⩐', '⩑', '⩒', '⩓', '⩔', '⩕', '⩖', '⩗', '⩘', '⩙', '⩚', '⩛', '⩜', '⩝', '⩞', '⩟', '⩠', '⩡', '⩢', '⩣', '⩤', '⩥', '⩦', '⩧', '⩨', '⩩', '⩪', '⩫', '⩬', '⩭', '⩮', '⩯', '⩰', '⩱', '⩲', '⩳', '⩴', '⩵', '⩶', '⩷', '⩸', '⩹', '⩺', '⩻', '⩼', '⩽', '⩾', '⩿', '⪀', '⪁', '⪂', '⪃', '⪄', '⪅', '⪆', '⪇', '⪈', '⪉', '⪊', '⪋', '⪌', '⪍', '⪎', '⪏', '⪐', '⪑', '⪒', '⪓', '⪔', '⪕', '⪖', '⪗', '⪘', '⪙', '⪚', '⪛', '⪜', '⪝', '⪞', '⪟', '⪠', '⪡', '⪢', '⪣', '⪤', '⪥', '⪦', '⪧', '⪨', '⪩', '⪪', '⪫', '⪬', '⪭', '⪮', '⪯', '⪰', '⪱', '⪲', '⪳', '⪴', '⪵', '⪶', '⪷', '⪸', '⪹', '⪺', '⪻', '⪼', '⪽', '⪾', '⪿', '⫀', '⫁', '⫂', '⫃', '⫄', '⫅', '⫆', '⫇', '⫈', '⫉', '⫊', '⫋', '⫌', '⫍', '⫎', '⫏', '⫐', '⫑', '⫒', '⫓', '⫔', '⫕', '⫖', '⫗', '⫘', '⫙', '⫚', '⫛', '⫝̸', '⫝', '⫞', '⫟', '⫠', '⫡', '⫢', '⫣', '⫤', '⫥', '⫦', '⫧', '⫨', '⫩', '⫪', '⫫', '⫬', '⫭', '⫮', '⫯', '⫰', '⫱', '⫲', '⫳', '⫴', '⫵', '⫶', '⫷', '⫸', '⫹', '⫺', '⫻', '⫼', '⫽', '⫾', '⫿'];
-
-function getRandomInt(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getRandomGlyph() {
-  return GLYPHS[getRandomInt(0, GLYPHS.length - 1)];
-}
-
-// Generate a field of random glyphs (symbols)
-function generateSymbolField(rows = 7, cols = 32) {
-  let field = [];
-  for (let r = 0; r < rows; r++) {
-    let row = [];
-    for (let c = 0; c < cols; c++) {
-      row.push(getRandomGlyph());
-    }
-    field.push(row);
-  }
-  return field;
-}
-
-// Generate random dot positions for the title area
-function generateDotPositions(dotCount = 18) {
-  // Dots will be absolutely positioned in a box around the title
-  return Array.from({ length: dotCount }, () => ({
-    top: getRandomInt(-30, 60), // px, relative to title
-    left: getRandomInt(-40, 340), // px, relative to title
-    size: getRandomInt(4, 10), // px
-    opacity: Math.random() * 0.5 + 0.3 // 0.3 - 0.8
-  }));
-}
-
 const App: React.FC = () => { 
   const [currentStory, setCurrentStory] = useState<StoryState>({ 
     sceneDescription: "Welcome to QUARRY.", 
@@ -98,19 +62,27 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
-  const [symbolField, setSymbolField] = useState<string[][]>(generateSymbolField());
-  const [dotPositions, setDotPositions] = useState<{top: number, left: number, size: number, opacity: number}[]>(generateDotPositions());
+  // Random glyph field for main menu (starscape)
+  const glyphs = ['.', '·', '•', '░', '▒', '▓', '█', '╳', '╬', '¤', '†', '§', 'Ω', 'Ψ', 'Ξ', 'Ж'];
+  const glyphField = useMemo(() => {
+    const lines = [];
+    for (let i = 0; i < 6; i++) {
+      let line = '';
+      for (let j = 0; j < 32; j++) {
+        // Heavily weight '.' and '·' for a starry look
+        const pool = Math.random() < 0.7 ? ['.', '·', '•'] : glyphs;
+        line += pool[Math.floor(Math.random() * pool.length)];
+      }
+      lines.push(line);
+    }
+    return lines.join('\n');
+  }, []);
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
       console.error("API_KEY is not available. Check deployment secrets and the local env.js file."); 
     } 
   }, []); 
-
-  useEffect(() => {
-    setSymbolField(generateSymbolField());
-    setDotPositions(generateDotPositions());
-  }, [isInitialLoad, currentStory.sceneDescription, isGameOver, isInCombat, error]);
 
   const handleFatalError = useCallback((message: string, gameOver: boolean = true, isNarrativeDefeat: boolean = false, narrativeDemiseScene?: string) => { 
     setIsLoading(false); 
@@ -565,41 +537,19 @@ const App: React.FC = () => {
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} />} 
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
-        <div className="relative w-full flex flex-col items-center">
-          {/* Overlay red dots around the title area */}
-          <div className="absolute left-1/2 -translate-x-1/2 top-0 w-[360px] h-[90px] pointer-events-none select-none z-10">
-            {dotPositions.map((dot, i) => (
-              <span
-                key={i}
-                style={{
-                  position: 'absolute',
-                  top: dot.top,
-                  left: dot.left,
-                  width: dot.size,
-                  height: dot.size,
-                  borderRadius: '50%',
-                  background: 'rgba(255, 64, 64, 0.7)',
-                  opacity: dot.opacity,
-                  filter: 'blur(0.5px)',
-                }}
-              />
-            ))}
-          </div>
-          {/* Main Title */}
-          <h1 
-            className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
-            style={{ fontSize: '5.625rem' }}
-            onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
-            title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
-          > 
-            QUARRY 
-          </h1> 
-          {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
-            <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
-              "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|EXISTENTIAL HORROR:|COSMIC HORROR:|SURREAL:|MUNDANE:|CONTEMPORARY:|MYSTERY:|SCIENCE FICTION:|SCI_FI:|MODERN:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
-            </p>
-          )}
-        </div>
+        <h1 
+          className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
+          style={{ fontSize: '5.625rem' }}
+          onClick={!isDisplayingInitialStartOptions ? () => setIsReturnToMenuModalVisible(true) : undefined}
+          title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
+        > 
+          QUARRY 
+        </h1> 
+        {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
+          <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
+            "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|EXISTENTIAL HORROR:|COSMIC HORROR:|SURREAL:|MUNDANE:|CONTEMPORARY:|MYSTERY:|SCIENCE FICTION:|SCI_FI:|MODERN:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
+          </p>
+        )}
       </header> 
 
       <main className="w-full max-w-3xl flex flex-col items-center"> 
@@ -725,24 +675,36 @@ const App: React.FC = () => {
         <div className="w-full max-w-xl flex flex-col items-center mt-4 md:mt-6"> 
 
             {isDisplayingInitialStartOptions && (
-              <>
-                <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8"> 
-                  <button 
-                    key="random" 
-                    onClick={() => handleStartGameWithTheme("random")} 
-                    className={randomThemeButtonClass} 
-                    disabled={isLoading} 
-                  > 
-                    Random 
-                  </button> 
-                  <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>Realism</button> 
-                  <button key="custom" onClick={() => setIsCustomScenarioModalVisible(true)} className={customThemeButtonClass} disabled={isLoading}>Custom Scenario</button> 
+                 <>
+                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4"> 
+                    <button 
+                        key="random" 
+                        onClick={() => handleStartGameWithTheme("random")} 
+                        className={randomThemeButtonClass} 
+                        disabled={isLoading} 
+                    > 
+                        Random 
+                    </button> 
+                    <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>Realism</button> 
+                    <button 
+                      key="select" 
+                      onClick={() => setIsCustomScenarioModalVisible(true)} 
+                      className={customThemeButtonClass} 
+                      disabled={isLoading} 
+                    > 
+                      Select... 
+                    </button> 
+                    <button 
+                      key="custom" 
+                      onClick={() => setIsCustomScenarioInputVisible(true)} 
+                      className={customThemeButtonClass} 
+                      disabled={isLoading} 
+                    > 
+                      Custom... 
+                    </button> 
                 </div>
-                {/* Floating field of menacing symbols */}
-                <pre className="mt-8 w-full text-xs md:text-base text-red-400 font-mono text-center select-none" style={{lineHeight: '1.1', userSelect: 'none'}} aria-hidden="true">
-                  {symbolField.map((row, i) => row.join(' ') + (i < symbolField.length - 1 ? '\n' : '')).join('')}
-                </pre>
-              </>
+                <pre className="mt-8 w-full text-xs md:text-base text-red-400 font-mono text-center select-none" style={{lineHeight: '1.1', userSelect: 'none'}} aria-hidden="true">{glyphField}</pre>
+                </>
             )}
 
             {/* Custom Scenario Input Modal */}
