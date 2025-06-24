@@ -529,7 +529,7 @@ const App: React.FC = () => {
           QUARRY 
         </h1> 
         {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
-          <p className="text-sm italic text-gray-300 mt-2 font-['Inter']">
+          <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
             "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MODERN:|SCI_FI:|FANTASY:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
           </p>
         )}
