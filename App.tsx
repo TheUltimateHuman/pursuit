@@ -183,18 +183,19 @@ const App: React.FC = () => {
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
   // Typing effect for title (with terminal-style underscore)
+  const fullTitle = 'QUARRY';
   const [typedTitle, setTypedTitle] = useState('');
   const [typingIndex, setTypingIndex] = useState(0);
-  const [underscorePos, setUnderscorePos] = useState(0);
-  const [underscoreDir, setUnderscoreDir] = useState(1);
-  const fullTitle = 'QUARRY';
+  const [underscorePos, setUnderscorePos] = useState(fullTitle.length - 1); // Start at the end (Y)
+  const [underscoreDir, setUnderscoreDir] = useState(-1); // Start moving left
 
+  // Initial typing animation
   useEffect(() => {
     let i = 0;
     setTypedTitle('');
     setTypingIndex(0);
-    setUnderscorePos(0);
-    setUnderscoreDir(1);
+    setUnderscorePos(fullTitle.length - 1);
+    setUnderscoreDir(-1);
     const timeout = setTimeout(() => {
       const interval = setInterval(() => {
         setTypedTitle((prev) => {
@@ -216,23 +217,21 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Terminal-style underline animation: move left to right, then right to left, under each letter
+  // Terminal-style underline animation: move right to left (Y to Q), then reverse
   useEffect(() => {
     if (typingIndex < fullTitle.length) return;
-    setUnderscorePos(0);
-    setUnderscoreDir(1);
+    
     const interval = setInterval(() => {
       setUnderscorePos((pos) => {
-        if (pos + underscoreDir >= fullTitle.length) {
-          setUnderscoreDir(-1);
-          return pos - 1;
-        } else if (pos + underscoreDir < 0) {
-          setUnderscoreDir(1);
-          return pos + 1;
+        // If we hit Q (pos === 0) while moving left, or Y (pos === length-1) while moving right
+        if ((pos === 0 && underscoreDir === -1) || (pos === fullTitle.length - 1 && underscoreDir === 1)) {
+          setUnderscoreDir(dir => -dir); // Reverse direction
+          return pos + (-underscoreDir); // Move in new direction
         }
         return pos + underscoreDir;
       });
-    }, 400); // Ominous speed
+    }, 400); // Keep the same ominous speed
+    
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typingIndex]);
@@ -706,25 +705,32 @@ const App: React.FC = () => {
         >
           <span style={{ position: 'relative', display: 'inline-block' }}>
             {typedTitle.split('').map((char, idx) => (
-              <span key={idx} style={{ position: 'relative', zIndex: 1 }}>{char}</span>
-            ))}
-            {/* Animated underscore as underline */}
-            {typingIndex < fullTitle.length ? (
-              <span style={{ color: '#ffe066', fontWeight: 400, fontFamily: 'inherit', marginLeft: '-0.1em', marginRight: '0.05em' }}>
-                _
+              <span key={idx} style={{ position: 'relative', display: 'inline-block', minWidth: '1em' }}>
+                {char}
+                {/* Animated underscore as underline, only after typing finishes */}
+                {typingIndex === fullTitle.length && underscorePos === idx && (
+                  <span style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: '-0.18em',
+                    color: '#ffe066',
+                    fontWeight: 400,
+                    fontFamily: 'inherit',
+                    fontSize: '1.1em',
+                    textAlign: 'center',
+                    transition: 'left 0.38s cubic-bezier(0.4,0,0.2,1)',
+                    zIndex: 0,
+                    pointerEvents: 'none',
+                  }}>
+                    _
+                  </span>
+                )}
               </span>
-            ) : (
-              <span style={{
-                position: 'absolute',
-                left: `calc(${underscorePos} * 1em + ${underscorePos * 0.15}em)`,
-                bottom: '-0.15em',
-                color: '#ffe066',
-                fontWeight: 400,
-                fontFamily: 'inherit',
-                fontSize: '1.1em',
-                transition: 'left 0.38s cubic-bezier(0.4,0,0.2,1)',
-                zIndex: 0,
-              }}>
+            ))}
+            {/* Blinking underscore while typing */}
+            {typingIndex < fullTitle.length && (
+              <span style={{ color: '#ffe066', fontWeight: 400, fontFamily: 'inherit', marginLeft: '-0.1em', marginRight: '0.05em' }}>
                 _
               </span>
             )}
