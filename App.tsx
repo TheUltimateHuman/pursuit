@@ -220,12 +220,11 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
-  // Typing effect for title (with terminal-style underscore)
+  // Typing effect for title (simple type-in, then blinking underscore under Y)
   const fullTitle = 'QUARRY';
   const [typedTitle, setTypedTitle] = useState('');
   const [typingIndex, setTypingIndex] = useState(0);
-  const [underscorePos, setUnderscorePos] = useState(fullTitle.length - 1); // Start at Y
-  const [underscoreDir, setUnderscoreDir] = useState(-1); // Start moving left (Y to Q)
+  const [showBlinkCursor, setShowBlinkCursor] = useState(false);
   const [isUnderscoreVisible, setIsUnderscoreVisible] = useState(true);
 
   // Use refs to track current state for animation
@@ -237,27 +236,9 @@ const App: React.FC = () => {
     let i = 0;
     setTypedTitle('');
     setTypingIndex(0);
-    setUnderscorePos(fullTitle.length - 1); // Start at Y
-    setUnderscoreDir(-1); // Start moving left (Y to Q)
-    underscorePosRef.current = fullTitle.length - 1;
-    underscoreDirRef.current = -1;
+    setShowBlinkCursor(false);
     let cancelled = false;
     let blinkInterval: NodeJS.Timeout | null = null;
-
-    function setBlinking(active: boolean) {
-      if (active) {
-        setIsUnderscoreVisible(true);
-        if (!blinkInterval) {
-          blinkInterval = setInterval(() => {
-            setIsUnderscoreVisible((v) => !v);
-          }, 400);
-        }
-      } else {
-        if (blinkInterval) clearInterval(blinkInterval);
-        blinkInterval = null;
-        setIsUnderscoreVisible(true);
-      }
-    }
 
     function typeNextChar() {
       if (cancelled) return;
@@ -266,21 +247,14 @@ const App: React.FC = () => {
           const next = prev + fullTitle[i];
           i++;
           setTypingIndex(i);
-          // Determine pause: longer after space or punctuation
-          let base = 180; // base ms
-          let extra = 0;
-          const char = fullTitle[i - 1];
-          if (char === ' ' || char === '\n') extra += 120;
-          if (/[.,!?;:]/.test(char)) extra += 180;
-          const randomPause = base + extra + Math.floor(Math.random() * 180); // 180-480ms
-          // Blink if pause is long enough
-          if (randomPause > 400) setBlinking(true); else setBlinking(false);
-          setTimeout(() => {
-            typeNextChar();
-          }, randomPause);
+          setTimeout(typeNextChar, 120);
           return next;
         } else {
           setTypingIndex(fullTitle.length);
+          setShowBlinkCursor(true);
+          blinkInterval = setInterval(() => {
+            setIsUnderscoreVisible((v) => !v);
+          }, 500);
           return prev;
         }
       });
@@ -289,71 +263,13 @@ const App: React.FC = () => {
     return () => { cancelled = true; if (blinkInterval) clearInterval(blinkInterval); };
   }, []);
 
-  // Terminal-style underline animation: move left to right (Q to Y), then right to left (Y to Q)
+  // When the player presses the button to start the game, stop the blinking cursor
   useEffect(() => {
-    if (typingIndex < fullTitle.length) return;
-    
-    let pauseTimeout: NodeJS.Timeout | null = null;
-    let blinkInterval: NodeJS.Timeout | null = null;
-    let isPaused = false;
-    let moveTimeout: NodeJS.Timeout | null = null;
-    
-    const startBlinking = () => {
-      setIsUnderscoreVisible(true);
-      blinkInterval = setInterval(() => {
-        setIsUnderscoreVisible((v) => !v);
-      }, 400);
-    };
-    const stopBlinking = () => {
-      if (blinkInterval) clearInterval(blinkInterval);
-      setIsUnderscoreVisible(true);
-    };
-    
-    function moveUnderscore() {
-      if (isPaused) return;
-      const currentPos = underscorePosRef.current;
-      const currentDir = underscoreDirRef.current;
-      const newPos = currentPos + currentDir;
-      // If we are about to land on Q (0) or Y (length-1), move there, then pause, then reverse
-      if ((currentDir === -1 && currentPos === 1) || (currentDir === 1 && currentPos === fullTitle.length - 2)) {
-        // Move to end
-        underscorePosRef.current = newPos;
-        setUnderscorePos(newPos);
-        stopBlinking();
-        // Pause at the end
-        isPaused = true;
-        startBlinking();
-        const pauseDuration = Math.floor(Math.random() * 4) + 1; // 1-4 ticks
-        pauseTimeout = setTimeout(() => {
-          isPaused = false;
-          stopBlinking();
-          // Reverse direction
-          if (newPos === 0) {
-            underscoreDirRef.current = 1;
-            setUnderscoreDir(1);
-          } else if (newPos === fullTitle.length - 1) {
-            underscoreDirRef.current = -1;
-            setUnderscoreDir(-1);
-          }
-          moveUnderscore();
-        }, pauseDuration * 1800);
-      } else {
-        // Normal move
-        underscorePosRef.current = newPos;
-        setUnderscorePos(newPos);
-        stopBlinking();
-        const randomMove = 1100 + Math.random() * 1100;
-        moveTimeout = setTimeout(moveUnderscore, randomMove);
-      }
+    if (!isInitialLoad) {
+      setShowBlinkCursor(false);
+      setIsUnderscoreVisible(false);
     }
-    moveUnderscore();
-    return () => {
-      if (pauseTimeout) clearTimeout(pauseTimeout);
-      if (blinkInterval) clearInterval(blinkInterval);
-      if (moveTimeout) clearTimeout(moveTimeout);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [typingIndex]);
+  }, [isInitialLoad]);
 
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
@@ -830,8 +746,8 @@ const App: React.FC = () => {
                 {typedTitle.split('').map((char, idx) => (
                   <span key={idx} style={{ position: 'relative', display: 'inline-block', minWidth: '1em' }}>
                     {char}
-                    {/* Animated underscore as underline, only after typing finishes */}
-                    {typingIndex === fullTitle.length && underscorePos === idx && isUnderscoreVisible && (
+                    {/* Blinking underscore under Y after typing finishes */}
+                    {showBlinkCursor && idx === fullTitle.length - 1 && isUnderscoreVisible && (
                       <span style={{
                         position: 'absolute',
                         left: 0,
@@ -842,7 +758,6 @@ const App: React.FC = () => {
                         fontFamily: 'inherit',
                         fontSize: '1.1em',
                         textAlign: 'center',
-                        transition: 'left 0.38s cubic-bezier(0.4,0,0.2,1)',
                         zIndex: 0,
                         pointerEvents: 'none',
                       }}>
@@ -851,12 +766,6 @@ const App: React.FC = () => {
                     )}
                   </span>
                 ))}
-                {/* Blinking underscore while typing */}
-                {typingIndex < fullTitle.length && (
-                  <span style={{ color: '#ffe066', fontWeight: 400, fontFamily: 'inherit', marginLeft: '-0.1em', marginRight: '0.05em' }}>
-                    _
-                  </span>
-                )}
               </>
             ) : (
               // In game: show static title, no underscore
