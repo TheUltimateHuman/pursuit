@@ -62,20 +62,36 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
-  // ASCII art for QUARRY title (blocky, legible)
+  // Provided ASCII art for QUARRY
   const asciiTitle = [
-    "  ██████  ██    ██ ██    ██ ██████  ██████  ██   ██",
-    " ██      ██    ██ ██    ██ ██      ██      ██   ██",
-    " ██  ██  ██    ██ ██    ██ █████   █████   ███████",
-    " ██   █  ██    ██ ██    ██ ██      ██      ██   ██",
-    "  █████   ██████   ██████  ██████  ██████  ██   ██",
-    "",
-    "   ██████  ██    ██  █████  ██████  ██    ██",
-    "  ██    ██ ██    ██ ██   ██ ██   ██  ██  ██ ",
-    "  ██    ██ ██    ██ ███████ ██████    ████  ",
-    "  ██    ██  ██  ██  ██   ██ ██   ██    ██   ",
-    "   ██████    ████   ██   ██ ██   ██    ██   "
+    "    _////    _//     _//      _/       _///////    _///////    _//      _//",
+    "  _//    _// _//     _//     _/ //     _//    _//  _//    _//   _//    _// ",
+    "_//       _//_//     _//    _/  _//    _//    _//  _//    _//    _// _//   ",
+    "_//       _//_//     _//   _//   _//   _/ _//      _/ _//          _//     ",
+    "_//       _//_//     _//  _////// _//  _//  _//    _//  _//        _//     ",
+    "  _// _/ _// _//     _// _//       _// _//    _//  _//    _//      _//     ",
+    "    _// //     _/////   _//         _//_//      _//_//      _//    _//     ",
+    "         _/                                                                "
   ];
+
+  // Render ASCII art with yellow fill for the word, dim for the rest
+  const renderAsciiTitle = () => (
+    <pre className="w-full overflow-x-auto text-xs md:text-lg lg:text-xl font-mono font-bold select-none mx-auto leading-tight" style={{userSelect: 'none', letterSpacing: '0.05em'}} aria-label="QUARRY title ASCII art">
+      {asciiTitle.map((line, i) => (
+        <div key={i} style={{display: 'flex', justifyContent: 'center'}}>
+          {line.split('').map((char, j) => {
+            // Color spaces (the fill of the word) yellow, rest dim
+            if (char === ' ') {
+              return <span key={j} className="text-yellow-400">█</span>;
+            } else {
+              return <span key={j} className="text-gray-600">{char}</span>;
+            }
+          })}
+        </div>
+      ))}
+    </pre>
+  );
+
   // Starfield with a window for the ASCII title
   const starGlyphs = ['.', '·', '•', '░', '▒', '╳', '¤', '†', '§', 'Ω'];
   const asciiWithStarfield = useMemo(() => {
@@ -559,9 +575,7 @@ const App: React.FC = () => {
       
       <header className="w-full max-w-3xl text-center mb-6 md:mb-8"> 
         {isDisplayingInitialStartOptions ? (
-          <pre className="w-full overflow-x-auto text-xs md:text-lg lg:text-xl text-yellow-400 font-mono font-bold select-none mx-auto" style={{lineHeight: '1.1', userSelect: 'none', letterSpacing: '0.05em'}} aria-label="QUARRY title ASCII art">
-            {asciiWithStarfield}
-          </pre>
+          renderAsciiTitle()
         ) : (
           <h1 
             className={`uppercase font-medium tracking-wider text-yellow-400 italic font-['Chakra_Petch'] ${!isDisplayingInitialStartOptions ? 'cursor-pointer hover:text-yellow-300 transition-colors duration-150' : ''}`}
