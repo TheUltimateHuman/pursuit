@@ -91,7 +91,7 @@ const GlyphFieldOverlay: React.FC = () => {
       setGlyphs(Array.from({ length: dimensions.rows * dimensions.cols }, getRandomGlyph));
     }
     randomizeGlyphs();
-    const interval = setInterval(randomizeGlyphs, 700); // Slower flicker (was 350ms)
+    const interval = setInterval(randomizeGlyphs, 1400); // Slower flicker (was 700ms)
     return () => clearInterval(interval);
   }, [dimensions]);
 
@@ -186,16 +186,16 @@ const App: React.FC = () => {
   const fullTitle = 'QUARRY';
   const [typedTitle, setTypedTitle] = useState('');
   const [typingIndex, setTypingIndex] = useState(0);
-  const [underscorePos, setUnderscorePos] = useState(fullTitle.length - 1); // Start at the end (Y)
-  const [underscoreDir, setUnderscoreDir] = useState(-1); // Start moving left
+  const [underscorePos, setUnderscorePos] = useState(fullTitle.length - 1); // Start at Y
+  const [underscoreDir, setUnderscoreDir] = useState(-1); // Start moving left (Y to Q)
 
   // Initial typing animation
   useEffect(() => {
     let i = 0;
     setTypedTitle('');
     setTypingIndex(0);
-    setUnderscorePos(fullTitle.length - 1);
-    setUnderscoreDir(-1);
+    setUnderscorePos(fullTitle.length - 1); // Start at Y
+    setUnderscoreDir(-1); // Start moving left (Y to Q)
     const timeout = setTimeout(() => {
       const interval = setInterval(() => {
         setTypedTitle((prev) => {
@@ -217,7 +217,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Terminal-style underline animation: move right to left (Y to Q), then reverse
+  // Terminal-style underline animation: move left to right (Q to Y), then right to left (Y to Q)
   useEffect(() => {
     if (typingIndex < fullTitle.length) return;
     
@@ -225,13 +225,16 @@ const App: React.FC = () => {
       setUnderscorePos((pos) => {
         const newPos = pos + underscoreDir;
         // If we hit Q (pos === 0) while moving left, or Y (pos === length-1) while moving right
-        if (newPos <= 0 || newPos >= fullTitle.length - 1) {
-          setUnderscoreDir(dir => -dir); // Reverse direction
-          return newPos <= 0 ? 0 : fullTitle.length - 1; // Clamp to bounds
+        if (newPos <= 0) {
+          setUnderscoreDir(1); // Start moving right (Q to Y)
+          return 0; // Stay at Q
+        } else if (newPos >= fullTitle.length - 1) {
+          setUnderscoreDir(-1); // Start moving left (Y to Q)
+          return fullTitle.length - 1; // Stay at Y
         }
         return newPos;
       });
-    }, 400); // Keep the same ominous speed
+    }, 800); // Slower, more ominous (was 400ms)
     
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
