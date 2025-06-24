@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 // App.tsx (with Custom Scenario Selection Feature) 
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
