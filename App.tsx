@@ -180,6 +180,11 @@ const GlyphFieldOverlay = React.forwardRef<{ shuffleGlyphs: () => void }, { curr
   );
 });
 
+// Utility to remove all asterisks from a string
+function removeAsterisks(str: string): string {
+  return str.replace(/\*/g, '');
+}
+
 const App: React.FC = () => { 
   const [currentStory, setCurrentStory] = useState<StoryState>({ 
     sceneDescription: "Welcome to QUARRY.", 
@@ -803,18 +808,13 @@ const App: React.FC = () => {
             )}
           </span>
         </h1> 
-        {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
-          <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
-            "{(currentScenarioTheme ?? '').replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|SCIENCE FICTION:|CONTEMPORARY:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
-          </p>
-        )}
       </header> 
 
       <main className="w-full max-w-3xl flex flex-col items-center"> 
         
         {(!isInitialLoad || currentStory.sceneDescription !== "Welcome to QUARRY.") && ( 
             <div className="relative w-full max-w-3xl mb-8">
-                <StoryDisplay text={currentStory.sceneDescription} />
+                <StoryDisplay text={removeAsterisks(currentStory.sceneDescription)} />
                 {showRegenerateButton && (
                     <button
                         onClick={handleRegenerateInitialScene}
@@ -832,8 +832,12 @@ const App: React.FC = () => {
 
         {currentStory.persistentThreat && !isGameOver && !isInitialLoad && ( 
           <PersistentThreatDisplay 
-            threat={currentStory.persistentThreat} 
-            message={currentStory.threatEncounterMessage} 
+            threat={{
+              ...currentStory.persistentThreat,
+              name: removeAsterisks(currentStory.persistentThreat.name),
+              description: removeAsterisks(currentStory.persistentThreat.description),
+            }} 
+            message={currentStory.threatEncounterMessage ? removeAsterisks(currentStory.threatEncounterMessage) : undefined} 
             isInCombat={currentStory.isInCombat} 
           /> 
         )} 
@@ -863,7 +867,7 @@ const App: React.FC = () => {
                 <ul className="list-none text-gray-200 flex flex-col space-y-1 custom-scroll max-h-24 overflow-y-auto pr-2"> 
                     {playerAbilities.map((ability, index) => ( 
                         <li key={index} className="text-sm py-0.5 hover:text-purple-100 transition-colors duration-150" title={ability.description}> 
-                            <span className="text-purple-300 mr-1.5">&#✦</span> {ability.name} {ability.uses !== undefined && ability.uses !== null ? `(${ability.uses} use${ability.uses === 1 ? '' : 's'} left)` : ''} 
+                            <span className="text-purple-300 mr-1.5">✪</span> {ability.name} {ability.uses !== undefined && ability.uses !== null ? `(${ability.uses} use${ability.uses === 1 ? '' : 's'} left)` : ''} 
                         </li> 
                     ))} 
                 </ul> 
@@ -1113,10 +1117,9 @@ const App: React.FC = () => {
 
                     {currentDisplayedChoices.length > 0 && ( 
                         <ChoicesDisplay 
-                            choices={currentDisplayedChoices} 
+                            choices={currentStory.choices.map(choice => typeof choice === 'string' ? removeAsterisks(choice) : { ...choice, text: removeAsterisks(choice.text) })} 
                             onChoiceSelected={handleChoiceSelected} 
-                            disabled={isLoading} 
-                            isInCombat={currentStory.isInCombat}
+                            isInCombat={currentStory.isInCombat} 
                         /> 
                     )} 
                 </> 
@@ -1134,14 +1137,14 @@ const App: React.FC = () => {
                                 memoryLog.slice(-6).forEach((entry, index) => {
                                     timeline.push({
                                         type: 'event',
-                                        content: entry,
+                                        content: removeAsterisks(entry),
                                         originalIndex: index
                                     });
                                 });
                                 playerChoices.slice(-4).forEach((choice, index) => {
                                     timeline.push({
                                         type: 'choice',
-                                        content: choice,
+                                        content: removeAsterisks(choice),
                                         originalIndex: index
                                     });
                                 });
