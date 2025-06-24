@@ -116,7 +116,7 @@ const GlyphFieldOverlay: React.FC = () => {
         }}
       >
         {glyphs.map((glyph, i) => (
-          <span key={i} style={{ opacity: Math.random() * 0.7 + 0.3, transform: 'rotate(45deg)', display: 'inline-block' }}>{glyph}</span>
+          <span key={i} style={{ opacity: Math.random() * 0.7 + 0.3 }}>{glyph}</span>
         ))}
       </div>
     </div>
@@ -165,16 +165,23 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState(false);
 
-  // Typing effect for title
+  // Typing effect for title (fixed)
   const [typedTitle, setTypedTitle] = useState('');
   useEffect(() => {
     const fullTitle = 'QUARRY';
     let i = 0;
     setTypedTitle('');
     const interval = setInterval(() => {
-      setTypedTitle((prev) => prev + fullTitle[i]);
-      i++;
-      if (i >= fullTitle.length) clearInterval(interval);
+      setTypedTitle((prev) => {
+        if (i < fullTitle.length) {
+          const next = prev + fullTitle[i];
+          i++;
+          return next;
+        } else {
+          clearInterval(interval);
+          return prev;
+        }
+      });
     }, 120);
     return () => clearInterval(interval);
   }, []);
