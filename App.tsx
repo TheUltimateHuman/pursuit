@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // App.tsx (with Custom Scenario Selection Feature) 
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
@@ -1053,7 +1054,7 @@ const App: React.FC = () => {
       {/* SVG Eye for technohorror motif, below main menu buttons on mobile */}
       <div className="w-full flex justify-center items-center mt-8 mb-2 sm:hidden" aria-hidden="true">
         <img 
-          src="/eye.svg" 
+          src={`${import.meta.env.BASE_URL}eye.svg`} 
           alt="Technohorror Eye" 
           style={{ width: '60px', height: '32px', display: 'block' }}
         />
