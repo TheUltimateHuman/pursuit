@@ -24,11 +24,12 @@ type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fa
 const GLYPH_SET = [
   // Heavily weight star-like glyphs for starfield effect
   ...Array(160).fill('.'),
-  ...Array(100).fill('·'),
-  ...Array(80).fill('•'),
-  ...Array(80).fill('∙'),
-  ...Array(80).fill('°'),
-  ...Array(80).fill('⋅'),
+  ...Array(200).fill('·'),
+  ...Array(100).fill('•'),
+  ...Array(100).fill('∙'),
+  ...Array(100).fill('°'),
+  ...Array(100).fill('⋅'),
+  ...Array(100).fill("'"),
   '∆', 'λ', 'µ', 'π', '†', '‡', '§', '¤', '☠', '☢', '☣', '⚠', '⛧', '⟁',
   '⩫', '⩪', '⩤', '⩥', '⧫', '⧖', '⧗', '⧛', '⧜', '⩶', '⩷', '⩸', '⩹', '⩺', '⩻', '⩼', '⩽', '⩾', '⩿',
   '⪀', '⪁', '⪂', '⪃', '⪄', '⪅', '⪆', '⪇', '⪈', '⪉', '⪊', '⪋', '⪌', '⪍', '⪎', '⪏', '⪐', '⪑',
@@ -72,7 +73,7 @@ const GlyphFieldOverlay: React.FC = () => {
 
   React.useEffect(() => {
     function updateDimensions() {
-      const glyphSize = 32; // px
+      const glyphSize = 18; // px
       const cols = Math.ceil(window.innerWidth / glyphSize);
       const rows = Math.ceil(window.innerHeight / glyphSize);
       setDimensions({ cols, rows });
@@ -98,7 +99,7 @@ const GlyphFieldOverlay: React.FC = () => {
         color: '#ffe066',
         fontFamily: 'JetBrains Mono, monospace',
         fontWeight: 700,
-        fontSize: '1.1rem',
+        fontSize: '0.7rem',
         lineHeight: 1,
         userSelect: 'none',
         mixBlendMode: 'screen',
@@ -766,7 +767,7 @@ const App: React.FC = () => {
                     <button 
                         key="random" 
                         onClick={() => handleStartGameWithTheme("random")}
-                        className={randomThemeButtonClass} 
+                        className={randomThemeButtonClass + " focus:ring-black"} 
                         disabled={isLoading} 
                     > 
                         Random 
