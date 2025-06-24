@@ -107,7 +107,7 @@ const ScenarioSelectorModal: React.FC<ScenarioSelectorModalProps> = ({
               <div key={group.name} className="border border-gray-600" style={{ borderRadius: '4px' }}>
                 <button
                   onClick={() => toggleGenre(group.name)}
-                  className="w-full p-4 text-left bg-gray-700 hover:bg-gray-600 transition-colors duration-150 flex justify-between items-center"
+                  className="w-full p-4 text-left bg-black text-yellow-300 border border-yellow-700 hover:bg-gray-900 transition-colors duration-150 flex justify-between items-center"
                   style={{ borderRadius: '4px' }}
                 >
                   <span className="text-lg font-semibold text-yellow-400">{group.name === 'REALISM' ? 'Realism' : group.name}</span>
@@ -123,7 +123,7 @@ const ScenarioSelectorModal: React.FC<ScenarioSelectorModalProps> = ({
                         <button
                           key={index}
                           onClick={() => handleScenarioClick(group.name, scenario)}
-                          className="p-3 text-left bg-gray-700 hover:bg-gray-600 transition-colors duration-150 text-sm border border-gray-600"
+                          className="p-3 text-left bg-black text-yellow-300 border border-yellow-700 hover:bg-gray-900 transition-colors duration-150 text-sm"
                           style={{ borderRadius: '4px' }}
                         >
                           {scenario}

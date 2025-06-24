@@ -792,7 +792,7 @@ const App: React.FC = () => {
                         <button
                             key="fantasy"
                             onClick={() => handleStartGameWithTheme("fantasy")}
-                            className="w-full font-semibold py-2 px-2 text-base border bg-purple-800 text-purple-100 border-purple-900 hover:bg-purple-700 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-gray-900 text-gray-100 border-gray-700 hover:bg-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
                             disabled={isLoading}
                         >
                             Fantasy
@@ -800,7 +800,7 @@ const App: React.FC = () => {
                         <button
                             key="historical"
                             onClick={() => handleStartGameWithTheme("historical")}
-                            className="w-full font-semibold py-2 px-2 text-base border bg-yellow-700 text-yellow-100 border-yellow-800 hover:bg-yellow-600 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-gray-900 text-gray-100 border-gray-700 hover:bg-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
                             disabled={isLoading}
                         >
                             Historical
@@ -808,7 +808,7 @@ const App: React.FC = () => {
                         <button
                             key="mythological"
                             onClick={() => handleStartGameWithTheme("mythological")}
-                            className="w-full font-semibold py-2 px-2 text-base border bg-emerald-800 text-emerald-100 border-emerald-900 hover:bg-emerald-700 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-gray-900 text-gray-100 border-gray-700 hover:bg-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
                             disabled={isLoading}
                         >
                             Mythological
@@ -816,7 +816,7 @@ const App: React.FC = () => {
                         <button
                             key="science_fiction"
                             onClick={() => handleStartGameWithTheme("sci_fi")}
-                            className="w-full font-semibold py-2 px-2 text-base border bg-cyan-800 text-cyan-100 border-cyan-900 hover:bg-cyan-700 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
+                            className="w-full font-semibold py-2 px-2 text-base border bg-gray-900 text-gray-100 border-gray-700 hover:bg-gray-800 focus:outline-none sm:py-3 sm:px-5 sm:text-lg transition-colors"
                             disabled={isLoading}
                         >
                             Science Fiction
@@ -826,7 +826,7 @@ const App: React.FC = () => {
                     <button 
                       key="select" 
                       onClick={() => setIsCustomScenarioModalVisible(true)} 
-                      className={customThemeButtonClass} 
+                      className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
                       disabled={isLoading} 
                     > 
                       Select... 
@@ -834,7 +834,7 @@ const App: React.FC = () => {
                     <button 
                       key="custom" 
                       onClick={() => setIsCustomScenarioInputVisible(true)} 
-                      className={customThemeButtonClass} 
+                      className="w-full font-semibold py-3 px-5 text-lg border bg-black text-yellow-300 border-yellow-700 hover:bg-gray-900 focus:outline-none transition-colors" 
                       disabled={isLoading} 
                     > 
                       Custom... 
