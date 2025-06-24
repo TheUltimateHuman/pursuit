@@ -10,7 +10,7 @@ import LoadingIndicator from './components/LoadingIndicator';
 import ApiKeyMissingBanner from './components/ApiKeyMissingBanner'; 
 import InventoryDisplay from './components/InventoryDisplay'; 
 import PersistentThreatDisplay from './components/PersistentThreatDisplay'; 
-import { MAX_PLAYER_HEALTH, SCENARIO_THEMES_LIST } from './constants'; 
+import { SCENARIO_THEMES_LIST } from './constants'; 
 import ScenarioSelectorModal from './components/ScenarioSelectorModal'; // <-- IMPORT THE NEW COMPONENT
 
 // --- This is the ONLY configuration needed. It uses the env.js file. --- 
@@ -199,7 +199,8 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null); 
   const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true); 
   
-  const [playerHealth, setPlayerHealth] = useState<number>(MAX_PLAYER_HEALTH); 
+  const [playerHealth, setPlayerHealth] = useState<number>(100);
+  const [playerMaxHealth, setPlayerMaxHealth] = useState<number>(100);
   const [isGameOver, setIsGameOver] = useState<boolean>(false); 
   const [gameOverSummaryText, setGameOverSummaryText] = useState<string | null>(null); 
   const [gameEndType, setGameEndType] = useState<string | null>(null);
@@ -218,7 +219,7 @@ const App: React.FC = () => {
     threat: null, // {name, status, health, senses, etc.}
     flags: {},
     inventory: [],
-    playerHealth: MAX_PLAYER_HEALTH,
+    playerHealth: 100,
   });
 
   const [isCustomChoiceInputVisible, setIsCustomChoiceInputVisible] = useState<boolean>(false); 
@@ -431,9 +432,11 @@ const App: React.FC = () => {
           typeof item === 'string' ? parseInventoryItem(item) : item
         );
         setInventory(initialInventoryItems);
+        setPlayerHealth(apiResponse.playerMaxHealth || 100);
+        setPlayerMaxHealth(apiResponse.playerMaxHealth || 100);
         setIsInitialLoad(false); 
-        tempPlayerHealth = MAX_PLAYER_HEALTH; 
-        setPlayerHealth(MAX_PLAYER_HEALTH); 
+        tempPlayerHealth = apiResponse.playerMaxHealth || 100; 
+        setPlayerHealth(apiResponse.playerMaxHealth || 100);
         setCombatLog([]); 
         setIsInCombat(false); 
 
@@ -478,7 +481,7 @@ const App: React.FC = () => {
         
         let newPlayerHealthThisTurn = tempPlayerHealth; 
         if (playerHeal > 0) { 
-          newPlayerHealthThisTurn = Math.min(MAX_PLAYER_HEALTH, newPlayerHealthThisTurn + playerHeal); 
+          newPlayerHealthThisTurn = Math.min(playerMaxHealth, newPlayerHealthThisTurn + playerHeal); 
         } 
         newPlayerHealthThisTurn -= playerDamage; 
         tempPlayerHealth = Math.max(0, newPlayerHealthThisTurn); 
@@ -564,7 +567,8 @@ const App: React.FC = () => {
   const startGame = useCallback(() => { 
     setIsInitialLoad(true); 
     setInventory([]); 
-    setPlayerHealth(MAX_PLAYER_HEALTH); 
+    setPlayerHealth(100); 
+    setPlayerMaxHealth(100);
     setIsGameOver(false); 
     setGameOverSummaryText(null); 
     setGameEndType(null);
@@ -846,15 +850,15 @@ const App: React.FC = () => {
           <div className="w-full max-w-lg text-center my-4"> 
             <div className="relative w-full bg-gray-700 h-6 border-2 border-gray-600 overflow-hidden shadow-md" style={{ borderRadius: '4px' }}> 
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-                <span className="text-yellow-200 text-sm font-semibold" title={`Health: ${playerHealth}/${MAX_PLAYER_HEALTH}`} aria-label={`Health: ${playerHealth} out of ${MAX_PLAYER_HEALTH}`}>HEALTH</span>
+                <span className="text-yellow-200 text-sm font-semibold" title={`Health: ${playerHealth}/${playerMaxHealth}`} aria-label={`Health: ${playerHealth} out of ${playerMaxHealth}`}>HEALTH</span>
               </div>
               <div 
                 className="bg-gradient-to-r from-red-500 to-red-700 h-full transition-all duration-300 ease-out" 
-                style={{ width: `${Math.max(0, (playerHealth / MAX_PLAYER_HEALTH) * 100)}%`, borderRadius: '2px' }} 
-                aria-valuenow={playerHealth} 
-                aria-valuemin={0} 
-                aria-valuemax={MAX_PLAYER_HEALTH} 
-              ></div> 
+                style={{ width: `${Math.max(0, (playerHealth / playerMaxHealth) * 100)}%`, borderRadius: '2px' }}
+                aria-valuenow={playerHealth}
+                aria-valuemin={0}
+                aria-valuemax={playerMaxHealth}
+              ></div>
             </div> 
           </div> 
         )} 

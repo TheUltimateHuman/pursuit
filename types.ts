@@ -80,6 +80,7 @@ export interface GeminiApiResponse {
   addItem?: string;
   removeItem?: string;
   initialInventory?: string[]; // For player's starting items (1-3)
+  playerMaxHealth?: number; // For setting player's starting health based on character description
   memoryLogSummary?: string; // Concise summary of the current turn for the memory log
   gameplayEffects?: GameplayEffect[]; // New field for emergent effects
   gameOverSummary?: string; // New: Concise summary of game end (e.g., "You perished.")

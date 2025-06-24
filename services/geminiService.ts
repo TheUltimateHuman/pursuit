@@ -218,7 +218,10 @@ export const fetchInitialStory = async (selectedTheme: string, systemMemoryLog: 
       if (parsedResponse.persistentThreatDetails && !parsedResponse.persistentThreatDetails.senses) {
         parsedResponse.persistentThreatDetails.senses = [];
       }
-
+      if (typeof parsedResponse.playerMaxHealth !== 'number' || parsedResponse.playerMaxHealth <= 0) {
+        console.warn("AI did not provide valid playerMaxHealth. Using default of 100.");
+        parsedResponse.playerMaxHealth = 100;
+      }
 
       return parsedResponse; // Success
     } catch (error) {

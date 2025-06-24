@@ -311,7 +311,8 @@ Respond ONLY in valid JSON format. Your tone should balance calculated tension w
     * **Choices & Outcomes:** Player choices and their outcomes MUST be realistic.
     * **Items:** All inventory items MUST be ordinary, real-world objects appropriate to the scenario.
     * **Gameplay Effects (Abilities/Flags):** Any \`player_ability_gain\` must represent realistic skill development (e.g., "Improved Stamina"), knowledge acquisition, or understandable psychological states (e.g., "Heightened Awareness"). NO supernatural powers or magic. Story flags must reflect tangible changes in the real-world situation (e.g., "door_unlocked: true").
-    * **DAMAGE REALISM (CRITICAL):** All combat damage MUST be realistic and appropriate to the actual threat and weaponry involved. There are NO artificial damage caps or limitations. Realistic damage examples: pistol shots (15-25 damage), rifle shots (25-40 damage), knife wounds (10-20 damage), bear attacks (25-45 damage), falls (10-25 damage). If a realistic attack would be lethal, the damage should reflect this reality. Do not artificially limit damage to keep the player alive.
+    * **DAMAGE REALISM (CRITICAL):** All combat damage MUST be realistic and appropriate to the actual threat and weaponry involved. There are NO artificial damage caps or limitations. Combat should be quick and lethal - 100 HP represents the total damage a human can realistically take before death. Realistic damage examples: pistol shots (25-40 damage), rifle shots (40-60 damage), knife wounds (15-30 damage), bear attacks (35-55 damage), falls (20-40 damage). Multiple hits should be cumulative and potentially lethal. If a realistic attack would be lethal, the damage should reflect this reality. Do not artificially limit damage to keep the player alive.
+    * **PLAYER HEALTH SETTING (CRITICAL):** Based on the character description and scenario context, you MUST set an appropriate starting player health value that reflects the character's physical condition, age, fitness level, and any relevant factors. Include this as "playerMaxHealth" in your initial response. Examples: a fit young adult might have 100 HP, an elderly person might have 60-80 HP, someone with pre-existing injuries might have 70-90 HP, a child might have 50-70 HP, a trained athlete might have 100-120 HP. This value should be realistic and consistent with the character's described physical state.
 * **Failure to adhere to this directive for "REALISM" scenarios breaks the game's fundamental promise to the player.**
 
 **HISTORICAL SCENARIO DIRECTIVE (HIGHEST PRIORITY & ABSOLUTE RULE):**
@@ -538,12 +539,12 @@ their condition or the hazard's impact (e.g., taking "damage" from "Hypothermia"
         "isEnemyDefeated": boolean,
         "combatContinues": boolean
       }.
-    * **REALISTIC DAMAGE VALUES FOR REALISM MODE**: When the scenario theme starts with "REALISM:", you MUST deliver realistic damage values based on the actual threat and weaponry involved. There are NO artificial damage caps or limitations. Realistic damage examples:
-        * **Firearms**: Pistol shots (15-25 damage), rifle shots (25-40 damage), shotgun blasts (30-50 damage), multiple hits (cumulative damage)
-        * **Bladed Weapons**: Knife wounds (10-20 damage), machete strikes (20-35 damage), multiple cuts (cumulative damage)
-        * **Blunt Force**: Fists (5-15 damage), clubs/bats (15-30 damage), falls (10-25 damage)
-        * **Animal Attacks**: Bear claws (25-45 damage), wolf bites (15-25 damage), snake venom (20-35 damage per turn)
-        * **Environmental Hazards**: Fire burns (20-40 damage), drowning (30-50 damage), hypothermia (10-20 damage per turn)
+    * **REALISTIC DAMAGE VALUES FOR REALISM MODE**: When the scenario theme starts with "REALISM:", you MUST deliver realistic damage values based on the actual threat and weaponry involved. There are NO artificial damage caps or limitations. Combat should be quick and lethal - 100 HP represents the total damage a human can realistically take before death. Realistic damage examples:
+        * **Firearms**: Pistol shots (25-40 damage), rifle shots (40-60 damage), shotgun blasts (45-70 damage), multiple hits (cumulative damage)
+        * **Bladed Weapons**: Knife wounds (15-30 damage), machete strikes (25-45 damage), multiple cuts (cumulative damage)
+        * **Blunt Force**: Fists (8-20 damage), clubs/bats (20-40 damage), falls (20-40 damage)
+        * **Animal Attacks**: Bear claws (35-55 damage), wolf bites (20-35 damage), snake venom (25-40 damage per turn)
+        * **Environmental Hazards**: Fire burns (30-50 damage), drowning (40-60 damage), hypothermia (15-25 damage per turn)
         * **Multiple Injuries**: Cumulative damage from multiple sources should be realistic and potentially lethal
     * **NO DAMAGE LIMITATIONS**: Do not artificially limit damage to keep the player alive. If a realistic attack would be lethal (e.g., a headshot, multiple gunshot wounds, severe trauma), the damage should reflect this reality. The player's survival should depend on their choices and luck, not artificial damage caps.
     * **DAMAGE SCALING**: Damage should scale appropriately with the threat's capabilities, weaponry, and the severity of the attack. A trained assassin with a high-powered rifle should be able to deliver lethal damage, while an unarmed civilian might cause minimal damage.
