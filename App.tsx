@@ -531,7 +531,7 @@ const App: React.FC = () => {
         </h1> 
         {!isDisplayingInitialStartOptions && currentStory.sceneDescription !== "Welcome to QUARRY." && (
           <p className="text-sm italic text-gray-300 mt-2 font-['Inter'] uppercase">
-            "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MODERN:|SCI_FI:|FANTASY:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
+            "{currentScenarioTheme.replace(/^(REALISM:|HISTORICAL:|MYTHOLOGICAL:|FANTASY:|EXISTENTIAL HORROR:|COSMIC HORROR:|SURREAL:|MUNDANE:|CONTEMPORARY:|MYSTERY:|SCIENCE FICTION:|SCI_FI:|MODERN:)\s*/i, '').replace(/\s*\([^)]*\)$/, '')}"
           </p>
         )}
       </header> 
@@ -790,6 +790,7 @@ const App: React.FC = () => {
                             choices={currentDisplayedChoices} 
                             onChoiceSelected={handleChoiceSelected} 
                             disabled={isLoading} 
+                            isInCombat={currentStory.isInCombat}
                         /> 
                     )} 
                 </> 
