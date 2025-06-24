@@ -23,12 +23,12 @@ type ThemeType = "random" | "realism" | "historical" | "modern" | "sci_fi" | "fa
 // --- GLYPH FIELD OVERLAY COMPONENT (restored) ---
 const GLYPH_SET = [
   // Heavily weight star-like glyphs for starfield effect
-  ...Array(60).fill('.'),
-  ...Array(30).fill('·'),
-  ...Array(20).fill('•'),
+  ...Array(100).fill('.'),
+  ...Array(60).fill('·'),
+  ...Array(40).fill('•'),
   ...Array(20).fill('∙'),
   ...Array(20).fill('°'),
-  ...Array(10).fill('⋅'),
+  ...Array(20).fill('⋅'),
   '∆', 'λ', 'µ', 'π', '†', '‡', '§', '¤', '☠', '☢', '☣', '⚠', '⛧', '⟁',
   '⩫', '⩪', '⩤', '⩥', '⧫', '⧖', '⧗', '⧛', '⧜', '⩶', '⩷', '⩸', '⩹', '⩺', '⩻', '⩼', '⩽', '⩾', '⩿',
   '⪀', '⪁', '⪂', '⪃', '⪄', '⪅', '⪆', '⪇', '⪈', '⪉', '⪊', '⪋', '⪌', '⪍', '⪎', '⪏', '⪐', '⪑',
@@ -98,7 +98,7 @@ const GlyphFieldOverlay: React.FC = () => {
         color: '#ffe066',
         fontFamily: 'JetBrains Mono, monospace',
         fontWeight: 700,
-        fontSize: '2rem',
+        fontSize: '1.1rem',
         lineHeight: 1,
         userSelect: 'none',
         mixBlendMode: 'screen',
@@ -611,11 +611,11 @@ const App: React.FC = () => {
   const isDisplayingInitialStartOptions = isInitialLoad && !isLoading && currentStory.choices.length === 1 && currentStory.choices[0] === "Begin"; 
   const showRegenerateButton = !isInitialLoad && !isLoading && !isGameOver && !isCustomChoiceInputVisible && memoryLog.length <= 1 && currentDisplayedChoices.length > 0; 
 
-  const themeButtonBaseClass = "w-full font-semibold py-3 px-5 shadow-md transition-all duration-150 ease-in-out hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-75 text-lg disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none border"; 
-  const randomThemeButtonClass = `${themeButtonBaseClass} bg-yellow-500 text-black font-bold hover:bg-yellow-400 focus:ring-yellow-300`; 
-  const realismThemeButtonClass = `${themeButtonBaseClass} text-white bg-red-800 hover:bg-red-700 focus:ring-red-600 disabled:bg-red-900 disabled:text-gray-300`; 
-  const specificThemeButtonClass = `${themeButtonBaseClass} text-white bg-gray-600 hover:bg-gray-500 focus:ring-gray-400 disabled:bg-gray-400`; 
-  const customThemeButtonClass = `${themeButtonBaseClass} text-yellow-300 bg-gray-700 hover:bg-gray-600 focus:ring-gray-500 disabled:bg-gray-800`;
+  const themeButtonBaseClass = "w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900 focus:outline-none"; 
+  const randomThemeButtonClass = `${themeButtonBaseClass} bg-yellow-400`; 
+  const realismThemeButtonClass = `${themeButtonBaseClass} text-white bg-red-800`; 
+  const specificThemeButtonClass = `${themeButtonBaseClass} text-white bg-gray-600`; 
+  const customThemeButtonClass = `${themeButtonBaseClass} text-yellow-300 bg-gray-700`;
 
 
   return ( 
@@ -766,17 +766,17 @@ const App: React.FC = () => {
                     <button 
                         key="random" 
                         onClick={() => handleStartGameWithTheme("random")} 
-                        className="w-full font-semibold py-3 px-5 shadow-md text-lg border bg-gray-200 text-gray-900 disabled:bg-gray-100 disabled:text-gray-400"
+                        className={randomThemeButtonClass} 
                         disabled={isLoading} 
                     > 
                         Random 
                     </button> 
-                    <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className="w-full font-semibold py-3 px-5 shadow-md text-lg border bg-red-800 text-white disabled:bg-gray-100 disabled:text-gray-400" disabled={isLoading}>REALISM</button>
+                    <button key="realism" onClick={() => handleStartGameWithTheme("realism")} className={realismThemeButtonClass} disabled={isLoading}>REALISM</button>
                     {/* New category buttons */}
                     <button
                         key="contemporary"
                         onClick={() => handleStartGameWithTheme("modern")}
-                        className="w-full font-semibold py-3 px-5 shadow-md text-lg border bg-gray-200 text-gray-900 disabled:bg-gray-100 disabled:text-gray-400"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
                         disabled={isLoading}
                     >
                         Contemporary
@@ -784,7 +784,7 @@ const App: React.FC = () => {
                     <button
                         key="fantasy"
                         onClick={() => handleStartGameWithTheme("fantasy")}
-                        className="w-full font-semibold py-3 px-5 shadow-md text-lg border bg-gray-200 text-gray-900 disabled:bg-gray-100 disabled:text-gray-400"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
                         disabled={isLoading}
                     >
                         Fantasy
@@ -792,7 +792,7 @@ const App: React.FC = () => {
                     <button
                         key="historical"
                         onClick={() => handleStartGameWithTheme("historical")}
-                        className="w-full font-semibold py-3 px-5 shadow-md text-lg border bg-gray-200 text-gray-900 disabled:bg-gray-100 disabled:text-gray-400"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
                         disabled={isLoading}
                     >
                         Historical
@@ -800,7 +800,7 @@ const App: React.FC = () => {
                     <button
                         key="mythological"
                         onClick={() => handleStartGameWithTheme("mythological")}
-                        className="w-full font-semibold py-3 px-5 shadow-md text-lg border bg-gray-200 text-gray-900 disabled:bg-gray-100 disabled:text-gray-400"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
                         disabled={isLoading}
                     >
                         Mythological
@@ -808,7 +808,7 @@ const App: React.FC = () => {
                     <button
                         key="science_fiction"
                         onClick={() => handleStartGameWithTheme("sci_fi")}
-                        className="w-full font-semibold py-3 px-5 shadow-md text-lg border bg-gray-200 text-gray-900 disabled:bg-gray-100 disabled:text-gray-400"
+                        className="w-full font-semibold py-3 px-5 text-lg border bg-gray-200 text-gray-900"
                         disabled={isLoading}
                     >
                         Science Fiction
@@ -817,7 +817,7 @@ const App: React.FC = () => {
                     <button 
                       key="select" 
                       onClick={() => setIsCustomScenarioModalVisible(true)} 
-                      className="w-full font-semibold py-3 px-5 shadow-md text-lg border bg-gray-700 text-yellow-300 disabled:bg-gray-100 disabled:text-gray-400"
+                      className={customThemeButtonClass} 
                       disabled={isLoading} 
                     > 
                       Select... 
@@ -825,7 +825,7 @@ const App: React.FC = () => {
                     <button 
                       key="custom" 
                       onClick={() => setIsCustomScenarioInputVisible(true)} 
-                      className="w-full font-semibold py-3 px-5 shadow-md text-lg border bg-gray-700 text-yellow-300 disabled:bg-gray-100 disabled:text-gray-400"
+                      className={customThemeButtonClass} 
                       disabled={isLoading} 
                     > 
                       Custom... 
