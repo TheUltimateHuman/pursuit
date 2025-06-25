@@ -5,6 +5,8 @@ interface PersistentThreatDisplayProps {
   threat: PersistentThreat | null;
   message?: string | null;
   isInCombat?: boolean;
+  customMessage?: string;
+  forceTyping?: boolean;
 }
 
 const getVisualIndicator = (status: PersistentThreat['status'], isInCombat?: boolean) => {
@@ -39,12 +41,18 @@ const getVisualIndicator = (status: PersistentThreat['status'], isInCombat?: boo
   }
 };
 
-const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ threat, message, isInCombat }) => {
+const PersistentThreatDisplay: React.FC<PersistentThreatDisplayProps> = ({ 
+  threat, 
+  message, 
+  isInCombat, 
+  customMessage, 
+  forceTyping = false 
+}) => {
   if (!threat) {
     return null;
   }
 
-  const displayMessage = message || threat.lastKnownAction;
+  const displayMessage = forceTyping && customMessage !== undefined ? customMessage : (message || threat.lastKnownAction);
   const visualIndicator = getVisualIndicator(threat.status, isInCombat);
   
   const ariaStatusDescription = visualIndicator.title;

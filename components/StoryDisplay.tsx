@@ -2,18 +2,29 @@ import React, { useState, useEffect, useRef } from 'react';
 
 interface StoryDisplayProps {
   text: string;
+  onTypingStateChange?: (isTyping: boolean) => void;
+  customText?: string;
+  forceTyping?: boolean;
 }
 
-const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
+const StoryDisplay: React.FC<StoryDisplayProps> = ({ text, onTypingStateChange, customText, forceTyping = false }) => {
   const [typedText, setTypedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    if (forceTyping && customText !== undefined) {
+      setTypedText(customText);
+      setIsTyping(customText.length < text.length);
+      onTypingStateChange?.(customText.length < text.length);
+      return;
+    }
+
     let currentCharIndex = 0;
     let cancelled = false;
     setTypedText('');
     setIsTyping(true);
+    onTypingStateChange?.(true);
 
     function typeNextChar() {
       if (cancelled) return;
@@ -23,6 +34,7 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
         timeoutRef.current = setTimeout(typeNextChar, 30);
       } else {
         setIsTyping(false);
+        onTypingStateChange?.(false);
       }
     }
 
@@ -32,7 +44,7 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({ text }) => {
       cancelled = true;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [text]);
+  }, [text, onTypingStateChange, customText, forceTyping]);
 
   return (
     <div className="bg-gray-800 bg-opacity-80 backdrop-blur-sm p-6 shadow-2xl w-full border border-gray-600" style={{ borderRadius: '4px' }}>
