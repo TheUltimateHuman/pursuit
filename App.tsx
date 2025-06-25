@@ -280,19 +280,11 @@ const App: React.FC = () => {
     return () => { cancelled = true; if (blinkInterval) clearInterval(blinkInterval); };
   }, []);
 
-  // When the player presses the button to start the game, stop the blinking cursor
-  useEffect(() => {
-    if (!isInitialLoad) {
-      setShowBlinkCursor(false);
-      setIsUnderscoreVisible(false);
-    }
-  }, [isInitialLoad]);
-
   useEffect(() => { 
     if (!API_KEY_AVAILABLE) { 
       console.error("API_KEY is not available. Check deployment secrets and the local env.js file."); 
     } 
-  }, []); 
+  }, []);
 
   const handleFatalError = useCallback((message: string, gameOver: boolean = true, isNarrativeDefeat: boolean = false, narrativeDemiseScene?: string) => { 
     setIsLoading(false); 
@@ -779,37 +771,30 @@ const App: React.FC = () => {
           title={!isDisplayingInitialStartOptions ? "Click to return to main menu" : undefined}
         >
           <span style={{ position: 'relative', display: 'inline-block' }}>
-            {/* If on main menu, show animated/typing title. If in game, show static title. */}
-            {isInitialLoad ? (
-              <>
-                {typedTitle.split('').map((char, idx) => (
-                  <span key={idx} style={{ position: 'relative', display: 'inline-block', minWidth: '1em' }}>
-                    {char}
-                    {/* Blinking underscore under Y after typing finishes */}
-                    {showBlinkCursor && idx === fullTitle.length - 1 && isUnderscoreVisible && (
-                      <span style={{
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        bottom: '-0.18em',
-                        color: '#ffe066',
-                        fontWeight: 400,
-                        fontFamily: 'inherit',
-                        fontSize: '1.1em',
-                        textAlign: 'center',
-                        zIndex: 0,
-                        pointerEvents: 'none',
-                      }}>
-                        _
-                      </span>
-                    )}
+            {/* Show animated title with blinking cursor on both home screen and game screen */}
+            {typedTitle.split('').map((char, idx) => (
+              <span key={idx} style={{ position: 'relative', display: 'inline-block', minWidth: '1em' }}>
+                {char}
+                {/* Blinking underscore under Y after typing finishes - show on both home and game screen */}
+                {showBlinkCursor && idx === fullTitle.length - 1 && isUnderscoreVisible && (
+                  <span style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: '-0.18em',
+                    color: '#ffe066',
+                    fontWeight: 400,
+                    fontFamily: 'inherit',
+                    fontSize: '1.1em',
+                    textAlign: 'center',
+                    zIndex: 0,
+                    pointerEvents: 'none',
+                  }}>
+                    _
                   </span>
-                ))}
-              </>
-            ) : (
-              // In game: show static title, no underscore
-              <>{fullTitle}</>
-            )}
+                )}
+              </span>
+            ))}
           </span>
         </h1> 
       </header> 
