@@ -766,7 +766,7 @@ const App: React.FC = () => {
   const glyphOverlayRef = React.useRef<{ shuffleGlyphs: () => void }>(null);
 
   return ( 
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-start py-4 md:py-8 px-4 md:px-8 relative" style={{ position: 'relative' }}>
+    <div className={`min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 pl-2 pr-4 selection:bg-red-700 selection:text-white font-['Inter']${isInitialLoad ? ' overflow-hidden' : ''}`} style={{ position: 'relative', zIndex: 1 }}>
       {/* Glyph overlay with ref for shuffling */}
       <GlyphFieldOverlay ref={glyphOverlayRef} currentScenario={currentScenarioTheme} />
       {isLoading && <LoadingIndicator message={isInitialLoad && !currentStory.sceneDescription.startsWith("Welcome") ? "Loading..." : "Processing..."} scenario={currentScenarioTheme} />} 
@@ -812,7 +812,7 @@ const App: React.FC = () => {
             )}
           </span>
         </h1> 
-      </header>
+      </header> 
 
       <main className="w-full max-w-3xl flex flex-col items-center"> 
         
@@ -1184,30 +1184,28 @@ const App: React.FC = () => {
         onScenarioSelected={handleCustomScenarioSelected}
         scenarios={SCENARIO_THEMES_LIST}
       />
-      {/* SVG Eye for technohorror motif, positioned at bottom of content */}
-      {!isLoading && (
-        <img 
-          src="eye.svg" 
-          alt="Technohorror Eye" 
-          style={{ 
-            position: 'absolute',
-            left: '50%',
-            bottom: '18px',
-            transform: 'translateX(-50%)',
-            width: '25%',
-            height: 'auto',
-            display: 'block',
-            cursor: 'pointer',
-            maxWidth: '120px',
-            zIndex: 40,
-          }}
-          className="md:w-[8%] md:max-w-[60px]"
-          onClick={() => glyphOverlayRef.current?.shuffleGlyphs()}
-          tabIndex={0}
-          role="button"
-          aria-label="Shuffle glyphs"
-        />
-      )}
+      {/* SVG Eye for technohorror motif, always fixed at the bottom center, shrunk on desktop */}
+      <img 
+        src="eye.svg" 
+        alt="Technohorror Eye" 
+        style={{ 
+          position: 'fixed',
+          left: '50%',
+          bottom: '18px',
+          transform: 'translateX(-50%)',
+          width: '25%',
+          height: 'auto',
+          display: 'block',
+          cursor: 'pointer',
+          maxWidth: '120px', // Prevents it from being too large on very wide screens
+          zIndex: 40, // Above most content, below modals
+        }}
+        className="md:w-[8%] md:max-w-[60px]"
+        onClick={() => glyphOverlayRef.current?.shuffleGlyphs()}
+        tabIndex={0}
+        role="button"
+        aria-label="Shuffle glyphs"
+      />
 
       {/* Return to Menu Modal */}
       {isReturnToMenuModalVisible && (
