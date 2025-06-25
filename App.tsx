@@ -1178,28 +1178,21 @@ const App: React.FC = () => {
             )}
         </div>
       </main>
-      <ScenarioSelectorModal
-        isOpen={isCustomScenarioModalVisible}
-        onClose={() => setIsCustomScenarioModalVisible(false)}
-        onScenarioSelected={handleCustomScenarioSelected}
-        scenarios={SCENARIO_THEMES_LIST}
-      />
-      {/* SVG Eye for technohorror motif, always fixed at the bottom center, shrunk on desktop */}
+      
+      {/* SVG Eye positioned at bottom of content */}
       {!isLoading && (
         <img 
           src="eye.svg" 
           alt="Technohorror Eye" 
           style={{ 
-            position: 'fixed',
-            left: '50%',
-            bottom: '18px',
-            transform: 'translateX(-50%)',
             width: '25%',
             height: 'auto',
             display: 'block',
             cursor: 'pointer',
-            maxWidth: '120px', // Prevents it from being too large on very wide screens
-            zIndex: 40, // Above most content, below modals
+            maxWidth: '120px',
+            margin: '0 auto',
+            marginTop: '20px',
+            marginBottom: '20px',
           }}
           className="md:w-[6%] md:max-w-[30px]"
           onClick={() => glyphOverlayRef.current?.shuffleGlyphs()}
@@ -1208,6 +1201,13 @@ const App: React.FC = () => {
           aria-label="Shuffle glyphs"
         />
       )}
+      
+      <ScenarioSelectorModal
+        isOpen={isCustomScenarioModalVisible}
+        onClose={() => setIsCustomScenarioModalVisible(false)}
+        onScenarioSelected={handleCustomScenarioSelected}
+        scenarios={SCENARIO_THEMES_LIST}
+      />
 
       {/* Return to Menu Modal */}
       {isReturnToMenuModalVisible && (
