@@ -1185,27 +1185,29 @@ const App: React.FC = () => {
         scenarios={SCENARIO_THEMES_LIST}
       />
       {/* SVG Eye for technohorror motif, always fixed at the bottom center, shrunk on desktop */}
-      <img 
-        src="eye.svg" 
-        alt="Technohorror Eye" 
-        style={{ 
-          position: 'fixed',
-          left: '50%',
-          bottom: '18px',
-          transform: 'translateX(-50%)',
-          width: '25%',
-          height: 'auto',
-          display: 'block',
-          cursor: 'pointer',
-          maxWidth: '120px', // Prevents it from being too large on very wide screens
-          zIndex: 40, // Above most content, below modals
-        }}
-        className="md:w-[8%] md:max-w-[60px]"
-        onClick={() => glyphOverlayRef.current?.shuffleGlyphs()}
-        tabIndex={0}
-        role="button"
-        aria-label="Shuffle glyphs"
-      />
+      {!isLoading && (
+        <img 
+          src="eye.svg" 
+          alt="Technohorror Eye" 
+          style={{ 
+            position: 'fixed',
+            left: '50%',
+            bottom: '18px',
+            transform: 'translateX(-50%)',
+            width: '25%',
+            height: 'auto',
+            display: 'block',
+            cursor: 'pointer',
+            maxWidth: '120px', // Prevents it from being too large on very wide screens
+            zIndex: 40, // Above most content, below modals
+          }}
+          className="md:w-[6%] md:max-w-[30px]"
+          onClick={() => glyphOverlayRef.current?.shuffleGlyphs()}
+          tabIndex={0}
+          role="button"
+          aria-label="Shuffle glyphs"
+        />
+      )}
 
       {/* Return to Menu Modal */}
       {isReturnToMenuModalVisible && (
