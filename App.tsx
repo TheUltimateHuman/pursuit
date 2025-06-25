@@ -237,24 +237,7 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState<boolean>(false);
   const [isSceneTyping, setIsSceneTyping] = useState<boolean>(false);
-  const [sequentialTypingState, setSequentialTypingState] = useState<{
-    isActive: boolean;
-    currentField: string;
-    currentText: string;
-    targetText: string;
-  }>({
-    isActive: false,
-    currentField: '',
-    currentText: '',
-    targetText: ''
-  });
-  const [threatMessageTyping, setThreatMessageTyping] = useState<{
-    isActive: boolean;
-    currentText: string;
-  }>({
-    isActive: false,
-    currentText: ''
-  });
+  const glyphOverlayRef = useRef<{ shuffleGlyphs: () => void }>(null);
 
   // Typing effect for title (simple type-in, then blinking underscore under Y)
   const fullTitle = 'QUARRY';
@@ -773,98 +756,6 @@ const App: React.FC = () => {
   const specificThemeButtonClass = `${themeButtonBaseClass} text-white bg-gray-600`; 
   const customThemeButtonClass = `${themeButtonBaseClass} text-yellow-300 bg-gray-700`;
 
-  // Ref for glyph overlay
-  const glyphOverlayRef = useRef<{ shuffleGlyphs: () => void }>(null);
-
-  // Sequential typing system for game screen text fields
-  const startSequentialTyping = useCallback((sceneDescription: string) => {
-    setSequentialTypingState({
-      isActive: true,
-      currentField: 'sceneDescription',
-      currentText: '',
-      targetText: sceneDescription
-    });
-    setIsSceneTyping(true);
-  }, []);
-
-  const typeNextChar = useCallback(() => {
-    if (!sequentialTypingState.isActive) return;
-
-    setSequentialTypingState(prev => {
-      if (prev.currentText.length < prev.targetText.length) {
-        const nextChar = prev.targetText[prev.currentText.length];
-        return {
-          ...prev,
-          currentText: prev.currentText + nextChar
-        };
-      } else {
-        // Current field finished typing, move to next field
-        if (prev.currentField === 'sceneDescription') {
-          // Move to persistent threat message if available
-          const threatMessage = currentStory.threatEncounterMessage || 
-            (currentStory.persistentThreat?.lastKnownAction || '');
-          
-          if (threatMessage && !isInitialLoad) {
-            setThreatMessageTyping({
-              isActive: true,
-              currentText: ''
-            });
-            return {
-              isActive: true,
-              currentField: 'threatMessage',
-              currentText: '',
-              targetText: threatMessage
-            };
-          }
-        }
-        
-        // No more fields to type
-        setIsSceneTyping(false);
-        return {
-          ...prev,
-          isActive: false
-        };
-      }
-    });
-  }, [sequentialTypingState, currentStory.threatEncounterMessage, currentStory.persistentThreat, isInitialLoad]);
-
-  // Type next character every 30ms when sequential typing is active
-  useEffect(() => {
-    if (!sequentialTypingState.isActive) return;
-
-    const interval = setInterval(typeNextChar, 30);
-    return () => clearInterval(interval);
-  }, [sequentialTypingState.isActive, typeNextChar]);
-
-  // Handle threat message typing
-  useEffect(() => {
-    if (!threatMessageTyping.isActive) return;
-
-    const threatMessage = currentStory.threatEncounterMessage || 
-      (currentStory.persistentThreat?.lastKnownAction || '');
-    
-    if (threatMessageTyping.currentText.length < threatMessage.length) {
-      const interval = setInterval(() => {
-        setThreatMessageTyping(prev => ({
-          ...prev,
-          currentText: threatMessage.slice(0, prev.currentText.length + 1)
-        }));
-      }, 30);
-      return () => clearInterval(interval);
-    } else {
-      // Threat message finished typing
-      setThreatMessageTyping(prev => ({ ...prev, isActive: false }));
-      setIsSceneTyping(false);
-    }
-  }, [threatMessageTyping.isActive, threatMessageTyping.currentText, currentStory.threatEncounterMessage, currentStory.persistentThreat]);
-
-  // Start sequential typing when scene description changes
-  useEffect(() => {
-    if (!isInitialLoad && currentStory.sceneDescription !== "Welcome to QUARRY.") {
-      startSequentialTyping(currentStory.sceneDescription);
-    }
-  }, [currentStory.sceneDescription, isInitialLoad, startSequentialTyping]);
-
   return ( 
     <div className={`min-h-screen bg-gradient-to-br from-red-800 via-black to-red-800 text-white flex flex-col items-center justify-start pt-4 pb-4 pl-2 pr-4 selection:bg-red-700 selection:text-white font-['Inter']${isInitialLoad ? ' overflow-hidden' : ''}`} style={{ position: 'relative', zIndex: 1 }}>
       {/* Glyph overlay with ref for shuffling */}
@@ -914,8 +805,6 @@ const App: React.FC = () => {
                 <StoryDisplay 
                   text={removeAsterisks(currentStory.sceneDescription)} 
                   onTypingStateChange={setIsSceneTyping}
-                  customText={sequentialTypingState.currentText}
-                  forceTyping={sequentialTypingState.isActive}
                 />
                 {showRegenerateButton && (
                     <button
@@ -941,8 +830,6 @@ const App: React.FC = () => {
             }}
             message={currentStory.threatEncounterMessage ? removeAsterisks(currentStory.threatEncounterMessage) : undefined}
             isInCombat={currentStory.isInCombat}
-            customMessage={threatMessageTyping.currentText}
-            forceTyping={threatMessageTyping.isActive}
           />
         )} 
         
