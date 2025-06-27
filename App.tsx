@@ -4,12 +4,14 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'; 
 import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect, InventoryItem, addToInventory, removeFromInventory, parseInventoryItem } from './types'; 
 import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/geminiService'; 
+import { gameLogService } from './services/gameLogService';
 import StoryDisplay from './components/StoryDisplay'; 
 import ChoicesDisplay from './components/ChoicesDisplay'; 
 import LoadingIndicator from './components/LoadingIndicator'; 
 import ApiKeyMissingBanner from './components/ApiKeyMissingBanner'; 
 import InventoryDisplay from './components/InventoryDisplay'; 
 import PersistentThreatDisplay from './components/PersistentThreatDisplay'; 
+import GameLogModal from './components/GameLogModal';
 import { SCENARIO_THEMES_LIST } from './constants'; 
 import ScenarioSelectorModal from './components/ScenarioSelectorModal'; // <-- IMPORT THE NEW COMPONENT
 
@@ -237,6 +239,7 @@ const App: React.FC = () => {
   const [customScenarioText, setCustomScenarioText] = useState<string>("");
   const [isReturnToMenuModalVisible, setIsReturnToMenuModalVisible] = useState<boolean>(false);
   const [isSceneTyping, setIsSceneTyping] = useState<boolean>(false);
+  const [isGameLogModalVisible, setIsGameLogModalVisible] = useState<boolean>(false);
   const glyphOverlayRef = useRef<{ shuffleGlyphs: () => void }>(null);
 
   // Typing effect for title (simple type-in, then blinking underscore under Y)
@@ -742,6 +745,57 @@ const App: React.FC = () => {
     startGame();
   }, [startGame]);
 
+  // Auto-save game log function
+  const saveGameLog = useCallback(async () => {
+    if (isInitialLoad) return; // Don't save on initial load
+    
+    try {
+      await gameLogService.saveGameLog({
+        scenario: currentScenarioTheme || "Unknown Scenario",
+        gameEndType: isGameOver ? (gameEndType as any) || 'player_defeat' : 'ongoing',
+        gameOverSummary: gameOverSummaryText || undefined,
+        memoryLog: [...memoryLog],
+        playerChoices: [...playerChoices],
+        combatLog: [...combatLog],
+        finalInventory: inventory.map(item => ({ name: item.name, quantity: item.quantity })),
+        finalHealth: playerHealth,
+        finalMaxHealth: playerMaxHealth,
+        playerAbilities: [...playerAbilities],
+        storyFlags: { ...storyFlags },
+        totalTurns: playerChoices.length
+      });
+    } catch (error) {
+      console.error('Failed to save game log:', error);
+    }
+  }, [
+    isInitialLoad, currentScenarioTheme, isGameOver, gameEndType, gameOverSummaryText,
+    memoryLog, playerChoices, combatLog, inventory, playerHealth, playerMaxHealth,
+    playerAbilities, storyFlags
+  ]);
+
+  // Auto-save on game over
+  useEffect(() => {
+    if (isGameOver && !isInitialLoad) {
+      saveGameLog();
+    }
+  }, [isGameOver, isInitialLoad, saveGameLog]);
+
+  // Auto-save after each choice (with debouncing)
+  useEffect(() => {
+    if (!isInitialLoad && playerChoices.length > 0 && !isGameOver) {
+      const timeoutId = setTimeout(() => {
+        saveGameLog();
+      }, 1000); // Debounce saves by 1 second
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [playerChoices.length, isInitialLoad, isGameOver, saveGameLog]);
+
+  // Initialize game log service
+  useEffect(() => {
+    gameLogService.init();
+  }, []);
+
   if (!API_KEY_AVAILABLE) { 
     return <ApiKeyMissingBanner />; 
   } 
@@ -1182,10 +1236,10 @@ const App: React.FC = () => {
             marginBottom: '20px',
           }}
           className="md:w-[6%] md:max-w-[30px]"
-          onClick={() => glyphOverlayRef.current?.shuffleGlyphs()}
+          onClick={isDisplayingInitialStartOptions ? () => setIsGameLogModalVisible(true) : () => glyphOverlayRef.current?.shuffleGlyphs()}
           tabIndex={0}
           role="button"
-          aria-label="Shuffle glyphs"
+          aria-label={isDisplayingInitialStartOptions ? "View Game Logs" : "Shuffle glyphs"}
         />
       )}
       
@@ -1194,6 +1248,11 @@ const App: React.FC = () => {
         onClose={() => setIsCustomScenarioModalVisible(false)}
         onScenarioSelected={handleCustomScenarioSelected}
         scenarios={SCENARIO_THEMES_LIST}
+      />
+
+      <GameLogModal
+        isOpen={isGameLogModalVisible}
+        onClose={() => setIsGameLogModalVisible(false)}
       />
 
       {/* Return to Menu Modal */}
