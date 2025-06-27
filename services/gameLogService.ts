@@ -11,6 +11,7 @@ export interface GameLogEntry {
   playerAbilities: Array<{ name: string; description: string; uses?: number }>;
   storyFlags: Record<string, any>;
   totalTurns: number;
+  sessionId: string; // Add session ID to track current game
 }
 
 class GameLogService {
@@ -18,6 +19,7 @@ class GameLogService {
   private dbVersion = 1;
   private storeName = 'gameLogs';
   private db: IDBDatabase | null = null;
+  private currentSessionId: string | null = null;
 
   async init(): Promise<void> {
     if (!window.indexedDB) {
@@ -41,21 +43,37 @@ class GameLogService {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains(this.storeName)) {
-          db.createObjectStore(this.storeName, { keyPath: 'id' });
+          const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
+          store.createIndex('sessionId', 'sessionId', { unique: false });
         }
       };
     });
   }
 
-  async saveGameLog(gameLog: Omit<GameLogEntry, 'id' | 'timestamp'>): Promise<void> {
+  // Start a new game session
+  startNewSession(): string {
+    this.currentSessionId = this.generateId();
+    return this.currentSessionId;
+  }
+
+  // Get current session ID
+  getCurrentSessionId(): string | null {
+    return this.currentSessionId;
+  }
+
+  async saveGameLog(gameLog: Omit<GameLogEntry, 'id' | 'timestamp' | 'sessionId'>): Promise<void> {
+    const sessionId = this.currentSessionId || this.generateId();
+    this.currentSessionId = sessionId;
+
     const entry: GameLogEntry = {
       ...gameLog,
-      id: this.generateId(),
-      timestamp: Date.now()
+      id: sessionId, // Use session ID as the primary key
+      timestamp: Date.now(),
+      sessionId: sessionId
     };
 
     if (this.db) {
-      // Use IndexedDB
+      // Use IndexedDB - this will replace existing entry with same ID
       return new Promise((resolve, reject) => {
         const transaction = this.db!.transaction([this.storeName], 'readwrite');
         const store = transaction.objectStore(this.storeName);
@@ -65,9 +83,16 @@ class GameLogService {
         request.onerror = () => reject(request.error);
       });
     } else {
-      // Fallback to localStorage
+      // Fallback to localStorage - replace existing entry
       const logs = this.getLogsFromLocalStorage();
-      logs.push(entry);
+      const existingIndex = logs.findIndex(log => log.sessionId === sessionId);
+      
+      if (existingIndex >= 0) {
+        logs[existingIndex] = entry;
+      } else {
+        logs.push(entry);
+      }
+      
       this.saveLogsToLocalStorage(logs);
     }
   }

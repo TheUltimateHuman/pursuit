@@ -591,6 +591,9 @@ const App: React.FC = () => {
         combatLog: [], 
         isInCombat: false, 
     }); 
+    
+    // Start a new game session
+    gameLogService.startNewSession();
   }, []); 
 
   const getThemesByType = (themeType: ThemeType): string[] => { 
@@ -643,6 +646,10 @@ const App: React.FC = () => {
     setLastUsedThemeType(null); 
     setLastUsedCustomScenario(scenario); // Store the selected custom scenario
     setCurrentScenarioTheme(scenario); // Set the scenario theme
+    
+    // Start a new game session
+    gameLogService.startNewSession();
+    
     processApiResponse(fetchInitialStory(scenario, systemMemoryLog), true); 
   }, [processApiResponse, setError]);
 
@@ -664,6 +671,10 @@ const App: React.FC = () => {
     setLastUsedCustomScenario(scenarioText);
     setCurrentScenarioTheme(scenarioText); // Set the scenario theme
     setCustomScenarioText("");
+    
+    // Start a new game session
+    gameLogService.startNewSession();
+    
     processApiResponse(fetchInitialStory(scenarioText, systemMemoryLog), true);
   }, [customScenarioText, processApiResponse, setError]);
 
