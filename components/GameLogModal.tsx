@@ -81,7 +81,7 @@ const GameLogModal: React.FC<GameLogModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 border border-gray-600 p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-gray-800 border border-gray-600 p-6 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-white">Game Logs</h2>
           <div className="flex space-x-2">
@@ -103,7 +103,7 @@ const GameLogModal: React.FC<GameLogModalProps> = ({ isOpen, onClose }) => {
 
         <div className="flex-1 flex gap-4 overflow-hidden">
           {/* Game Logs List */}
-          <div className="w-1/2 bg-gray-700 rounded p-4 overflow-y-auto">
+          <div className="w-1/3 bg-gray-700 rounded p-4 overflow-y-auto">
             <h3 className="text-lg font-semibold text-white mb-3">Saved Games</h3>
             {isLoading ? (
               <div className="text-gray-300">Loading...</div>
@@ -149,9 +149,9 @@ const GameLogModal: React.FC<GameLogModalProps> = ({ isOpen, onClose }) => {
             )}
           </div>
 
-          {/* Game Log Details */}
-          <div className="w-1/2 bg-gray-700 rounded p-4 overflow-y-auto">
-            <h3 className="text-lg font-semibold text-white mb-3">Game Details</h3>
+          {/* Story Log Display */}
+          <div className="w-2/3 bg-gray-700 rounded p-4 overflow-y-auto">
+            <h3 className="text-lg font-semibold text-white mb-3">Story Log</h3>
             {selectedLog ? (
               <div className="space-y-4">
                 <div>
@@ -207,43 +207,19 @@ const GameLogModal: React.FC<GameLogModalProps> = ({ isOpen, onClose }) => {
                 )}
 
                 <div>
-                  <h4 className="font-semibold text-white mb-2">Memory Log</h4>
-                  <div className="text-sm text-gray-300 space-y-1 max-h-32 overflow-y-auto">
-                    {selectedLog.memoryLog.map((entry, index) => (
-                      <div key={index} className="border-l-2 border-gray-600 pl-2">
+                  <h4 className="font-semibold text-white mb-2">Complete Story</h4>
+                  <div className="text-sm text-gray-300 space-y-3 max-h-96 overflow-y-auto bg-gray-800 p-4 rounded border border-gray-600">
+                    {selectedLog.storyLog.map((entry, index) => (
+                      <div key={index} className="whitespace-pre-line leading-relaxed">
                         {entry}
                       </div>
                     ))}
                   </div>
                 </div>
-
-                <div>
-                  <h4 className="font-semibold text-white mb-2">Player Choices</h4>
-                  <div className="text-sm text-gray-300 space-y-1 max-h-32 overflow-y-auto">
-                    {selectedLog.playerChoices.map((choice, index) => (
-                      <div key={index} className="border-l-2 border-blue-600 pl-2">
-                        {choice}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {selectedLog.combatLog.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-white mb-2">Combat Log</h4>
-                    <div className="text-sm text-gray-300 space-y-1 max-h-32 overflow-y-auto">
-                      {selectedLog.combatLog.map((entry, index) => (
-                        <div key={index} className="border-l-2 border-red-600 pl-2">
-                          {entry}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             ) : (
               <div className="text-gray-400 text-center py-8">
-                Select a game to view details
+                Select a game to view the complete story
               </div>
             )}
           </div>

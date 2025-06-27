@@ -749,14 +749,55 @@ const App: React.FC = () => {
   const saveGameLog = useCallback(async () => {
     if (isInitialLoad) return; // Don't save on initial load
     
+    // Build comprehensive story log
+    const buildStoryLog = (): string[] => {
+      const storyLog: string[] = [];
+      
+      // Add initial scenario description
+      if (memoryLog.length > 0) {
+        storyLog.push(`SCENARIO: ${currentScenarioTheme || "Unknown Scenario"}\n`);
+        storyLog.push(`${memoryLog[0]}\n`);
+      }
+      
+      // Add story progression
+      for (let i = 0; i < playerChoices.length; i++) {
+        const choice = playerChoices[i];
+        const memoryEntry = memoryLog[i + 1]; // +1 because first entry is initial scene
+        
+        // Add player choice
+        storyLog.push(`\n▶ You chose: ${choice}`);
+        
+        // Add corresponding memory entry (story progression)
+        if (memoryEntry) {
+          storyLog.push(`${memoryEntry}\n`);
+        }
+      }
+      
+      // Add combat log entries if any
+      if (combatLog.length > 0) {
+        storyLog.push(`\n--- COMBAT LOG ---`);
+        combatLog.forEach(entry => {
+          storyLog.push(`▶ ${entry}`);
+        });
+        storyLog.push(`--- END COMBAT ---\n`);
+      }
+      
+      // Add game over summary if game is finished
+      if (isGameOver && gameOverSummaryText) {
+        storyLog.push(`\n--- GAME END ---`);
+        storyLog.push(`${gameOverSummaryText}`);
+        storyLog.push(`--- END GAME ---`);
+      }
+      
+      return storyLog;
+    };
+    
     try {
       await gameLogService.saveGameLog({
         scenario: currentScenarioTheme || "Unknown Scenario",
         gameEndType: isGameOver ? (gameEndType as any) || 'player_defeat' : 'ongoing',
         gameOverSummary: gameOverSummaryText || undefined,
-        memoryLog: [...memoryLog],
-        playerChoices: [...playerChoices],
-        combatLog: [...combatLog],
+        storyLog: buildStoryLog(),
         finalInventory: inventory.map(item => ({ name: item.name, quantity: item.quantity })),
         finalHealth: playerHealth,
         finalMaxHealth: playerMaxHealth,

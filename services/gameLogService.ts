@@ -4,9 +4,7 @@ export interface GameLogEntry {
   scenario: string;
   gameEndType?: 'player_defeat' | 'pursuer_combat_defeat' | 'alternate_win' | 'alternate_loss' | 'ongoing';
   gameOverSummary?: string;
-  memoryLog: string[];
-  playerChoices: string[];
-  combatLog: string[];
+  storyLog: string[]; // Single comprehensive story log
   finalInventory: Array<{ name: string; quantity: number }>;
   finalHealth: number;
   finalMaxHealth: number;
