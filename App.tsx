@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'; 
 import { StoryState, GeminiApiResponse, PersistentThreat, Choice as ChoiceType, CombatOutcome, GameplayEffect, PlayerAbilityEffect, StoryFlagEffect, PursuerModifierEffect, PlayerAbilityUpdateEffect, PlayerAbilityRemoveEffect, InventoryItem, addToInventory, removeFromInventory, parseInventoryItem } from './types'; 
-import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/geminiService'; 
+import { fetchInitialStory, fetchNextStorySegment, InitialStoryData } from './services/ollamaService'; 
 import { gameLogService } from './services/gameLogService';
 import StoryDisplay from './components/StoryDisplay'; 
 import ChoicesDisplay from './components/ChoicesDisplay'; 
@@ -12,12 +12,12 @@ import ApiKeyMissingBanner from './components/ApiKeyMissingBanner';
 import InventoryDisplay from './components/InventoryDisplay'; 
 import PersistentThreatDisplay from './components/PersistentThreatDisplay'; 
 import GameLogModal from './components/GameLogModal';
+import OllamaConnectionStatus from './components/OllamaConnectionStatus';
 import { SCENARIO_THEMES_LIST } from './constants'; 
 import ScenarioSelectorModal from './components/ScenarioSelectorModal'; // <-- IMPORT THE NEW COMPONENT
 
-// --- This is the ONLY configuration needed. It uses the env.js file. --- 
-import { API_KEY as API_KEY_FROM_ENV_JS } from './env.js'; 
-const API_KEY_AVAILABLE = typeof API_KEY_FROM_ENV_JS === 'string' && API_KEY_FROM_ENV_JS.trim() !== ""; 
+// --- Using local Ollama, no API key needed --- 
+const API_KEY_AVAILABLE = true; // Always true for local model
 // --- End Configuration --- 
 
 const MAX_MEMORY_LOG_ENTRIES = 15; 
@@ -1306,6 +1306,8 @@ const App: React.FC = () => {
         isOpen={isGameLogModalVisible}
         onClose={() => setIsGameLogModalVisible(false)}
       />
+
+      <OllamaConnectionStatus />
 
       {/* Return to Menu Modal */}
       {isReturnToMenuModalVisible && (
